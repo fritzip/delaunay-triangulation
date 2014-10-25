@@ -22,14 +22,13 @@
 #define JAR 4
 #define NBL 5
 
-int NB_VERTEX = 40;
+int NB_VERTEX = 20;
 
 const double minX = 0,
 			maxX = 500,
 			minY = 0,
 			maxY = 500,
 			margin = 10;
-
 
 
 /*! variable externe permettant de lire les parametres sur le ligne de commande.*/
@@ -214,7 +213,9 @@ void print_lnk(int LNK)
 			break;
 		case POL: printf("  Polar\n");
 			break;
-		case GRA: printf("  Convex hull\n");
+		case GRA: printf("  Graham\n");
+			break;
+		case JAR: printf("  Jarvis\n");
 			break;
 		default : printf("  Nothing to print\n");
 			break;
@@ -415,7 +416,25 @@ void graham(Dllist *dll)
 
 void jarvis(Dllist *dll)
 {
-
+	Vertex *p = dll->root->links[LEX][FWD];
+	Vertex *q = NULL;
+	Vertex *r = NULL;
+	add_end_dll(dll, p, JAR);
+	do
+	{
+		q = p->links[POL][FWD];
+		r = q->links[POL][FWD];
+		while (r != dll->root)
+		{
+			if ( orientation(p, q, r) >= 0 )
+			{
+				q = r;
+			}			
+			r = r->links[POL][FWD];
+		}
+		p = q;
+		add_end_dll(dll, p, JAR);
+	} while (p != dll->root->links[POL][BWD]);
 }
 
 
@@ -501,6 +520,16 @@ void init_links(Dllist *dll, int LNK)
 			}
 			break;
 
+		case JAR:
+			if (dll->up2date[POL])
+				jarvis(dll); 
+			else
+			{
+				init_links(dll, POL);
+				init_links(dll, JAR);
+			}
+			break;
+
 		default: printf("Error in init_links function\n");
 			break;
 	}
@@ -540,12 +569,13 @@ void display (void)
 	Dllist *dll_lnk = create_rd_data_struct();
 
 	init_links(dll_lnk, GRA);
+	init_links(dll_lnk, JAR);
 
 	print_dll(dll_lnk, STD);
 	print_dll(dll_lnk, LEX);
 	print_dll(dll_lnk, POL);
 	print_dll(dll_lnk, GRA);
-
+	print_dll(dll_lnk, JAR);
 
 	glBegin(GL_LINE_LOOP);
 	glColor3f(1.0, 0.0, 0.0);
@@ -564,7 +594,7 @@ void display (void)
 	glBegin(GL_LINE_LOOP);
 	glColor3f(1.0, 1.0, 1.0);
 
-	LNK = GRA;
+	LNK = JAR;
 	current = dll_lnk->root->links[LNK][FWD];
 
 	for(int i = 0; i < dll_lnk->length[LNK]; i++)
