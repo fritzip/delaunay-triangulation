@@ -10,6 +10,8 @@
 //                                  #define
 /*----------------------------------------------------------------------------------*/
 
+#define DEBUG 0
+
 #define DIM 2
 
 #define BWD 0 
@@ -20,7 +22,9 @@
 #define POL 2
 #define GRA 3
 #define JAR 4
-#define NBL 5
+#define LXC 5
+#define DAC 6
+#define NBL 7 // Nb de Liens : A incrémenter manuellement, LAST + 1
 
 int NB_VERTEX = 20;
 
@@ -60,6 +64,10 @@ typedef struct
 } Dllist;
 
 
+#if(DEBUG == 1)
+	void debug()
+
+#endif
 /*----------------------------------------------------------------------------------*/
 //                                  Geometry functions
 /*----------------------------------------------------------------------------------*/
@@ -155,6 +163,35 @@ void add_begin_dll(Dllist *dll, Vertex *vert, int LNK)
 	dll->length[LNK]++;
 }
 
+void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, int LNK)
+{
+	ins->links[LNK][FWD] = prev->links[LNK][FWD];
+	ins->links[LNK][FWD]->links[LNK][BWD] = ins;
+	ins->links[LNK][BWD] = prev;
+	prev->links[LNK][FWD] = ins;
+	dll->length[LNK]++;
+}
+
+void rm_after(Dllist *dll, Vertex *prev, int LNK)
+{
+	Vertex *rm = prev->links[LNK][FWD];
+	rm->links[LNK][FWD]->links[LNK][BWD] = prev;
+	rm->links[LNK][BWD]->links[LNK][FWD] = rm->links[LNK][FWD];
+	rm->links[LNK][FWD] = NULL;
+	rm->links[LNK][BWD] = NULL;
+	dll->length[LNK]--;
+}	
+
+void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int LNK)
+{
+	insert_after(dll, inf, ins, LNK);
+	Vertex *current = ins ;
+	while (current->links[LNK][FWD] != sup)
+	{
+		rm_after(dll, current, LNK);
+		current = current->links[LNK][FWD];
+	}
+}
 
 void rm_end_dll(Dllist *dll, int LNK)
 {
@@ -170,7 +207,6 @@ void rm_end_dll(Dllist *dll, int LNK)
 	else
 		printf("Cannot remove in empty list\n");
 }
-
 
 void rm_begin_dll(Dllist *dll, Vertex *vert, int LNK)
 {
@@ -216,6 +252,10 @@ void print_lnk(int LNK)
 		case GRA: printf("  Graham\n");
 			break;
 		case JAR: printf("  Jarvis\n");
+			break;
+		case LXC: printf("  Insertion Lexico\n");
+			break;
+		case DAC: printf("  Divide & Conquer\n");
 			break;
 		default : printf("  Nothing to print\n");
 			break;
@@ -530,6 +570,30 @@ void init_links(Dllist *dll, int LNK)
 			}
 			break;
 
+		case LXC:
+			if (dll->up2date[LEX]) 
+			{
+				// insertionlexico(dll); 
+			}
+			else
+			{
+				init_links(dll, LEX);
+				init_links(dll, LXC);
+			}
+			break;
+
+		case DAC:
+			if (dll->up2date[LEX]) 
+			{
+				// divideandconquer(dll); 
+			}
+			else
+			{
+				init_links(dll, LEX);
+				init_links(dll, DAC);
+			}
+			break;
+
 		default: printf("Error in init_links function\n");
 			break;
 	}
@@ -603,7 +667,7 @@ void display (void)
 		current = current->links[LNK][FWD];
 	}
 
-	remove_data_struct(dll_lnk);
+	// remove_data_struct(dll_lnk);
 
 	glEnd();
 	glFlush();
