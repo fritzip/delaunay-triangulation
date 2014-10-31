@@ -189,7 +189,6 @@ void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int LNK)
 	while (current->links[LNK][FWD] != sup)
 	{
 		rm_after(dll, current, LNK);
-		current = current->links[LNK][FWD];
 	}
 }
 
