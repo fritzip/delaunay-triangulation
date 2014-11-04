@@ -274,10 +274,10 @@ void print_lnk(int LNK)
 
 void print_info(Dllist *dll, int LNK)
 {
-	printf("=================\n");
+	printf("=====================\n");
 	print_lnk(LNK);
 	printf("  Length : %d \n", dll->length[LNK]);
-	printf("=================\n");
+	printf("=====================\n");
 }
 
 
@@ -807,6 +807,21 @@ void winInit (void)
 	gluOrtho2D(minX, maxX, minY, maxY);
 }
 
+void affiche(Dllist *dll, int LNK, int GL_DRAW_STYLE, double r, double g, double b)
+{
+	glBegin(GL_DRAW_STYLE);
+	glColor3f(r, g, b);
+
+	Vertex *current = dll->root->links[LNK][FWD];
+
+	for(int i = 0; i < dll->length[LNK]; i++)
+	{
+		glVertex2f(current->coords[0], current->coords[1]);
+		current = current->links[LNK][FWD];
+	}
+
+	glEnd();
+}
 
 void display (void)
 {
@@ -829,35 +844,11 @@ void display (void)
 	print_dll(dll_lnk, LXC);
 	print_dll(dll_lnk, DAC);
 
-	glBegin(GL_LINE_LOOP);
-	glColor3f(1.0, 0.0, 0.0);
-
-	int LNK = STD;
-	Vertex *current = dll_lnk->root->links[LNK][FWD];
-
-	for(int i = 0; i < dll_lnk->length[LNK]; i++)
-	{
-		glVertex2f(current->coords[0], current->coords[1]);
-		current = current->links[LNK][FWD];
-	}
-
-	glEnd();
-
-	glBegin(GL_LINE_LOOP);
-	glColor3f(1.0, 1.0, 1.0);
-
-	LNK = DAC;
-	current = dll_lnk->root->links[LNK][FWD];
-
-	for(int i = 0; i < dll_lnk->length[LNK]; i++)
-	{
-		glVertex2f(current->coords[0], current->coords[1]);
-		current = current->links[LNK][FWD];
-	}
-
+	affiche(dll_lnk, STD, GL_LINE_LOOP, 1.0, 0.0, 0.0);
+	affiche(dll_lnk, DAC, GL_LINE_LOOP, 1.0, 1.0, 1.0);
+	
 	// remove_data_struct(dll_lnk);
 
-	glEnd();
 	glFlush();
 }
 
