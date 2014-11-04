@@ -26,7 +26,8 @@
 #define DAC 6
 #define NBL 7 // Nb de Liens : A incrémenter manuellement, LAST + 1
 
-int NB_VERTEX = 20;
+#define NB_VERTEX_TOTAL 20
+const int NB_VERTEX = NB_VERTEX_TOTAL;
 
 const double minX = 0,
 			maxX = 500,
@@ -62,6 +63,15 @@ typedef struct
 	int up2date[NBL];
 	Vertex *root;
 } Dllist;
+
+// TABLEAU GLOBAL //
+Vertex *tablex[NB_VERTEX_TOTAL];
+
+typedef struct
+{
+    Vertex *vmin;
+    Vertex *vmax;
+} EConv;
 
 
 #if(DEBUG == 1)
@@ -323,6 +333,18 @@ void print_dll_full(Dllist *dll, int LNK)
 //                      Create and remove data struct functions
 /*----------------------------------------------------------------------------------*/
 
+void inittab(Dllist *dll)
+{
+	// Initialisation du tableau
+	int LNK = LEX;
+	Vertex *current = dll->root->links[LNK][FWD];
+	for (int i = 0;i < NB_VERTEX;i++)
+	{
+		tablex[i]=current;
+		current = current->links[LNK][FWD];
+	}
+}
+
 Dllist* create_rd_data_struct()
 {
 	Dllist* dll_lnk = create_dll();
@@ -477,6 +499,184 @@ void jarvis(Dllist *dll)
 }
 
 
+void lexconvex(Dllist *dll){
+	Vertex *first = dll->root->links[LEX][FWD];
+	Vertex *deuze = first->links[LEX][FWD];
+	Vertex *current = deuze->links[LEX][FWD];
+	Vertex *aplacer = NULL;
+	Vertex *maxlex = NULL;
+	Vertex *bot = NULL;
+	int debugi = 0;
+	
+	if (1==orientation(first, deuze, current)){
+		// Si le triangle est CW, on lie les points directement
+		first->links[LXC][FWD]=deuze;
+		deuze->links[LXC][FWD]=current;
+		current->links[LXC][FWD]=first;
+		// Dans les deux sens
+		first->links[LXC][BWD]=current;
+		deuze->links[LXC][BWD]=first;
+		current->links[LXC][BWD]=deuze;
+	}else{
+		//Sinon, s'il est CCW, on les lie dans le sens inverse
+		first->links[LXC][FWD]=current;
+		deuze->links[LXC][FWD]=first;
+		current->links[LXC][FWD]=deuze;
+		// Dans les deux sens
+		first->links[LXC][BWD]=deuze;
+		deuze->links[LXC][BWD]=current;
+		current->links[LXC][BWD]=first;	
+	}
+
+	while ((current->links[LEX][FWD] != dll->root)){ // Tant qu'on a pas fait le tour des points à placer...
+		debugi++;	
+		aplacer=current->links[LEX][FWD];	
+		maxlex=current;
+		while (1==orientation(current, aplacer, current->links[LXC][FWD])){ // On check si l'angle est CW	
+			current=current->links[LXC][FWD]; // On avance
+			current->links[LXC][BWD]->links[LXC][FWD]=NULL; // Et on détruit le liens avec le précédent
+			current->links[LXC][BWD]=NULL; // Dans les deux sens
+		}
+		bot=current;
+		current = maxlex; // On réinitialise current
+		while (0>=orientation(current, aplacer, current->links[LXC][BWD])){ // On check si l'angle est CCW	
+			current=current->links[LXC][BWD]; // On recule
+			current->links[LXC][FWD]->links[LXC][BWD]=NULL; // Et on détruit le liens avec le suivant
+			current->links[LXC][FWD]=NULL; // Dans les deux sens
+		}
+		bot->links[LXC][BWD]=aplacer; // Puis on crée la nouvelle arrete
+		aplacer->links[LXC][FWD]=bot;
+		current->links[LXC][FWD]=aplacer; // Puis on crée la nouvelle arrete
+		aplacer->links[LXC][BWD]=current; // Dans les deux sens	
+		current = aplacer; // Et on remet le curseur sur le dernier placé	
+	}
+	dll->root->links[LXC][FWD] = dll->root->links[LEX][FWD];
+	dll->root->links[LXC][BWD] = dll->root->links[LEX][BWD];
+	int size=1;
+	current=dll->root->links[LXC][FWD];
+	first=dll->root->links[LXC][FWD];
+	while (current->links[LXC][FWD]!=first){
+		size++;
+		current=current->links[LXC][FWD];
+		//printf(" Current = %d,%d\n", current->coords[0],current->coords[1]);
+	}
+	dll->length[LXC] = size;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// FUSION /////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+EConv miniConvexe(int idmin, int idmax){
+        EConv EC;
+        if (2==(idmax-idmin)) {
+            if (1==orientation(tablex[idmin],tablex[idmin+1],tablex[idmax])){
+                tablex[idmin]->links[DAC][BWD]=tablex[idmin+1];
+                tablex[idmin+1]->links[DAC][BWD]=tablex[idmax];
+                tablex[idmax]->links[DAC][BWD]=tablex[idmin];
+                tablex[idmin]->links[DAC][FWD]=tablex[idmax];
+                tablex[idmin+1]->links[DAC][FWD]=tablex[idmin];
+                tablex[idmax]->links[DAC][FWD]=tablex[idmin+1];
+            } else {
+                tablex[idmin]->links[DAC][FWD]=tablex[idmin+1];
+                tablex[idmin+1]->links[DAC][FWD]=tablex[idmax];
+                tablex[idmax]->links[DAC][FWD]=tablex[idmin];
+                tablex[idmin]->links[DAC][BWD]=tablex[idmax];
+                tablex[idmin+1]->links[DAC][BWD]=tablex[idmin];
+                tablex[idmax]->links[DAC][BWD]=tablex[idmin+1];
+            }
+        }
+        if (1==(idmax-idmin)){
+            tablex[idmax]->links[DAC][BWD]=tablex[idmin];
+            tablex[idmax]->links[DAC][FWD]=tablex[idmin];
+            tablex[idmin]->links[DAC][FWD]=tablex[idmax];
+            tablex[idmin]->links[DAC][BWD]=tablex[idmax];
+        }
+        if (0==(idmax-idmin)){
+            tablex[idmax]->links[DAC][BWD]=tablex[idmax];
+            tablex[idmax]->links[DAC][FWD]=tablex[idmax];
+        }
+        /*for (int i=0; i<4; i++){
+            tablex[idmin] = tablex[idmin]->links[6][FWD];
+        }*/
+        EC.vmax=tablex[idmax];
+        EC.vmin=tablex[idmin];
+        return EC;
+} 
+  
+EConv fusionec(EConv ECg, EConv ECd){
+    EConv EC;
+    Vertex *g=ECg.vmax;
+    Vertex *d=ECd.vmin;
+    Vertex *tg=ECg.vmax;
+    Vertex *td=ECd.vmin;
+    // On ajoute l'arete du bas
+    while (-1==orientation(g, d, d->links[6][BWD]) || (1==orientation(d, g, g->links[6][FWD]))){
+            if (-1==orientation(g, d, d->links[6][BWD])){
+                d=d->links[6][BWD];         
+            }
+            if (1==orientation(d, g, g->links[6][FWD])){
+                g=g->links[6][FWD];      
+            }
+    }
+    tg = g;
+    td = d;
+    // On ajoute l'arete du haut
+    g=ECg.vmax;
+    d=ECd.vmin;
+    while (1==orientation(g, d, d->links[6][FWD]) || (-1==orientation(d, g, g->links[6][BWD]))){
+            if (1==orientation(g, d, d->links[6][FWD])){
+                d=d->links[6][FWD];             
+            }
+            if (-1==orientation(d, g, g->links[6][BWD])){
+                g=g->links[6][BWD];
+            }
+    }
+    g->links[6][FWD]=d;
+    d->links[6][BWD]=g;
+    tg->links[6][BWD]=td;
+    td->links[6][FWD]=tg;
+    // Et on retourne l'EC fusionnée
+    EC.vmax=ECd.vmax;
+    EC.vmin=ECg.vmin;
+    return EC;
+}  
+  
+EConv divideAndConquer(int idmin, int idmax){
+    EConv EC;
+    EConv ECg;
+    EConv ECd;
+    if (2>=(idmax-idmin)){
+        EC = miniConvexe(idmin,idmax);
+    }else{
+        ECg=divideAndConquer(idmin, ((idmax-idmin)/2)+idmin);
+        ECd=divideAndConquer(((idmax-idmin)/2)+idmin+1, idmax);
+        EC = fusionec(ECg,ECd);
+    }
+    return EC;
+}
+
+void divac(Dllist *dll){
+	divideAndConquer(0, NB_VERTEX-1);
+	dll->length[DAC]=dll->length[JAR];
+	dll->root->links[DAC][FWD] = dll->root->links[LEX][FWD];
+	dll->root->links[DAC][BWD] = dll->root->links[LEX][BWD];
+	//dll->length[DAC] = dll->length[JAR];
+	int size=1;
+	Vertex *current=dll->root->links[LXC][FWD];
+	Vertex *first=dll->root->links[LXC][FWD];
+	while (current->links[LXC][FWD]!=first){
+		size++;
+		current=current->links[LXC][FWD];
+		//printf(" Current = %d,%d\n", current->coords[0],current->coords[1]);
+	}
+	dll->length[LXC] = size;
+}
+
 Vertex* merge(Vertex* p, int P, Vertex* q, int Q, Dllist *dll, int LNK)
 {
 	while (1)
@@ -572,7 +772,7 @@ void init_links(Dllist *dll, int LNK)
 		case LXC:
 			if (dll->up2date[LEX]) 
 			{
-				// insertionlexico(dll); 
+				lexconvex(dll);
 			}
 			else
 			{
@@ -584,7 +784,8 @@ void init_links(Dllist *dll, int LNK)
 		case DAC:
 			if (dll->up2date[LEX]) 
 			{
-				// divideandconquer(dll); 
+				inittab(dll);
+				divac(dll);
 			}
 			else
 			{
@@ -611,39 +812,27 @@ void display (void)
 {
 	glColor3f(0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(1.0, 1.0, 1.0);
-		
-	switch (displayChoice)
-	{
-		case 0: glBegin(GL_POINTS);
-				break;
-		case 1: glBegin(GL_LINES);
-				break;
-		case 2: glBegin(GL_LINE_STRIP);
-				break;
-		case 3: glBegin(GL_LINE_LOOP);
-				break;
-		default: glBegin(GL_POLYGON);
-				break;
-	}
-	glEnd();
 
 	//----------------------------------------------------------//
 	Dllist *dll_lnk = create_rd_data_struct();
 
 	init_links(dll_lnk, GRA);
 	init_links(dll_lnk, JAR);
+	init_links(dll_lnk, LXC);
+	init_links(dll_lnk, DAC);
 
 	print_dll(dll_lnk, STD);
 	print_dll(dll_lnk, LEX);
 	print_dll(dll_lnk, POL);
 	print_dll(dll_lnk, GRA);
 	print_dll(dll_lnk, JAR);
+	print_dll(dll_lnk, LXC);
+	print_dll(dll_lnk, DAC);
 
 	glBegin(GL_LINE_LOOP);
 	glColor3f(1.0, 0.0, 0.0);
 
-	int LNK = POL;
+	int LNK = STD;
 	Vertex *current = dll_lnk->root->links[LNK][FWD];
 
 	for(int i = 0; i < dll_lnk->length[LNK]; i++)
@@ -657,7 +846,7 @@ void display (void)
 	glBegin(GL_LINE_LOOP);
 	glColor3f(1.0, 1.0, 1.0);
 
-	LNK = JAR;
+	LNK = DAC;
 	current = dll_lnk->root->links[LNK][FWD];
 
 	for(int i = 0; i < dll_lnk->length[LNK]; i++)
