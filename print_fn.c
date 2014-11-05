@@ -8,7 +8,7 @@
 //                                  Print functions
 /*----------------------------------------------------------------------------------*/
 
-void print_lnk(int LNK)
+void print_lnk(int const LNK)
 {
 	switch (LNK)
 	{
@@ -32,7 +32,7 @@ void print_lnk(int LNK)
 }
 
 
-void print_info(Dllist *dll, int LNK)
+void print_info(Dllist const *dll, int const LNK)
 {
 	printf("=====================\n");
 	print_lnk(LNK);
@@ -41,7 +41,7 @@ void print_info(Dllist *dll, int LNK)
 }
 
 
-void print_vertex(Vertex *vert)
+void print_vertex(Vertex const *vert)
 {
 	for (int i = 0; i < DIM; i++)
 	{
@@ -51,7 +51,7 @@ void print_vertex(Vertex *vert)
 }
 
 
-void print_dll(Dllist *dll, int LNK)
+void print_dll(Dllist const *dll, int const LNK)
 {
 	Vertex *temp = dll->root->links[LNK][FWD];
 	int n = 0;
@@ -67,7 +67,7 @@ void print_dll(Dllist *dll, int LNK)
 }
 
 
-void print_dll_full(Dllist *dll, int LNK)
+void print_dll_full(Dllist const *dll, int const LNK)
 {
 	Vertex *tempfw = dll->root;
 	Vertex *tempbw = dll->root;

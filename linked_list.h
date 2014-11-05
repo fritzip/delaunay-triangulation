@@ -28,21 +28,21 @@ Vertex* create_vert( int coords[DIM] );
 
 Dllist* create_dll(void);
 
-void add_end_dll(Dllist *dll, Vertex *vert, int LNK);
+void add_end_dll(Dllist *dll, Vertex *vert, int const LNK);
 
-void add_begin_dll(Dllist *dll, Vertex *vert, int LNK);
+void add_begin_dll(Dllist *dll, Vertex *vert, int const LNK);
 
-void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, int LNK);
+void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, int const LNK);
 
-void rm_after(Dllist *dll, Vertex *prev, int LNK);
+void rm_after(Dllist *dll, Vertex *prev, int const LNK);
 
-void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int LNK);
+void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int const LNK);
 
-void rm_end_dll(Dllist *dll, int LNK);
+void rm_end_dll(Dllist *dll, int const LNK);
 
-void rm_begin_dll(Dllist *dll, Vertex *vert, int LNK);
+void rm_begin_dll(Dllist *dll, Vertex *vert, int const LNK);
 
-void copy_order(Dllist *dll, int SRC, int DEST);
+void copy_order(Dllist *dll, int const SRC, int const DEST);
 
 
 /*----------------------------------------------------------------------------------*/
@@ -51,7 +51,7 @@ void copy_order(Dllist *dll, int SRC, int DEST);
 
 void inittab(Dllist *dll);
 
-void init_links(Dllist *dll, int LNK);
+void init_links(Dllist *dll, int const LNK);
 
 Dllist* create_rd_data_struct();
 

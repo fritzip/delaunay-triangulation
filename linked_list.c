@@ -46,7 +46,7 @@ Dllist* create_dll(void)
 }
 
 
-void add_end_dll(Dllist *dll, Vertex *vert, int LNK)
+void add_end_dll(Dllist *dll, Vertex *vert, int const LNK)
 {
 	vert->links[LNK][BWD] = dll->root->links[LNK][BWD];
 	vert->links[LNK][FWD] = dll->root;
@@ -56,7 +56,7 @@ void add_end_dll(Dllist *dll, Vertex *vert, int LNK)
 }
 
 
-void add_begin_dll(Dllist *dll, Vertex *vert, int LNK)
+void add_begin_dll(Dllist *dll, Vertex *vert, int const LNK)
 {
 	vert->links[LNK][BWD] = dll->root; 
 	vert->links[LNK][FWD] = dll->root->links[LNK][FWD];
@@ -65,7 +65,7 @@ void add_begin_dll(Dllist *dll, Vertex *vert, int LNK)
 	dll->length[LNK]++;
 }
 
-void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, int LNK)
+void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, int const LNK)
 {
 	ins->links[LNK][FWD] = prev->links[LNK][FWD];
 	ins->links[LNK][FWD]->links[LNK][BWD] = ins;
@@ -74,7 +74,7 @@ void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, int LNK)
 	dll->length[LNK]++;
 }
 
-void rm_after(Dllist *dll, Vertex *prev, int LNK)
+void rm_after(Dllist *dll, Vertex *prev, int const LNK)
 {
 	Vertex *rm = prev->links[LNK][FWD];
 	rm->links[LNK][FWD]->links[LNK][BWD] = prev;
@@ -84,7 +84,7 @@ void rm_after(Dllist *dll, Vertex *prev, int LNK)
 	dll->length[LNK]--;
 }	
 
-void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int LNK)
+void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int const LNK)
 {
 	insert_after(dll, inf, ins, LNK);
 	Vertex *current = ins ;
@@ -94,7 +94,7 @@ void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int LNK)
 	}
 }
 
-void rm_end_dll(Dllist *dll, int LNK)
+void rm_end_dll(Dllist *dll, int const LNK)
 {
 	if ( dll->length[LNK] > 0 )
 	{
@@ -109,7 +109,7 @@ void rm_end_dll(Dllist *dll, int LNK)
 		printf("Cannot remove in empty list\n");
 }
 
-void rm_begin_dll(Dllist *dll, Vertex *vert, int LNK)
+void rm_begin_dll(Dllist *dll, Vertex *vert, int const LNK)
 {
 	if ( dll->length[LNK] > 0 )
 	{
@@ -124,7 +124,7 @@ void rm_begin_dll(Dllist *dll, Vertex *vert, int LNK)
 		printf("Cannot remove in empty list\n");
 }
 
-void copy_order(Dllist *dll, int SRC, int DEST)
+void copy_order(Dllist *dll, int const SRC, int const DEST)
 {
 	Vertex *temp = dll->root;
 	for (int i = 0; i <= dll->length[STD]; i++)
@@ -142,7 +142,7 @@ void copy_order(Dllist *dll, int SRC, int DEST)
 //                      Create and remove data struct functions
 /*----------------------------------------------------------------------------------*/
 
-void init_links(Dllist *dll, int LNK)
+void init_links(Dllist *dll, int const LNK)
 {
 	switch (LNK)
 	{
