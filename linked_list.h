@@ -40,10 +40,13 @@ void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int const LN
 
 void rm_end_dll(Dllist *dll, int const LNK);
 
-void rm_begin_dll(Dllist *dll, Vertex *vert, int const LNK);
+void rm_begin_dll(Dllist *dll, int const LNK);
 
 void copy_order(Dllist *dll, int const SRC, int const DEST);
 
+void move_after(Vertex *p, Vertex *q, int const LNK);
+
+void switch_cells(Vertex *p, Vertex *q, int const LNK);
 
 /*----------------------------------------------------------------------------------*/
 //                      Create and remove data struct functions

@@ -19,12 +19,6 @@ typedef struct
 
 int isSuperior(Vertex *p, Vertex *q, Dllist *dll, int LNK);
 
-int isInferior(Vertex *p, Vertex *q, Dllist *dll, int LNK);
-
-void insNextAfter(Vertex *p, Vertex *q, int LNK);
-
-void switchCells(Vertex *p, Vertex *q, int LNK);
-
 /*----------------------------------------------------------------------------------*/
 //                                  Algos
 /*----------------------------------------------------------------------------------*/

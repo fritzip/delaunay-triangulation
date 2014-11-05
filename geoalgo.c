@@ -20,58 +20,6 @@ int isSuperior(Vertex* p, Vertex *q, Dllist *dll, int LNK)
 	return -1;
 }
 
-int isInferior(Vertex *p, Vertex *q, Dllist *dll, int LNK)
-{
-	return 1 - isSuperior(p, q, dll, LNK);
-}
-
-void insNextAfter(Vertex *p, Vertex *q, int LNK)
-{
-	Vertex *t = q->links[LNK][FWD];
-
-	q->links[LNK][FWD] = t->links[LNK][FWD];
-	q->links[LNK][FWD]->links[LNK][BWD] = q;
-	 
-	t->links[LNK][BWD] = p;
-	t->links[LNK][FWD] = p->links[LNK][FWD];
-	p->links[LNK][FWD]->links[LNK][BWD] = t;
-	p->links[LNK][FWD] = t;
-}
-
-void switchCells(Vertex *p, Vertex *q, int LNK)
-{
-	if (p->links[LNK][FWD]==q )
-	{
-		p->links[LNK][BWD]->links[LNK][FWD] = q;
-		q->links[LNK][FWD]->links[LNK][BWD] = p;
-		p->links[LNK][FWD] = q->links[LNK][FWD];
-		q->links[LNK][BWD] = p->links[LNK][BWD];
-		p->links[LNK][BWD] = q;
-		q->links[LNK][FWD] = p;
-	}
-	else if ( q->links[LNK][FWD]==p )
-	{
-		switchCells(q, p, LNK);
-	}
-	else
-	{
-		Vertex *tpbwd = p->links[LNK][BWD];
-		Vertex *tpfwd = p->links[LNK][FWD];
-		Vertex *tqbwd = q->links[LNK][BWD];
-		Vertex *tqfwd = q->links[LNK][FWD];
-
-		p->links[LNK][FWD]->links[LNK][BWD] = q;
-		q->links[LNK][FWD]->links[LNK][BWD] = p;
-		p->links[LNK][BWD]->links[LNK][FWD] = q;
-		q->links[LNK][BWD]->links[LNK][FWD] = p;
-		
-		p->links[LNK][BWD] = tqbwd;
-		q->links[LNK][BWD] = tpbwd;
-		p->links[LNK][FWD] = tqfwd;
-		q->links[LNK][FWD] = tpfwd;
-	}
-}
-
 void graham(Dllist *dll)
 {
 	add_end_dll(dll, dll->root->links[POL][FWD], GRA); // 1st in polar order
@@ -339,7 +287,7 @@ Vertex* merge(Vertex* p, int P, Vertex* q, int Q, Dllist *dll, int LNK)
 	{
 		if ( isSuperior( p->links[LNK][FWD], q->links[LNK][FWD], dll, LNK ) )
 		{
-			insNextAfter(p, q, LNK);
+			move_after(p, q->links[LNK][FWD], LNK);
 
 			if ( Q == 1 ) break;
 			Q = Q - 1;
