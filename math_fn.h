@@ -3,17 +3,17 @@
 
 #include "linked_list.h"
 /*----------------------------------------------------------------------------------*/
-//                                  Geometry functions prototypes
+//                                  Math functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-int sgn(int x);
+int sgn(int const x);
 
-int randn(int min, int max);
+int randn(int const min, int const max);
 
-int determinant2d(int a, int b, int c, int d);
+int determinant2d(int const a, int const b, int const c, int const d);
 
-int determinant3d(Vertex* p1, Vertex* p2, Vertex* p3);
+int determinant3d(Vertex const *p1, Vertex const *p2, Vertex const *p3);
 
-int orientation(Vertex* p1, Vertex* p2, Vertex* p3);
+int orientation(Vertex const *p1, Vertex const *p2, Vertex const *p3);
 
 #endif
