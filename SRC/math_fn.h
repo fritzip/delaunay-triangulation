@@ -1,5 +1,9 @@
 #ifndef __MATH_H__
 #define __MATH_H__
+/*! \file math_fn.h
+ * \author M. Sainlot & G. Schoder
+ * \date 2014
+ */
 
 #include "linked_list.h"
 /*----------------------------------------------------------------------------------*/

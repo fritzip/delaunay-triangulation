@@ -1,5 +1,9 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
+/*! \file main.h
+ * \author M. Sainlot & G. Schoder
+ * \date 2014
+ */
 
 #include "linked_list.h"
 #include "print_fn.h"

@@ -38,6 +38,7 @@ endif
 SRCDIR   = SRC
 OBJDIR   = OBJ
 BINDIR   = BIN
+DOCDIR   = DOC
 
 SOURCES  := $(wildcard $(SRCDIR)/*.c)
 INCLUDES := $(wildcard $(SRCDIR)/*.h)
@@ -48,7 +49,7 @@ ln       = ln -sf
 
 $(BINDIR)/$(TARGET): $(OBJECTS)
 	@$(CC) $(LFLAGS) $(GL_LIBRARIES) $(OBJECTS) $(GL_LIBDIR) -o $@ 
-	@echo "Linking complete!"
+	@echo "Linking complete !"
 	@$(ln) $(BINDIR)/$(TARGET)
 	@echo "You can now run ./"$(TARGET)
 
@@ -59,8 +60,13 @@ $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
 .PHONEY: clean
 clean:
 	@$(rm) $(OBJECTS)
-	@echo "Cleanup complete!"
+	@echo "Cleanup complete !"
 
 remove: clean
 	@$(rm) $(BINDIR)/$(TARGET)
-	@echo "Executable removed!"
+	@echo "Executable removed !"
+
+dox:
+	@$(rm) $(DOCDIR)
+	doxygen Doxyfile
+	@echo "Doc generated !"

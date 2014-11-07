@@ -1,5 +1,9 @@
 #ifndef __GEOALGO_H__
 #define __GEOALGO_H__
+/*! \file geoalgo.h
+ * \author M. Sainlot & G. Schoder
+ * \date 2014
+ */
 
 #include "linked_list.h"
 #include "math_fn.h"

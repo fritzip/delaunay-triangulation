@@ -1,7 +1,13 @@
 #ifndef __LINKED_LIST_H__
 #define __LINKED_LIST_H__
+/*! \file linked_list.h
+ * \author M. Sainlot & G. Schoder
+ * \date 2014
+ */
 
 #include "ressources.h"
+
+
 
 /*----------------------------------------------------------------------------------*/
 //                                  Structures

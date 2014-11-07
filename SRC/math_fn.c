@@ -1,3 +1,8 @@
+/*! \file math_fn.c
+ * \author M. Sainlot & G. Schoder
+ * \date 2014
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 

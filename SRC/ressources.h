@@ -1,5 +1,9 @@
 #ifndef __RESSOURCES_H__
 #define __RESSOURCES_H__
+/*! \file ressources.h
+ * \author M. Sainlot & G. Schoder
+ * \date 2014
+ */
 
 /*----------------------------------------------------------------------------------*/
 //                                  #define
