@@ -1,4 +1,4 @@
-/*! \file linked_list.c
+/*! \file primitives.c
  * \author M. Sainlot & G. Schoder
  * \date 2014
  */
@@ -6,46 +6,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "linked_list.h"
+#include "primitives.h"
 #include "geoalgo.h"
 
 /*----------------------------------------------------------------------------------*/
 //                                  DLL Functions prototypes
 /*----------------------------------------------------------------------------------*/
-Vertex* create_vert( int coords[DIM] )
-{
-	Vertex *new_vert = (Vertex *) malloc(sizeof(Vertex));
 
-	for(int i=0; i<DIM; i++)
-	{
-		new_vert->coords[i] = coords[i];
-	}
+void init_dll(Dllist *dll)
+{
+	int coords[DIM] = {0};
+	dll->root = create_vert(coords);
 
 	for(int i=0; i<NBL; i++)
 	{
-		new_vert->links[i][BWD] = NULL;	
-		new_vert->links[i][FWD] = NULL;
+		dll->root->links[i][BWD] = dll->root;	
+		dll->root->links[i][FWD] = dll->root;
+		dll->length[i] = 0;
+		dll->up2date[i] = 0;
 	}
-
-	return new_vert;
 }
-
 
 Dllist* create_dll(void)
 {
 	Dllist *new_dll = (Dllist *) malloc(sizeof(Dllist));
 	if (new_dll != NULL)
 	{
-		int coords[DIM] = {0};
-		new_dll->root = create_vert(coords);
-
-		for(int i=0; i<NBL; i++)
-		{
-			new_dll->root->links[i][BWD] = new_dll->root;	
-			new_dll->root->links[i][FWD] = new_dll->root;
-			new_dll->length[i] = 0;
-			new_dll->up2date[i] = 0;
-		}
+		init_dll(new_dll);
 	}
 	return new_dll;
 }
@@ -209,6 +196,39 @@ void copy_order(Dllist *dll, int const SRC, int const DEST)
 	dll->length[DEST] = dll->length[SRC];
 }
 
+
+/*----------------------------------------------------------------------------------*/
+//                                  Vertex functions prototypes
+/*----------------------------------------------------------------------------------*/
+
+void init_vert( Vertex *vert, int coords[DIM] )
+{
+	for(int i=0; i<DIM; i++)
+	{
+		vert->coords[i] = coords[i];
+	}
+
+	for(int i=0; i<NBL; i++)
+	{
+		vert->links[i][BWD] = NULL;	
+		vert->links[i][FWD] = NULL;
+	}
+}
+
+Vertex* create_vert( int coords[DIM] )
+{
+	Vertex *new_vert = (Vertex *) malloc(sizeof(Vertex));
+	if (new_vert != NULL)
+	{
+		init_vert( new_vert, coords );
+	}
+	return new_vert;
+}
+
+
+/*----------------------------------------------------------------------------------*/
+//                                  Simplex functions prototypes
+/*----------------------------------------------------------------------------------*/
 
 
 /*----------------------------------------------------------------------------------*/

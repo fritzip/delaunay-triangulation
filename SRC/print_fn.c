@@ -7,7 +7,6 @@
 #include <stdlib.h>
 
 #include "print_fn.h"
-#include "linked_list.h"
 
 /*----------------------------------------------------------------------------------*/
 //                                  Print functions

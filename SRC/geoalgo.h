@@ -5,7 +5,7 @@
  * \date 2014
  */
 
-#include "linked_list.h"
+#include "primitives.h"
 #include "math_fn.h"
 
 typedef struct

@@ -1,12 +1,11 @@
-#ifndef __LINKED_LIST_H__
-#define __LINKED_LIST_H__
-/*! \file linked_list.h
+#ifndef __PRIMITIVES_H__
+#define __PRIMITIVES_H__
+/*! \file primitives.h
  * \author M. Sainlot & G. Schoder
  * \date 2014
  */
 
 #include "ressources.h"
-
 
 
 /*----------------------------------------------------------------------------------*/
@@ -19,6 +18,12 @@ typedef struct vertex
 	struct vertex *links[NBL][2];
 } Vertex;
 
+typedef struct simplex
+{
+	Vertex *v[3];
+	struct simplex *voisins[3];
+} Simplex;
+
 typedef struct
 {
 	int length[NBL];
@@ -26,11 +31,18 @@ typedef struct
 	Vertex *root;
 } Dllist;
 
+typedef struct
+{
+	void *father;
+	void *son1;
+	void *son2;
+} ABR;
+
 /*----------------------------------------------------------------------------------*/
 //                                  DLL functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-Vertex* create_vert( int coords[DIM] );
+void init_dll(Dllist *dll);
 
 Dllist* create_dll(void);
 
@@ -52,7 +64,22 @@ void copy_order(Dllist *dll, int const SRC, int const DEST);
 
 void move_after(Vertex *p, Vertex *q, int const LNK);
 
-void switch_cells(Vertex *p, Vertex *q, int const LNK);
+void swich_cells(Vertex *p, Vertex *q, int const LNK);
+
+
+/*----------------------------------------------------------------------------------*/
+//                                  Vertex functions prototypes
+/*----------------------------------------------------------------------------------*/
+
+void init_vert( Vertex *vert, int coords[DIM] );
+
+Vertex* create_vert( int coords[DIM] );
+
+
+/*----------------------------------------------------------------------------------*/
+//                                  Simplex functions prototypes
+/*----------------------------------------------------------------------------------*/
+
 
 /*----------------------------------------------------------------------------------*/
 //                      Create and remove data struct functions
