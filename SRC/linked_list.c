@@ -154,8 +154,8 @@ void move_after(Vertex *prev, Vertex *move, int const LNK)
 
 void switch_cells(Vertex *p, Vertex *q, int const LNK)
 {
-	// root <=> a <=> p <=> b <=> c <=> d <=> q <=> e <=> f <=> root 
-	// root <=> a <=> q <=> b <=> c <=> d <=> p <=> e <=> f <=> root 
+	// root <=> a <=> P <=> b <=> c <=> d <=> Q <=> e <=> f <=> root 
+	// root <=> a <=> Q <=> b <=> c <=> d <=> P <=> e <=> f <=> root 
 	if (p->links[LNK][FWD]==q )
 	{
 		p->links[LNK][BWD]->links[LNK][FWD] = q;

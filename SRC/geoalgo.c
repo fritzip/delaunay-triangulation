@@ -3,11 +3,14 @@
 
 #include "geoalgo.h"
 
+// TABLEAU GLOBAL //
+static Vertex *tablex[NB_VERTEX];
+
 /*----------------------------------------------------------------------------------*/
 //                                  Ordering functions
 /*----------------------------------------------------------------------------------*/
 
-int isSuperior(Vertex* p, Vertex *q, Dllist *dll, int LNK)
+int isSuperior(Vertex const *p, Vertex const *q, Dllist const *dll, int const LNK)
 {
 	switch (LNK)
 	{
@@ -77,42 +80,100 @@ void inittab(Dllist *dll)
 }
 
 
+
+// void lexconvex(Dllist *dll)
+// {
+// 	Vertex *p = dll->root->links[LEX][FWD];
+// 	Vertex *q = p->links[LEX][FWD];
+// 	Vertex *r = q->links[LEX][FWD];
+// 	Vertex *maxlex = NULL;
+// 	Vertex *bot = NULL;
+
+// 	if (1==orientation(p, p->links[LEX][FWD], p->links[LEX][FWD]->links[LEX][FWD]))
+// 	{
+// 		q = p->links[LEX][FWD]->links[LEX][FWD];
+// 		r = p->links[LEX][FWD];
+// 	}
+
+// 	add_end_dll(dll, p, LXC);
+// 	add_end_dll(dll, q, LXC);
+// 	add_end_dll(dll, r, LXC);
+
+// 	p = q;
+// 	q = r;
+// 	r = r->links[LEX][FWD];
+	
+// 	while ((q->links[LEX][FWD] != dll->root))
+// 	{ // Tant qu'on a pas fait le tour des points à placer...
+// 		// q = r;
+// 		r=q->links[LEX][FWD];	
+// 		maxlex=q;
+// 		while (1==orientation(q, r, q->links[LXC][FWD]))
+// 		{ // On check si l'angle est CW	
+// 			q=q->links[LXC][FWD]; // On avance
+// 			// q->links[LXC][BWD]->links[LXC][FWD]=NULL; // Et on détruit le liens avec le précédent
+// 			// q->links[LXC][BWD]=NULL; // Dans les deux sens
+// 		}
+
+// 		bot=q;
+// 		q = maxlex; // On réinitialise q
+// 		while (0>=orientation(q, r, q->links[LXC][BWD]))
+// 		{ // On check si l'angle est CCW	
+// 			q=q->links[LXC][BWD]; // On recule
+// 			// q->links[LXC][FWD]->links[LXC][BWD]=NULL; // Et on détruit le liens avec le suivant
+// 			// q->links[LXC][FWD]=NULL; // Dans les deux sens
+// 		}
+		
+// 		insert_btw(dll, q, bot, r, LXC);
+// 		// bot->links[LXC][BWD]=r; // Puis on crée la nouvelle arrete
+// 		// r->links[LXC][FWD]=bot;
+// 		// q->links[LXC][FWD]=r; // Puis on crée la nouvelle arrete
+// 		// r->links[LXC][BWD]=q; // Dans les deux sens	
+// 		q = r; // Et on remet le curseur sur le dernier placé	
+// 	}
+// }
+
 void lexconvex(Dllist *dll)
 {
 	Vertex *first = dll->root->links[LEX][FWD];
-	Vertex *deuze = first->links[LEX][FWD];
-	Vertex *current = deuze->links[LEX][FWD];
+	Vertex *second = first->links[LEX][FWD];
+	Vertex *current = second->links[LEX][FWD];
 	Vertex *aplacer = NULL;
 	Vertex *maxlex = NULL;
 	Vertex *bot = NULL;
-	int debugi = 0;
+	// int debugi = 0;
 	
-	if (1==orientation(first, deuze, current))
+	add_end_dll(dll, first, LXC); // 1st in polar order
+	if (1==orientation(first, second, current))
 	{
+		// add_end_dll(dll, second, LXC);
+		// add_end_dll(dll, current, LXC);
 		// Si le triangle est CW, on lie les points directement
-		first->links[LXC][FWD]=deuze;
-		deuze->links[LXC][FWD]=current;
+		first->links[LXC][FWD]=second;
+		second->links[LXC][FWD]=current;
 		current->links[LXC][FWD]=first;
 		// Dans les deux sens
 		first->links[LXC][BWD]=current;
-		deuze->links[LXC][BWD]=first;
-		current->links[LXC][BWD]=deuze;
+		second->links[LXC][BWD]=first;
+		current->links[LXC][BWD]=second;
 	}
 	else
 	{
+		// add_end_dll(dll, current, LXC);
+		// add_end_dll(dll, second, LXC);
 		//Sinon, s'il est CCW, on les lie dans le sens inverse
 		first->links[LXC][FWD]=current;
-		deuze->links[LXC][FWD]=first;
-		current->links[LXC][FWD]=deuze;
+		second->links[LXC][FWD]=first;
+		current->links[LXC][FWD]=second;
 		// Dans les deux sens
-		first->links[LXC][BWD]=deuze;
-		deuze->links[LXC][BWD]=current;
+		first->links[LXC][BWD]=second;
+		second->links[LXC][BWD]=current;
 		current->links[LXC][BWD]=first;	
 	}
 
 	while ((current->links[LEX][FWD] != dll->root))
 	{ // Tant qu'on a pas fait le tour des points à placer...
-		debugi++;	
+		// debugi++;	
 		aplacer=current->links[LEX][FWD];	
 		maxlex=current;
 		while (1==orientation(current, aplacer, current->links[LXC][FWD]))
@@ -129,12 +190,15 @@ void lexconvex(Dllist *dll)
 			current->links[LXC][FWD]->links[LXC][BWD]=NULL; // Et on détruit le liens avec le suivant
 			current->links[LXC][FWD]=NULL; // Dans les deux sens
 		}
+		// insert_btw(dll, current, bot, aplacer, LXC);
 		bot->links[LXC][BWD]=aplacer; // Puis on crée la nouvelle arrete
 		aplacer->links[LXC][FWD]=bot;
 		current->links[LXC][FWD]=aplacer; // Puis on crée la nouvelle arrete
 		aplacer->links[LXC][BWD]=current; // Dans les deux sens	
 		current = aplacer; // Et on remet le curseur sur le dernier placé	
 	}
+
+
 	dll->root->links[LXC][FWD] = dll->root->links[LEX][FWD];
 	dll->root->links[LXC][BWD] = dll->root->links[LEX][BWD];
 	int size=1;
@@ -146,7 +210,7 @@ void lexconvex(Dllist *dll)
 		current=current->links[LXC][FWD];
 		//printf(" Current = %d,%d\n", current->coords[0],current->coords[1]);
 	}
-	dll->length[LXC] = size;
+	// dll->length[LXC] = dll->length[JAR];
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -206,15 +270,15 @@ EConv fusionec(EConv ECg, EConv ECd)
 	Vertex *tg=ECg.vmax;
 	Vertex *td=ECd.vmin;
 	// On ajoute l'arete du bas
-	while (-1==orientation(g, d, d->links[6][BWD]) || (1==orientation(d, g, g->links[6][FWD])))
+	while (-1==orientation(g, d, d->links[DAC][BWD]) || (1==orientation(d, g, g->links[DAC][FWD])))
 	{
-		if (-1==orientation(g, d, d->links[6][BWD]))
+		if (-1==orientation(g, d, d->links[DAC][BWD]))
 		{
-			d=d->links[6][BWD];         
+			d=d->links[DAC][BWD];         
 		}
-		if (1==orientation(d, g, g->links[6][FWD]))
+		if (1==orientation(d, g, g->links[DAC][FWD]))
 		{
-			g=g->links[6][FWD];      
+			g=g->links[DAC][FWD];      
 		}
 	}
 	tg = g;
@@ -222,21 +286,21 @@ EConv fusionec(EConv ECg, EConv ECd)
 	// On ajoute l'arete du haut
 	g=ECg.vmax;
 	d=ECd.vmin;
-	while (1==orientation(g, d, d->links[6][FWD]) || (-1==orientation(d, g, g->links[6][BWD])))
+	while (1==orientation(g, d, d->links[DAC][FWD]) || (-1==orientation(d, g, g->links[DAC][BWD])))
 	{
-		if (1==orientation(g, d, d->links[6][FWD]))
+		if (1==orientation(g, d, d->links[DAC][FWD]))
 		{
-			d=d->links[6][FWD];             
+			d=d->links[DAC][FWD];             
 		}
-		if (-1==orientation(d, g, g->links[6][BWD]))
+		if (-1==orientation(d, g, g->links[DAC][BWD]))
 		{
-			g=g->links[6][BWD];
+			g=g->links[DAC][BWD];
 		}
 	}
-	g->links[6][FWD]=d;
-	d->links[6][BWD]=g;
-	tg->links[6][BWD]=td;
-	td->links[6][FWD]=tg;
+	g->links[DAC][FWD]=d;
+	d->links[DAC][BWD]=g;
+	tg->links[DAC][BWD]=td;
+	td->links[DAC][FWD]=tg;
 	// Et on retourne l'EC fusionnée
 	EC.vmax=ECd.vmax;
 	EC.vmin=ECg.vmin;

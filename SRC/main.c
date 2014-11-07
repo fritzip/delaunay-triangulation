@@ -34,23 +34,23 @@ void display (void)
 
 	Dllist *dll_lnk = create_rd_data_struct();
 
-	init_links(dll_lnk, GRA);
 	init_links(dll_lnk, JAR);
-	init_links(dll_lnk, LXC);
-	init_links(dll_lnk, DAC);
+	// init_links(dll_lnk, GRA);
+	// init_links(dll_lnk, LXC);
+	// init_links(dll_lnk, DAC);
 
-	print_dll(dll_lnk, STD);
+	// print_dll(dll_lnk, STD);
 	print_dll(dll_lnk, LEX);
-	print_dll(dll_lnk, POL);
-	print_dll(dll_lnk, GRA);
+	// print_dll(dll_lnk, POL);
+	// print_dll(dll_lnk, GRA);
 	print_dll(dll_lnk, JAR);
-	print_dll(dll_lnk, LXC);
-	print_dll(dll_lnk, DAC);
+	// print_dll(dll_lnk, LXC);
+	// print_dll(dll_lnk, DAC);
 
-	affiche(dll_lnk, STD, GL_LINE_LOOP, 1.0, 0.0, 0.0);
-	affiche(dll_lnk, DAC, GL_LINE_LOOP, 1.0, 1.0, 1.0);
+	affiche(dll_lnk, POL, GL_LINE_LOOP, 1.0, 0.0, 0.0);
+	affiche(dll_lnk, JAR, GL_LINE_LOOP, 1.0, 1.0, 1.0);
 	
-	// remove_data_struct(dll_lnk); TODO fix buggy function
+	// remove_data_struct(dll_lnk); //ne s'utilise pas ici, pac comme ça
 
 	glFlush();
 }

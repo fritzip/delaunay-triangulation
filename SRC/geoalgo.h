@@ -4,9 +4,6 @@
 #include "linked_list.h"
 #include "math_fn.h"
 
-// TABLEAU GLOBAL //
-Vertex *tablex[NB_VERTEX];
-
 typedef struct
 {
     Vertex *vmin;
@@ -17,7 +14,7 @@ typedef struct
 //                                  Ordering functions
 /*----------------------------------------------------------------------------------*/
 
-int isSuperior(Vertex *p, Vertex *q, Dllist *dll, int LNK);
+int isSuperior(Vertex const *p, Vertex const *q, Dllist const *dll, int const LNK);
 
 /*----------------------------------------------------------------------------------*/
 //                                  Algos
