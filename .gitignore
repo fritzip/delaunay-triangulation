@@ -27,3 +27,9 @@
 *.i*86
 *.x86_64
 *.hex
+
+# Perso
+DOC/
+delauney
+geoalgo.sublime-project
+geoalgo.sublime-workspace
