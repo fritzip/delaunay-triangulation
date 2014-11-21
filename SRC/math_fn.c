@@ -24,7 +24,7 @@ int randn(int const min, int const max)
 	return min+rand()%(max-min+1);
 }
 
-double randf()
+double randf( )
 {
 	return ((double) rand() / RAND_MAX);
 }
@@ -37,8 +37,8 @@ int determinant2d(int const a, int const b, int const c, int const d)
 int determinant3d(Vertex const *p1, Vertex const *p2, Vertex const *p3)
 {
 	return determinant2d (p1->coords[0], p2->coords[0], p1->coords[1], p2->coords[1])
-			-determinant2d (p1->coords[0], p3->coords[0], p1->coords[1], p3->coords[1])
-			+determinant2d (p2->coords[0], p3->coords[0], p2->coords[1], p3->coords[1]);
+		-  determinant2d (p1->coords[0], p3->coords[0], p1->coords[1], p3->coords[1])
+		+  determinant2d (p2->coords[0], p3->coords[0], p2->coords[1], p3->coords[1]);
 }
 
 int orientation(Vertex const *p1, Vertex const *p2, Vertex const *p3)

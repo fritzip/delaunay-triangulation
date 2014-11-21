@@ -251,6 +251,14 @@ Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
 	return new_simp;
 }
 
+int inside_simplex( Simplex *simp, Vertex *vert )
+{
+	int ori = 0;
+	for (int i = 0; i < 3; i++)
+		ori += orientation(simp->sommet[i], simp->sommet[(i+1)%3], vert);
+	return ( abs(ori) == 3 ) ;
+}
+
 
 /*----------------------------------------------------------------------------------*/
 //                                  Priority Queue
