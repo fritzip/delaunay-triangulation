@@ -287,7 +287,6 @@ FDP* create_fdp( int size )
 void switch_cells_fdp( FDP *fdp, int const a, int const b )
 {
 	Simplex *c = fdp->table[a];
-	// int c = fdp->table[a];
 	fdp->table[a] = fdp->table[b];
 	fdp->table[b] = c;
 }
@@ -304,7 +303,6 @@ int get_number_of_sons( int const i, int const n )
 int is_superior( FDP *fdp, int const a, int const b )
 {
 	return (fdp->table[a]->pts->root->links[STD][FWD]->coords[0] > fdp->table[b]->pts->root->links[STD][FWD]->coords[0]);
-	// return (fdp->table[a] > fdp->table[b]);
 }
 
 void up_heap( FDP *fdp, int son, int father )

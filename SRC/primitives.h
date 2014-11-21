@@ -91,6 +91,7 @@ void init_simplex(Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2 );
 
 Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 );
 
+int inside_simplex( Simplex *simp, Vertex *vert);
 
 /*----------------------------------------------------------------------------------*/
 //                                  Priority Queue functions prototypes
