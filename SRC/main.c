@@ -73,22 +73,7 @@ int main(int argc, char **argv)
 				displayChoice = 0;
 				break;
 		}
-	}
-
-
-	FDP *fdp = create_fdp();
-	for (int i = 1; i <= 20; i++)
-	{
-		insert_in_fdp(fdp, randn(1,10));
-	}
-
-	heap_sort(fdp);
-
-	for (int i = 1; i <= 20; i++)
-	{
-		printf("%d ", fdp->table[i]);
-	}
-	printf("\n");
+	}	
 
 
 	// assert(displayChoice >= 0 && displayChoice <= 4);

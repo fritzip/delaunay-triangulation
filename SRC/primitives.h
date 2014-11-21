@@ -39,8 +39,8 @@ typedef struct simplex Simplex;
 
 struct fdprior
 {
-	// Simplex **table;
-	int *table;
+	Simplex **table;
+	// int *table;
 	int nb;
 };
 typedef struct fdprior FDP;
@@ -110,9 +110,9 @@ void up_heap(FDP *fdp, int son, int father);
 
 void down_heap(FDP *fdp, int son, int father); 
 
-void insert_in_fdp(FDP *fdp, int simp);
+void insert_in_fdp(FDP *fdp, Simplex *simp);
 
-int extract_max(FDP *fdp);
+Simplex* extract_max(FDP *fdp);
 
 void heap_sort(FDP *fdp);
 

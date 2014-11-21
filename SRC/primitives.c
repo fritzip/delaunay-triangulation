@@ -258,7 +258,7 @@ Simplex* create_simplex(Vertex *vert[3])
 
 void init_fdp(FDP *fdp)
 {
-	int *new_tab = (int*)malloc((NB_SIMPLEX + 1)*sizeof(int));
+	Simplex **new_tab = (Simplex **)malloc((NB_SIMPLEX + 1)*sizeof(Simplex *));
 	if (new_tab != NULL)
 	{
 		fdp->table = new_tab;
@@ -278,8 +278,8 @@ FDP* create_fdp()
 
 void switch_cells_fdp(FDP *fdp, int const a, int const b)
 {
-	// Simplex *c = fdp->table[a];
-	int c = fdp->table[a];
+	Simplex *c = fdp->table[a];
+	// int c = fdp->table[a];
 	fdp->table[a] = fdp->table[b];
 	fdp->table[b] = c;
 }
@@ -294,8 +294,8 @@ int get_number_of_sons(int const i, int const n)
 
 int is_superior(FDP *fdp, int const a, int const b)
 {
-	// return (fdp->table[a]->pts->root->links[STD][FWD]->coords[0] > fdp->table[b]->pts->root->links[STD][FWD]->coords[0]);
-	return (fdp->table[a] > fdp->table[b]);
+	return (fdp->table[a]->pts->root->links[STD][FWD]->coords[0] > fdp->table[b]->pts->root->links[STD][FWD]->coords[0]);
+	// return (fdp->table[a] > fdp->table[b]);
 }
 
 void up_heap(FDP *fdp, int son, int father)
@@ -339,17 +339,17 @@ void down_heap(FDP *fdp, int son, int father)
 	}
 }
 
-void insert_in_fdp(FDP *fdp, int simp)
+void insert_in_fdp(FDP *fdp, Simplex *simp)
 {
 	fdp->table[fdp->nb + 1] = simp;
 	fdp->nb++;
 	up_heap(fdp, fdp->nb, fdp->nb / 2);
 }
 
-int extract_max(FDP *fdp)
+Simplex* extract_max(FDP *fdp)
 {
 	if (fdp->nb > 0) return fdp->table[1];
-	else return 9999;
+	else return NULL;
 }
 
 void heap_sort(FDP *fdp)
