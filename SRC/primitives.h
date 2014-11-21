@@ -12,93 +12,93 @@
 //                                  Structures
 /*----------------------------------------------------------------------------------*/
 
-struct vertex
+typedef struct vertex
 {
-	int coords[DIM];
+	double coords[DIM];
 	struct vertex *links[NBL][2];
-};
-typedef struct vertex Vertex;
+} Vertex ;
 
-
-struct dllist
+typedef struct dllist
 {
 	int length[NBL];
 	int up2date[NBL];
 	Vertex *root;
-};
-typedef struct dllist Dllist;
+} Dllist ;
 
-
-struct simplex
+typedef struct simplex
 {
 	Vertex *sommet[3];
 	struct simplex *voisin[3];
 	Dllist *pts;
-};
-typedef struct simplex Simplex;
+} Simplex ;
 
-struct fdprior
+typedef struct fdprior
 {
 	Simplex **table;
 	// int *table;
 	int nb;
-};
-typedef struct fdprior FDP;
+} FDP ;
+
+typedef struct grid
+{
+	FDP *fdp;
+	double gof;
+} Grid ;
 
 /*----------------------------------------------------------------------------------*/
 //                                  DLL functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_dll(Dllist *dll);
+void init_dll( Dllist *dll ) ;
 
-Dllist* create_dll(void);
+Dllist* create_dll( void ) ;
 
-void add_end_dll(Dllist *dll, Vertex *vert, int const LNK);
+void add_end_dll( Dllist *dll, Vertex *vert, int const LNK ) ;
 
-void add_begin_dll(Dllist *dll, Vertex *vert, int const LNK);
+void add_begin_dll( Dllist *dll, Vertex *vert, int const LNK ) ;
 
-void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, int const LNK);
+void insert_after( Dllist *dll, Vertex *prev, Vertex *ins, int const LNK ) ;
 
-void rm_after(Dllist *dll, Vertex *prev, int const LNK);
+void rm_after( Dllist *dll, Vertex *prev, int const LNK ) ;
 
-void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int const LNK);
+void insert_btw( Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int const LNK ) ;
 
-void rm_end_dll(Dllist *dll, int const LNK);
+void rm_end_dll( Dllist *dll, int const LNK ) ;
 
-void rm_begin_dll(Dllist *dll, int const LNK);
+void rm_begin_dll( Dllist *dll, int const LNK ) ;
 
-void copy_order(Dllist *dll, int const SRC, int const DEST);
+void copy_order( Dllist *dll, int const SRC, int const DEST ) ;
 
-void move_after(Vertex *p, Vertex *q, int const LNK);
+void move_after( Vertex *p, Vertex *q, int const LNK ) ;
 
-void swich_cells(Vertex *p, Vertex *q, int const LNK);
+void swich_cells( Vertex *p, Vertex *q, int const LNK ) ;
 
 
 /*----------------------------------------------------------------------------------*/
 //                                  Vertex functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_vert( Vertex *vert, int coords[DIM] );
+void init_vert( Vertex *vert, double x, double y, double z );
 
-Vertex* create_vert( int coords[DIM] );
+Vertex* create_vert( double x, double y, double z );
 
 
 /*----------------------------------------------------------------------------------*/
 //                                  Simplex functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_simplex(Simplex *simp, Vertex *vert[3]);
+void init_simplex(Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2 );
 
-Simplex* create_simplex(Vertex *vert[3]);
+Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 );
 
 
 /*----------------------------------------------------------------------------------*/
 //                                  Priority Queue functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_fdp(FDP *fdp);
+void init_fdp( FDP *fdp, int size );
 
-FDP* create_fdp();
+FDP* create_fdp( int size );
 
 void switch_cells_fdp(FDP *fdp, int const a, int const b);
 
@@ -115,6 +115,15 @@ void insert_in_fdp(FDP *fdp, Simplex *simp);
 Simplex* extract_max(FDP *fdp);
 
 void heap_sort(FDP *fdp);
+
+/*----------------------------------------------------------------------------------*/
+//                                  Grid prototypes
+/*----------------------------------------------------------------------------------*/
+
+void init_grid( Grid *grid, int nb_pts, int size );
+
+Grid* create_grid( int nb_pts, int size );
+
 
 /*----------------------------------------------------------------------------------*/
 //                      Create and remove data struct functions

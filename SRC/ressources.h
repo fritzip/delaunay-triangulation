@@ -11,7 +11,7 @@
 
 #define DEBUG 0
 
-#define DIM 2
+#define DIM 3
 
 #define BWD 0 
 #define FWD 1

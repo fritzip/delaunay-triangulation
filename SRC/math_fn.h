@@ -14,10 +14,14 @@ int sgn(int const x);
 
 int randn(int const min, int const max);
 
+double randf();
+
 int determinant2d(int const a, int const b, int const c, int const d);
 
 int determinant3d(Vertex const *p1, Vertex const *p2, Vertex const *p3);
 
 int orientation(Vertex const *p1, Vertex const *p2, Vertex const *p3);
+
+double distancez( Simplex const *s1, double x, double y );
 
 #endif

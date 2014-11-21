@@ -16,8 +16,7 @@
 
 void init_dll(Dllist *dll)
 {
-	int coords[DIM] = {0};
-	dll->root = create_vert(coords);
+	dll->root = create_vert(0.0, 0.0, 0.0 );
 
 	for(int i=0; i<NBL; i++)
 	{
@@ -202,12 +201,11 @@ void copy_order(Dllist *dll, int const SRC, int const DEST)
 //                                  Vertex functions
 /*----------------------------------------------------------------------------------*/
 
-void init_vert( Vertex *vert, int coords[DIM] )
+void init_vert( Vertex *vert, double x, double y, double z )
 {
-	for(int i=0; i<DIM; i++)
-	{
-		vert->coords[i] = coords[i];
-	}
+	vert->coords[0] = x;
+	vert->coords[1] = y;
+	vert->coords[2] = z;
 
 	for(int i=0; i<NBL; i++)
 	{
@@ -216,12 +214,12 @@ void init_vert( Vertex *vert, int coords[DIM] )
 	}
 }
 
-Vertex* create_vert( int coords[DIM] )
+Vertex* create_vert( double x, double y, double z )
 {
 	Vertex *new_vert = (Vertex *) malloc(sizeof(Vertex));
 	if (new_vert != NULL)
 	{
-		init_vert( new_vert, coords );
+		init_vert( new_vert, x, y, z );
 	}
 	return new_vert;
 }
@@ -231,22 +229,24 @@ Vertex* create_vert( int coords[DIM] )
 //                                  Simplex functions
 /*----------------------------------------------------------------------------------*/
 
-void init_simplex(Simplex *simp, Vertex *vert[3])
+void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2 )
 {
+	simp->sommet[0] = v0;
+	simp->sommet[1] = v1;
+	simp->sommet[2] = v2;
+
 	for(int i=0; i<3; i++)
-	{
-		simp->sommet[i] = vert[i];
 		simp->voisin[i] = NULL;
-	}
+
 	simp->pts = create_dll();
 }
 
-Simplex* create_simplex(Vertex *vert[3])
+Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
 {
 	Simplex *new_simp = (Simplex *) malloc(sizeof(Simplex));
 	if (new_simp != NULL)
 	{
-		init_simplex( new_simp, vert);
+		init_simplex( new_simp, v0, v1, v2);
 	}
 	return new_simp;
 }
@@ -256,9 +256,9 @@ Simplex* create_simplex(Vertex *vert[3])
 //                                  Priority Queue
 /*----------------------------------------------------------------------------------*/
 
-void init_fdp(FDP *fdp)
+void init_fdp( FDP *fdp, int size )
 {
-	Simplex **new_tab = (Simplex **)malloc((NB_SIMPLEX + 1)*sizeof(Simplex *));
+	Simplex **new_tab = (Simplex **)malloc(size*sizeof(Simplex *));
 	if (new_tab != NULL)
 	{
 		fdp->table = new_tab;
@@ -266,17 +266,17 @@ void init_fdp(FDP *fdp)
 	}	
 }
 
-FDP* create_fdp()
+FDP* create_fdp( int size )
 {
 	FDP *new_fdp = (FDP *) malloc(sizeof(FDP));
 	if (new_fdp != NULL)
 	{
-		init_fdp( new_fdp );
+		init_fdp( new_fdp, size );
 	}
 	return new_fdp;
 }
 
-void switch_cells_fdp(FDP *fdp, int const a, int const b)
+void switch_cells_fdp( FDP *fdp, int const a, int const b )
 {
 	Simplex *c = fdp->table[a];
 	// int c = fdp->table[a];
@@ -284,7 +284,8 @@ void switch_cells_fdp(FDP *fdp, int const a, int const b)
 	fdp->table[b] = c;
 }
 
-int get_number_of_sons(int const i, int const n)
+
+int get_number_of_sons( int const i, int const n )
 {
 	int nb_leafs = (n + 1) / 2;
 	if ( i > n - nb_leafs) return 0;
@@ -292,13 +293,13 @@ int get_number_of_sons(int const i, int const n)
 	else return 2;
 }
 
-int is_superior(FDP *fdp, int const a, int const b)
+int is_superior( FDP *fdp, int const a, int const b )
 {
 	return (fdp->table[a]->pts->root->links[STD][FWD]->coords[0] > fdp->table[b]->pts->root->links[STD][FWD]->coords[0]);
 	// return (fdp->table[a] > fdp->table[b]);
 }
 
-void up_heap(FDP *fdp, int son, int father)
+void up_heap( FDP *fdp, int son, int father )
 {
 	while(father > 0)
 	{
@@ -312,7 +313,7 @@ void up_heap(FDP *fdp, int son, int father)
 	}
 }
 
-void down_heap(FDP *fdp, int son, int father)
+void down_heap( FDP *fdp, int son, int father )
 {
 	int LOOP = 1;
 
@@ -339,20 +340,20 @@ void down_heap(FDP *fdp, int son, int father)
 	}
 }
 
-void insert_in_fdp(FDP *fdp, Simplex *simp)
+void insert_in_fdp( FDP *fdp, Simplex *simp )
 {
 	fdp->table[fdp->nb + 1] = simp;
 	fdp->nb++;
 	up_heap(fdp, fdp->nb, fdp->nb / 2);
 }
 
-Simplex* extract_max(FDP *fdp)
+Simplex* extract_max( FDP *fdp )
 {
 	if (fdp->nb > 0) return fdp->table[1];
 	else return NULL;
 }
 
-void heap_sort(FDP *fdp)
+void heap_sort( FDP *fdp )
 {
 	int son, father;
 
@@ -374,10 +375,41 @@ void heap_sort(FDP *fdp)
 }
 
 /*----------------------------------------------------------------------------------*/
+//                                  Grid
+/*----------------------------------------------------------------------------------*/
+
+void init_grid( Grid *grid, int nb_pts, int size )
+{
+	Vertex *ul = create_vert(0.0, 1.0, 0.0);
+	Vertex *ur = create_vert(1.0, 1.0, 0.0);
+	Vertex *dr = create_vert(1.0, 0.0, 0.0);
+	Vertex *dl = create_vert(0.0, 0.0, 0.0);
+
+	Simplex *first = create_simplex(ur, ul, dl);
+	Simplex *second = create_simplex(dl, dr, ur);
+	first->voisin[1] = second;
+	second->voisin[1] = first;
+	
+	grid->fdp = create_fdp( size );
+	insert_in_fdp( grid->fdp, first );
+	insert_in_fdp( grid->fdp, second );
+}
+
+Grid* create_grid( int nb_pts, int size )
+{
+	Grid *new_grid = (Grid *) malloc(sizeof(Grid));
+	if (new_grid != NULL)
+	{
+		init_grid( new_grid, nb_pts, size );
+	}
+	return new_grid;
+}
+
+/*----------------------------------------------------------------------------------*/
 //                      Create and remove data struct functions
 /*----------------------------------------------------------------------------------*/
 
-void init_links(Dllist *dll, int const LNK)
+void init_links( Dllist *dll, int const LNK )
 {
 	switch (LNK)
 	{
@@ -450,18 +482,13 @@ void init_links(Dllist *dll, int const LNK)
 }
 
 
-Dllist* create_rd_data_struct()
+Dllist* create_rd_data_struct( )
 {
 	Dllist *dll = create_dll();
-	int coords[DIM];
 
 	for(int i=0; i<NB_VERTEX; i++)
 	{
-		for (int j = 0; j < DIM; ++j)
-		{
-			coords[j] = randn( minX+margin, maxX-margin );
-		}
-		Vertex *new_vert = create_vert( coords );
+		Vertex *new_vert = create_vert( randf(), randf(), randf() );
 		add_end_dll( dll, new_vert, STD );
 	}
 	dll->up2date[STD] = 1;
@@ -471,7 +498,7 @@ Dllist* create_rd_data_struct()
 // TODO
 // create_data_struct_from_tab_of_coords()
 
-void remove_data_struct(Dllist *dll)
+void remove_data_struct( Dllist *dll )
 {
 	if (dll != NULL)
 	{

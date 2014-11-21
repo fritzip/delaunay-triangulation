@@ -38,6 +38,11 @@ void display (void)
 	glColor3f(0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+
+
+	Grid* mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1 );
+
+
 	// Dllist *dll_lnk = create_rd_data_struct();
 
 	// init_links(dll_lnk, JAR);

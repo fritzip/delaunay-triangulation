@@ -49,7 +49,7 @@ void print_vertex(Vertex const *vert)
 {
 	for (int i = 0; i < DIM; i++)
 	{
-		printf("%4d", vert->coords[i]);
+		printf("%.2f", vert->coords[i]);
 	}
 	printf("\n");
 }

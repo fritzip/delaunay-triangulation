@@ -24,6 +24,11 @@ int randn(int const min, int const max)
 	return min+rand()%(max-min+1);
 }
 
+double randf()
+{
+	return ((double) rand() / RAND_MAX);
+}
+
 int determinant2d(int const a, int const b, int const c, int const d)
 {
 	return a*d-c*b;
@@ -40,4 +45,25 @@ int orientation(Vertex const *p1, Vertex const *p2, Vertex const *p3)
 {
 	// 1 : sens horaire , -1 : sens trigo
 	return -sgn(determinant3d(p1, p2, p3));
+}
+
+double distancez( Simplex const *s1, double x, double y )
+{
+	return s1->sommet[0]->coords[2]
+		   - (((( s1->sommet[1]->coords[1] - s1->sommet[0]->coords[1] ) 
+		   *    ( s1->sommet[2]->coords[2] - s1->sommet[0]->coords[2] )
+		   -    ( s1->sommet[1]->coords[2] - s1->sommet[0]->coords[2] ) 
+		   *    ( s1->sommet[2]->coords[1] - s1->sommet[0]->coords[1] ))
+		   *    (                        x - s1->sommet[0]->coords[0] ))
+
+		   +  ((( s1->sommet[1]->coords[2] - s1->sommet[0]->coords[2] ) 
+		   *    ( s1->sommet[2]->coords[0] - s1->sommet[0]->coords[0] )
+		   -    ( s1->sommet[1]->coords[0] - s1->sommet[0]->coords[0] ) 
+		   *    ( s1->sommet[2]->coords[2] - s1->sommet[0]->coords[2] ))
+		   *    (                        y - s1->sommet[0]->coords[1] )))
+		 
+		   /  (( s1->sommet[1]->coords[0] - s1->sommet[0]->coords[0] ) 
+		   *   ( s1->sommet[2]->coords[1] - s1->sommet[0]->coords[1] )
+		   -   ( s1->sommet[1]->coords[1] - s1->sommet[0]->coords[1] ) 
+		   *   ( s1->sommet[2]->coords[0] - s1->sommet[0]->coords[0] ));
 }
