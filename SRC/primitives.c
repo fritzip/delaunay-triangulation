@@ -5,12 +5,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "primitives.h"
 #include "geoalgo.h"
 
 /*----------------------------------------------------------------------------------*/
-//                                  DLL Functions prototypes
+//                                  DLL Functions
 /*----------------------------------------------------------------------------------*/
 
 void init_dll(Dllist *dll)
@@ -198,7 +199,7 @@ void copy_order(Dllist *dll, int const SRC, int const DEST)
 
 
 /*----------------------------------------------------------------------------------*/
-//                                  Vertex functions prototypes
+//                                  Vertex functions
 /*----------------------------------------------------------------------------------*/
 
 void init_vert( Vertex *vert, int coords[DIM] )
@@ -227,9 +228,216 @@ Vertex* create_vert( int coords[DIM] )
 
 
 /*----------------------------------------------------------------------------------*/
-//                                  Simplex functions prototypes
+//                                  Simplex functions
 /*----------------------------------------------------------------------------------*/
 
+void init_simplex(Simplex *simp, Vertex *vert[3])
+{
+	for(int i=0; i<3; i++)
+	{
+		simp->sommet[i] = vert[i];
+		simp->voisin[i] = NULL;
+	}
+	simp->pts = create_dll();
+}
+
+Simplex* create_simplex(Vertex *vert[3])
+{
+	Simplex *new_simp = (Simplex *) malloc(sizeof(Simplex));
+	if (new_simp != NULL)
+	{
+		init_simplex( new_simp, vert);
+	}
+	return new_simp;
+}
+
+
+/*----------------------------------------------------------------------------------*/
+//                                  Priority Queue
+/*----------------------------------------------------------------------------------*/
+
+void init_fdp(FDP *fdp)
+{
+	int *new_tab = (int*)malloc((NB_SIMPLEX + 1)*sizeof(int));
+	if (new_tab != NULL)
+	{
+		fdp->table = new_tab;
+		fdp->nb = 0;
+	}	
+}
+
+FDP* create_fdp()
+{
+	FDP *new_fdp = (FDP *) malloc(sizeof(FDP));
+	if (new_fdp != NULL)
+	{
+		init_fdp( new_fdp );
+	}
+	return new_fdp;
+}
+
+void switch_cells_fdp(FDP *fdp, int const a, int const b)
+{
+	// Simplex *c = fdp->table[a];
+	int c = fdp->table[a];
+	fdp->table[a] = fdp->table[b];
+	fdp->table[b] = c;
+}
+
+int get_number_of_sons(int const i, int const n)
+{
+	int nb_leafs = (n + 1) / 2;
+	if ( i > n - nb_leafs) return 0;
+	else if (i == n - nb_leafs && !(n % 2)) return 1;
+	else return 2;
+}
+
+int is_superior(FDP *fdp, int const a, int const b)
+{
+	// return (fdp->table[a]->pts->root->links[STD][FWD]->coords[0] > fdp->table[b]->pts->root->links[STD][FWD]->coords[0]);
+	return (fdp->table[a] > fdp->table[b]);
+}
+
+void up_heap(FDP *fdp, int son, int father)
+{
+	// printf("%d, %d\n", son, father);
+	while(father > 0)
+	{
+		// printf("%d, %d, %d, %d, %d\n", is_superior(fdp, son, father), son, father, fdp->table[son], fdp->table[father]);
+		if (is_superior(fdp, son, father))
+		{
+			switch_cells_fdp(fdp, son, father);
+			son = father;
+			father = son/2;
+		}
+		else break;
+	}
+}
+
+void down_heap(FDP *fdp, int son, int father)
+{
+	int LOOP = 1;
+
+	while(LOOP)
+	{
+		switch( get_number_of_sons(father, fdp->nb) )
+		{
+			case 2: 
+				son += is_superior(fdp, son+1, son);
+				if ( is_superior(fdp, son, father) ) switch_cells_fdp(fdp, son, father);
+				break;
+			case 1: 
+				if ( is_superior(fdp, son, father) ) switch_cells_fdp(fdp, son, father);
+				break;
+			case 0: 
+				LOOP = 0;
+				break;
+			default: printf("Error in function down_heap\n");
+				break;
+		}
+
+		father = son;
+		son *= 2;
+	}
+}
+
+int check_tas_binaire(FDP *fdp, int i )
+{
+	// printf("check_tas_binaire i = %d, %d, %d\n", i, i*2, i*2+1);
+	switch( get_number_of_sons(i, fdp->nb) )
+	{
+		case 2: 
+			if (is_superior(fdp, i, i*2) && is_superior(fdp, i, i*2+1))
+			{
+				// printf("OUI : %d > %d ET %d > %d\n", fdp->table[i], fdp->table[i*2], fdp->table[i], fdp->table[i*2+1]);
+				if ( !check_tas_binaire(fdp, i*2) ) return 0;
+				if ( !check_tas_binaire(fdp, i*2+1) ) return 0;
+			}
+			else return 0;
+			break;
+		case 1: 
+			if ( !is_superior(fdp, i, i*2) )
+				return 0;
+			// printf("FIN BRANCHE OKAY 1\n");
+			break;
+		case 0: 
+			// printf("FIN BRANCHE OKAY 0\n");
+			break;
+		default: printf("Error in function check_tas_binaire\n");
+			break;
+	}
+	return 1;
+}
+
+void insert_in_fdp(FDP *fdp, int simp)
+{
+	fdp->table[fdp->nb + 1] = simp;
+	fdp->nb++;
+	up_heap(fdp, fdp->nb, fdp->nb / 2);
+}
+
+int extract_max(FDP *fdp)
+{
+	if (fdp->nb > 0) return fdp->table[1];
+	else return 9999;
+}
+
+void heap_sort(FDP *fdp)
+{
+	int son, father;
+
+	for(int i = 2; i <= fdp->nb; i++)
+	{
+		son = i;
+		father = son/2;
+		up_heap(fdp, son, father);
+	}
+
+	// printf("is tas binaire = %d\n", check_tas_binaire(fdp, 1));
+
+	while(fdp->nb > 1)
+	{
+		// printf("nb = %d\n", fdp->nb);
+		// printf("switch_cells\n");
+		switch_cells_fdp(fdp, 1, fdp->nb);
+
+		fdp->nb--;
+
+		// pui = 1;
+		// for (int i = 1; i <= 20; i++)
+		// {
+		// 	printf("%d ", fdp->table[i]);
+		// 	if (i == fdp->nb) printf("\n\t=>");
+		// 	if ((i+1) == (int)pow(2,pui) && i < fdp->nb)
+		// 	{
+		// 		printf("\n");
+		// 		pui++;
+		// 	}
+		// }
+		// printf("\n");
+
+
+		down_heap(fdp, 2, 1);
+
+
+		// pui = 1;
+		// for (int i = 1; i <= 20; i++)
+		// {
+		// 	printf("%d ", fdp->table[i]);
+		// 	if (i == fdp->nb) printf("\n\t=>");
+		// 	if ((i+1) == (int)pow(2,pui) && i < fdp->nb)
+		// 	{
+		// 		printf("\n");
+		// 		pui++;
+		// 	}
+		// }
+		// printf("\n");
+
+
+		// printf("ISBINARYTREE = %d\n", check_tas_binaire(fdp, 1));
+
+	}
+}
 
 /*----------------------------------------------------------------------------------*/
 //                      Create and remove data struct functions
@@ -310,16 +518,20 @@ void init_links(Dllist *dll, int const LNK)
 
 Dllist* create_rd_data_struct()
 {
-	Dllist* dll_lnk = create_dll();
+	Dllist *dll = create_dll();
+	int coords[DIM];
 
 	for(int i=0; i<NB_VERTEX; i++)
 	{
-		int coords[2] = { randn( minX+margin, maxX-margin ), randn( minY+margin, maxY-margin ) };
+		for (int j = 0; j < DIM; ++j)
+		{
+			coords[j] = randn( minX+margin, maxX-margin );
+		}
 		Vertex *new_vert = create_vert( coords );
-		add_end_dll( dll_lnk, new_vert, STD );
+		add_end_dll( dll, new_vert, STD );
 	}
-	dll_lnk->up2date[STD] = 1;
-	return dll_lnk;
+	dll->up2date[STD] = 1;
+	return dll;
 }
 
 // TODO

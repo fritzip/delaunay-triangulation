@@ -25,7 +25,9 @@
 #define DAC 6
 #define NBL 7 // Nb de Liens : A incrémenter manuellement, LAST + 1
 
-#define NB_VERTEX 20
+#define NB_H 4
+#define NB_VERTEX 33
+#define NB_SIMPLEX ( 2*(NB_VERTEX - 1) - NB_H )
 
 #define minX	0
 #define maxX	500

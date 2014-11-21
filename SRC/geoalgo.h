@@ -51,4 +51,6 @@ Vertex* merge(Vertex *p, int P, Vertex* q, int Q, Dllist *dll, int LNK);
 
 Vertex* sort(Vertex *p, int n, Dllist *dll, int LNK);
 
+
+
 #endif

@@ -12,31 +12,38 @@
 //                                  Structures
 /*----------------------------------------------------------------------------------*/
 
-typedef struct vertex
+struct vertex
 {
 	int coords[DIM];
 	struct vertex *links[NBL][2];
-} Vertex;
+};
+typedef struct vertex Vertex;
 
-typedef struct simplex
-{
-	Vertex *v[3];
-	struct simplex *voisins[3];
-} Simplex;
 
-typedef struct
+struct dllist
 {
 	int length[NBL];
 	int up2date[NBL];
 	Vertex *root;
-} Dllist;
+};
+typedef struct dllist Dllist;
 
-typedef struct
+
+struct simplex
 {
-	void *father;
-	void *son1;
-	void *son2;
-} ABR;
+	Vertex *sommet[3];
+	struct simplex *voisin[3];
+	Dllist *pts;
+};
+typedef struct simplex Simplex;
+
+struct fdprior
+{
+	// Simplex **table;
+	int *table;
+	int nb;
+};
+typedef struct fdprior FDP;
 
 /*----------------------------------------------------------------------------------*/
 //                                  DLL functions prototypes
@@ -79,6 +86,37 @@ Vertex* create_vert( int coords[DIM] );
 /*----------------------------------------------------------------------------------*/
 //                                  Simplex functions prototypes
 /*----------------------------------------------------------------------------------*/
+
+void init_simplex(Simplex *simp, Vertex *vert[3]);
+
+Simplex* create_simplex(Vertex *vert[3]);
+
+
+/*----------------------------------------------------------------------------------*/
+//                                  Priority Queue functions prototypes
+/*----------------------------------------------------------------------------------*/
+
+void init_fdp(FDP *fdp);
+
+FDP* create_fdp();
+
+void switch_cells_fdp(FDP *fdp, int const a, int const b);
+
+int get_number_of_sons(int const i, int const n);
+
+int is_superior(FDP *fdp, int const a, int const b);
+
+void up_heap(FDP *fdp, int son, int father);
+
+void down_heap(FDP *fdp, int son, int father); 
+
+void insert_in_fdp(FDP *fdp, int simp);
+
+int extract_max(FDP *fdp);
+
+void heap_sort(FDP *fdp);
+
+int check_tas_binaire(FDP *fdp, int i);
 
 
 /*----------------------------------------------------------------------------------*/

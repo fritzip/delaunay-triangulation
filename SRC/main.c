@@ -6,12 +6,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h>  
-#include <math.h>  
+#include <unistd.h>
+#include <math.h>
 #include <assert.h>
 #include <GL/glut.h> 
 
 #include "main.h"
+#include "math_fn.h"
 
 /*----------------------------------------------------------------------------------*/
 //                                  Graphic functions
@@ -37,25 +38,15 @@ void display (void)
 	glColor3f(0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	Dllist *dll_lnk = create_rd_data_struct();
+	// Dllist *dll_lnk = create_rd_data_struct();
 
-	init_links(dll_lnk, JAR);
-	// init_links(dll_lnk, GRA);
-	// init_links(dll_lnk, LXC);
-	// init_links(dll_lnk, DAC);
+	// init_links(dll_lnk, JAR);
+	// print_dll(dll_lnk, JAR);
 
-	// print_dll(dll_lnk, STD);
-	print_dll(dll_lnk, LEX);
-	// print_dll(dll_lnk, POL);
-	// print_dll(dll_lnk, GRA);
-	print_dll(dll_lnk, JAR);
-	// print_dll(dll_lnk, LXC);
-	// print_dll(dll_lnk, DAC);
-
-	affiche(dll_lnk, POL, GL_LINE_LOOP, 1.0, 0.0, 0.0);
-	affiche(dll_lnk, JAR, GL_LINE_LOOP, 1.0, 1.0, 1.0);
+	// affiche(dll_lnk, POL, GL_LINE_LOOP, 1.0, 0.0, 0.0);
+	// affiche(dll_lnk, JAR, GL_LINE_LOOP, 1.0, 1.0, 1.0);
 	
-	// remove_data_struct(dll_lnk); //ne s'utilise pas ici, pac comme ça
+	// remove_data_struct(dll_lnk); //ne s'utilise pas ici, pas comme ça !
 
 	glFlush();
 }
@@ -84,21 +75,54 @@ int main(int argc, char **argv)
 		}
 	}
 
-	assert(displayChoice >= 0 && displayChoice <= 4);
-	printf("Executing %s with line option %d = %s.\n", argv[0], displayChoice, lineOption[displayChoice]);
-	glutInit(&argc, argv);  
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);  
 
-	glutInitWindowPosition(5,5);  
-	glutInitWindowSize(maxX,maxY);  
+	FDP *fdp = create_fdp();
+	for (int i = 1; i <= 20; i++)
+	{
+		insert_in_fdp(fdp, randn(1,10));
+	}
 
-	glutCreateWindow("My first OpenGL window...");  
+	// printf("is tas binaire = %d\n", check_tas_binaire(fdp, 1));
+
+	// int pui = 1;
+	// for (int i = 1; i <= 20; i++)
+	// {
+	// 	printf("%d ", fdp->table[i]);
+	// 	// printf("%d, %d", i+1, (int)pow(2,pui));
+	// 	if ((i+1) == (int)pow(2,pui))
+	// 	{
+	// 		printf("\n");
+	// 		pui++;
+	// 	}
+	// }
+	// printf("\n");
+
+	heap_sort(fdp);
+
+	for (int i = 1; i <= 20; i++)
+	{
+		printf("%d ", fdp->table[i]);
+	}
+	printf("\n");
+
+	// printf("numson = %d\n", get_number_of_sons(38,11));
+	// printf("%d\n", 11/2);
+	// printf("%d\n", extract_max(fdp));
+	// assert(displayChoice >= 0 && displayChoice <= 4);
+	// printf("Executing %s with line option %d = %s.\n", argv[0], displayChoice, lineOption[displayChoice]);
+	// glutInit(&argc, argv);  
+	// glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);  
+
+	// glutInitWindowPosition(5,5);  
+	// glutInitWindowSize(maxX,maxY);  
+
+	// glutCreateWindow("My first OpenGL window...");  
 	
-	gluOrtho2D(minX, maxX, minY, maxY);
+	// gluOrtho2D(minX, maxX, minY, maxY);
 
-	glutDisplayFunc(display);  
+	// glutDisplayFunc(display);  
 
-	glutMainLoop();  
+	// glutMainLoop();  
 		
 	return EXIT_SUCCESS; 
 }
