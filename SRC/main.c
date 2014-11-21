@@ -82,21 +82,6 @@ int main(int argc, char **argv)
 		insert_in_fdp(fdp, randn(1,10));
 	}
 
-	// printf("is tas binaire = %d\n", check_tas_binaire(fdp, 1));
-
-	// int pui = 1;
-	// for (int i = 1; i <= 20; i++)
-	// {
-	// 	printf("%d ", fdp->table[i]);
-	// 	// printf("%d, %d", i+1, (int)pow(2,pui));
-	// 	if ((i+1) == (int)pow(2,pui))
-	// 	{
-	// 		printf("\n");
-	// 		pui++;
-	// 	}
-	// }
-	// printf("\n");
-
 	heap_sort(fdp);
 
 	for (int i = 1; i <= 20; i++)
@@ -105,9 +90,7 @@ int main(int argc, char **argv)
 	}
 	printf("\n");
 
-	// printf("numson = %d\n", get_number_of_sons(38,11));
-	// printf("%d\n", 11/2);
-	// printf("%d\n", extract_max(fdp));
+
 	// assert(displayChoice >= 0 && displayChoice <= 4);
 	// printf("Executing %s with line option %d = %s.\n", argv[0], displayChoice, lineOption[displayChoice]);
 	// glutInit(&argc, argv);  

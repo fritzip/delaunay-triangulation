@@ -116,9 +116,6 @@ int extract_max(FDP *fdp);
 
 void heap_sort(FDP *fdp);
 
-int check_tas_binaire(FDP *fdp, int i);
-
-
 /*----------------------------------------------------------------------------------*/
 //                      Create and remove data struct functions
 /*----------------------------------------------------------------------------------*/

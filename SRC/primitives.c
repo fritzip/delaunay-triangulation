@@ -300,10 +300,8 @@ int is_superior(FDP *fdp, int const a, int const b)
 
 void up_heap(FDP *fdp, int son, int father)
 {
-	// printf("%d, %d\n", son, father);
 	while(father > 0)
 	{
-		// printf("%d, %d, %d, %d, %d\n", is_superior(fdp, son, father), son, father, fdp->table[son], fdp->table[father]);
 		if (is_superior(fdp, son, father))
 		{
 			switch_cells_fdp(fdp, son, father);
@@ -341,34 +339,6 @@ void down_heap(FDP *fdp, int son, int father)
 	}
 }
 
-int check_tas_binaire(FDP *fdp, int i )
-{
-	// printf("check_tas_binaire i = %d, %d, %d\n", i, i*2, i*2+1);
-	switch( get_number_of_sons(i, fdp->nb) )
-	{
-		case 2: 
-			if (is_superior(fdp, i, i*2) && is_superior(fdp, i, i*2+1))
-			{
-				// printf("OUI : %d > %d ET %d > %d\n", fdp->table[i], fdp->table[i*2], fdp->table[i], fdp->table[i*2+1]);
-				if ( !check_tas_binaire(fdp, i*2) ) return 0;
-				if ( !check_tas_binaire(fdp, i*2+1) ) return 0;
-			}
-			else return 0;
-			break;
-		case 1: 
-			if ( !is_superior(fdp, i, i*2) )
-				return 0;
-			// printf("FIN BRANCHE OKAY 1\n");
-			break;
-		case 0: 
-			// printf("FIN BRANCHE OKAY 0\n");
-			break;
-		default: printf("Error in function check_tas_binaire\n");
-			break;
-	}
-	return 1;
-}
-
 void insert_in_fdp(FDP *fdp, int simp)
 {
 	fdp->table[fdp->nb + 1] = simp;
@@ -393,49 +363,13 @@ void heap_sort(FDP *fdp)
 		up_heap(fdp, son, father);
 	}
 
-	// printf("is tas binaire = %d\n", check_tas_binaire(fdp, 1));
-
 	while(fdp->nb > 1)
 	{
-		// printf("nb = %d\n", fdp->nb);
-		// printf("switch_cells\n");
 		switch_cells_fdp(fdp, 1, fdp->nb);
 
 		fdp->nb--;
 
-		// pui = 1;
-		// for (int i = 1; i <= 20; i++)
-		// {
-		// 	printf("%d ", fdp->table[i]);
-		// 	if (i == fdp->nb) printf("\n\t=>");
-		// 	if ((i+1) == (int)pow(2,pui) && i < fdp->nb)
-		// 	{
-		// 		printf("\n");
-		// 		pui++;
-		// 	}
-		// }
-		// printf("\n");
-
-
 		down_heap(fdp, 2, 1);
-
-
-		// pui = 1;
-		// for (int i = 1; i <= 20; i++)
-		// {
-		// 	printf("%d ", fdp->table[i]);
-		// 	if (i == fdp->nb) printf("\n\t=>");
-		// 	if ((i+1) == (int)pow(2,pui) && i < fdp->nb)
-		// 	{
-		// 		printf("\n");
-		// 		pui++;
-		// 	}
-		// }
-		// printf("\n");
-
-
-		// printf("ISBINARYTREE = %d\n", check_tas_binaire(fdp, 1));
-
 	}
 }
 
