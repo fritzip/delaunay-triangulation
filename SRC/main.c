@@ -33,11 +33,41 @@ void affiche(Dllist *dll, int LNK, int GL_DRAW_STYLE, double r, double g, double
 	glEnd();
 }
 
+void affiche_simplex(Simplex *simp, double r, double g, double b)
+{
+	glBegin(GL_LINE_LOOP);
+	glColor3f(r, g, b);
+
+	for(int i = 0; i < 3; i++)
+	{
+		glVertex2f(simp->sommet[i]->coords[0], simp->sommet[(i+1)%3]->coords[1]);
+	}
+
+	glEnd();
+
+	glBegin(GL_POINTS);
+
+	Vertex *current = simp->candidats->root->links[STD][FWD];
+	for (int i = 0; i < simp->candidats->length[STD]; i++)
+	{
+		glVertex2f(current->coords[0], current->coords[1]);
+		current = current->links[STD][FWD];
+	}
+
+	glEnd();
+}
+
+
 void display (void)
 {
 	glColor3f(0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+
+	Grid* mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1 );
+
+	affiche_simplex(mygrid->fdp->table[1], 1.0, 0.0, 0.0);
+	affiche_simplex(mygrid->fdp->table[2], 0.0, 1.0, 0.0);
 	// Dllist *dll_lnk = create_rd_data_struct();
 
 	// init_links(dll_lnk, JAR);
@@ -77,24 +107,21 @@ int main(int argc, char **argv)
 		}
 	}	
 
-	Grid* mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1 );
-	// printf("orixy = %f\n", orientationXY(1.0, 2.0, 1.12, 1.0, 1.0, 1.5));
+	assert(displayChoice >= 0 && displayChoice <= 4);
+	printf("Executing %s with line option %d = %s.\n", argv[0], displayChoice, lineOption[displayChoice]);
+	glutInit(&argc, argv);  
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);  
 
-	// assert(displayChoice >= 0 && displayChoice <= 4);
-	// printf("Executing %s with line option %d = %s.\n", argv[0], displayChoice, lineOption[displayChoice]);
-	// glutInit(&argc, argv);  
-	// glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);  
+	glutInitWindowPosition(5,5);  
+	glutInitWindowSize(maxX*500,maxY*500);  
 
-	// glutInitWindowPosition(5,5);  
-	// glutInitWindowSize(maxX,maxY);  
-
-	// glutCreateWindow("My first OpenGL window...");  
+	glutCreateWindow("My first OpenGL window...");  
 	
-	// gluOrtho2D(minX, maxX, minY, maxY);
+	gluOrtho2D(minX-0.1, maxX+0.1, minY-0.1, maxY+0.1);
 
-	// glutDisplayFunc(display);  
+	glutDisplayFunc(display);  
 
-	// glutMainLoop();  
+	glutMainLoop();  
 		
 	return EXIT_SUCCESS; 
 }

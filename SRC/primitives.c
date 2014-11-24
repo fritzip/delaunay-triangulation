@@ -408,7 +408,9 @@ void init_grid( Grid *grid, int nb_pts, int size )
 	Vertex *dl = create_vert(0.0, 0.0, 0.0);
 
 	// 2 init triangles
-	Simplex *simp[2] = {create_simplex(ur, ul, dl), create_simplex(dl, dr, ur)};
+	Simplex *simp[2];
+	simp[0] = create_simplex(ur, ul, dl);
+	simp[1] = create_simplex(dl, dr, ur);
 	simp[0]->voisin[1] = simp[1];
 	simp[1]->voisin[1] = simp[0];
 
@@ -424,9 +426,7 @@ void init_grid( Grid *grid, int nb_pts, int size )
 				break;
 		}
 
-		new_vert->zdist = randf() ; //compute_zdist( simp[j], new_vert->coords[0], new_vert->coords[1] );
-
-		// printf("%f ", compute_zdist( simp[j], new_vert->coords[0], new_vert->coords[1] ) );
+		new_vert->zdist = new_vert->coords[2] - compute_zdist( simp[j], new_vert->coords[0], new_vert->coords[1] );
 
 		if ( simp[j]->candidats->length[STD] > 0 && is_superior_vertex( new_vert, simp[j]->candidats->root->links[STD][FWD]) )
 			add_begin_dll( simp[j]->candidats, new_vert, STD );
@@ -434,10 +434,12 @@ void init_grid( Grid *grid, int nb_pts, int size )
 			add_end_dll( simp[j]->candidats, new_vert, STD );
 	}
 	
-	print_simplex(simp[0]);
-	print_simplex(simp[1]);
+	// print_simplex(simp[0]);
+	// print_simplex(simp[1]);
 
-	// grid->fdp = create_fdp( size );
+	grid->fdp = create_fdp( size );
+	insert_in_fdp(grid->fdp, simp[0]);
+	insert_in_fdp(grid->fdp, simp[1]);
 }
 
 Grid* create_grid( int nb_pts, int size )
