@@ -17,6 +17,8 @@ void print_info(Dllist const *dll, int const LNK);
 
 void print_vertex(Vertex const *vert);
 
+void print_simplex(Simplex const *simp);
+
 void print_dll(Dllist const *dll, int const LNK);
 
 void print_dll_full(Dllist const *dll, int const LNK);

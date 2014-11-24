@@ -16,6 +16,7 @@ typedef struct vertex
 {
 	double coords[DIM];
 	struct vertex *links[NBL][2];
+	double zdist;
 } Vertex ;
 
 typedef struct dllist
@@ -29,13 +30,13 @@ typedef struct simplex
 {
 	Vertex *sommet[3];
 	struct simplex *voisin[3];
-	Dllist *pts;
+	Dllist *candidats;
+	unsigned long int datation;
 } Simplex ;
 
 typedef struct fdprior
 {
 	Simplex **table;
-	// int *table;
 	int nb;
 } FDP ;
 
@@ -105,6 +106,10 @@ void switch_cells_fdp(FDP *fdp, int const a, int const b);
 
 int get_number_of_sons(int const i, int const n);
 
+int is_superior_vertex( Vertex *p1, Vertex *p2 );
+
+int is_superior_simplex( Simplex *s1, Simplex *s2 );
+
 int is_superior(FDP *fdp, int const a, int const b);
 
 void up_heap(FDP *fdp, int son, int father);
@@ -129,8 +134,6 @@ Grid* create_grid( int nb_pts, int size );
 /*----------------------------------------------------------------------------------*/
 //                      Create and remove data struct functions
 /*----------------------------------------------------------------------------------*/
-
-void inittab(Dllist *dll);
 
 void init_links(Dllist *dll, int const LNK);
 

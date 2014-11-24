@@ -38,11 +38,6 @@ void display (void)
 	glColor3f(0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-
-
-	Grid* mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1 );
-
-
 	// Dllist *dll_lnk = create_rd_data_struct();
 
 	// init_links(dll_lnk, JAR);
@@ -71,15 +66,19 @@ int main(int argc, char **argv)
 	{
 		switch (option)
 		{
-		case 'c': if ((sscanf(optarg, "%d", &displayChoice) == 1) && displayChoice >= 0 && displayChoice <= 4)
+			case 'c': 
+				if ((sscanf(optarg, "%d", &displayChoice) == 1) && displayChoice >= 0 && displayChoice <= 4)
 				break;
-		case '?': /* value returned by getopt if invalid option chosen */
-		default : printf("Usage: %s -cX, with X = 1, 2, 3 or 4.\n", argv[0]);
+			case '?': /* value returned by getopt if invalid option chosen */
+			default : 
+				printf("Usage: %s -cX, with X = 1, 2, 3 or 4.\n", argv[0]);
 				displayChoice = 0;
 				break;
 		}
 	}	
 
+	Grid* mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1 );
+	// printf("orixy = %f\n", orientationXY(1.0, 2.0, 1.12, 1.0, 1.0, 1.5));
 
 	// assert(displayChoice >= 0 && displayChoice <= 4);
 	// printf("Executing %s with line option %d = %s.\n", argv[0], displayChoice, lineOption[displayChoice]);

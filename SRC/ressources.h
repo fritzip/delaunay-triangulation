@@ -9,7 +9,7 @@
 //                                  #define
 /*----------------------------------------------------------------------------------*/
 
-#define DEBUG 0
+// #define DEBUG 0
 
 #define DIM 3
 
@@ -23,7 +23,7 @@
 #define JAR 4
 #define LXC 5
 #define DAC 6
-#define NBL 7 // Nb de Liens : A incrémenter manuellement, LAST + 1
+#define NBL 1 // Nb de Liens : A incrémenter manuellement, LAST + 1
 
 #define NB_H 4
 #define NB_VERTEX 33

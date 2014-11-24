@@ -10,18 +10,18 @@
 //                                  Math functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-int sgn(int const x);
+int sgn(double const x);
 
 int randn(int const min, int const max);
 
 double randf();
 
-int determinant2d(int const a, int const b, int const c, int const d);
+double determinant2d(double const a, double const b, double const c, double const d);
 
-int determinant3d(Vertex const *p1, Vertex const *p2, Vertex const *p3);
+double determinant3d(Vertex const *p1, Vertex const *p2, Vertex const *p3);
 
 int orientation(Vertex const *p1, Vertex const *p2, Vertex const *p3);
 
-double distancez( Simplex const *s1, double x, double y );
+double compute_zdist( Simplex const *s1, double x, double y );
 
 #endif

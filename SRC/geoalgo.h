@@ -28,6 +28,8 @@ void graham(Dllist *dll);
 
 void jarvis(Dllist *dll);
 
+void inittab(Dllist *dll);
+
 void lexconvex(Dllist *dll);
 
 //////////////////////////////////////////////////////////////////////////////////////

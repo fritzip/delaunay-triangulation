@@ -9,6 +9,7 @@
 
 #include "primitives.h"
 #include "geoalgo.h"
+#include "print_fn.h"
 
 /*----------------------------------------------------------------------------------*/
 //                                  DLL Functions
@@ -212,6 +213,8 @@ void init_vert( Vertex *vert, double x, double y, double z )
 		vert->links[i][BWD] = NULL;	
 		vert->links[i][FWD] = NULL;
 	}
+
+	vert->zdist = 0;
 }
 
 Vertex* create_vert( double x, double y, double z )
@@ -238,7 +241,7 @@ void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2 )
 	for(int i=0; i<3; i++)
 		simp->voisin[i] = NULL;
 
-	simp->pts = create_dll();
+	simp->candidats = create_dll();
 }
 
 Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
@@ -255,8 +258,10 @@ int inside_simplex( Simplex *simp, Vertex *vert )
 {
 	int ori = 0;
 	for (int i = 0; i < 3; i++)
+	{
 		ori += orientation(simp->sommet[i], simp->sommet[(i+1)%3], vert);
-	return ( abs(ori) == 3 ) ;
+	}
+	return ( fabs(ori) == 3 ) ;
 }
 
 
@@ -300,16 +305,26 @@ int get_number_of_sons( int const i, int const n )
 	else return 2;
 }
 
-int is_superior( FDP *fdp, int const a, int const b )
+int is_superior_vertex( Vertex *p1, Vertex *p2 )
 {
-	return (fdp->table[a]->pts->root->links[STD][FWD]->coords[0] > fdp->table[b]->pts->root->links[STD][FWD]->coords[0]);
+	return (p1->zdist > p2->zdist);
+}
+
+int is_superior_simplex( Simplex *s1, Simplex *s2 )
+{
+	return is_superior_vertex(s1->candidats->root->links[STD][FWD], s2->candidats->root->links[STD][FWD] );
+}
+
+int is_superior_fdp( FDP *fdp, int const a, int const b )
+{
+	return is_superior_simplex(fdp->table[a], fdp->table[b]);
 }
 
 void up_heap( FDP *fdp, int son, int father )
 {
 	while(father > 0)
 	{
-		if (is_superior(fdp, son, father))
+		if (is_superior_fdp(fdp, son, father))
 		{
 			switch_cells_fdp(fdp, son, father);
 			son = father;
@@ -328,11 +343,11 @@ void down_heap( FDP *fdp, int son, int father )
 		switch( get_number_of_sons(father, fdp->nb) )
 		{
 			case 2: 
-				son += is_superior(fdp, son+1, son);
-				if ( is_superior(fdp, son, father) ) switch_cells_fdp(fdp, son, father);
+				son += is_superior_fdp(fdp, son+1, son);
+				if ( is_superior_fdp(fdp, son, father) ) switch_cells_fdp(fdp, son, father);
 				break;
 			case 1: 
-				if ( is_superior(fdp, son, father) ) switch_cells_fdp(fdp, son, father);
+				if ( is_superior_fdp(fdp, son, father) ) switch_cells_fdp(fdp, son, father);
 				break;
 			case 0: 
 				LOOP = 0;
@@ -386,19 +401,43 @@ void heap_sort( FDP *fdp )
 
 void init_grid( Grid *grid, int nb_pts, int size )
 {
+	// 4 corners vertex
 	Vertex *ul = create_vert(0.0, 1.0, 0.0);
 	Vertex *ur = create_vert(1.0, 1.0, 0.0);
 	Vertex *dr = create_vert(1.0, 0.0, 0.0);
 	Vertex *dl = create_vert(0.0, 0.0, 0.0);
 
-	Simplex *first = create_simplex(ur, ul, dl);
-	Simplex *second = create_simplex(dl, dr, ur);
-	first->voisin[1] = second;
-	second->voisin[1] = first;
+	// 2 init triangles
+	Simplex *simp[2] = {create_simplex(ur, ul, dl), create_simplex(dl, dr, ur)};
+	simp[0]->voisin[1] = simp[1];
+	simp[1]->voisin[1] = simp[0];
+
+	// init vertex
+	Vertex *new_vert;
+	int i, j;
+	for (i = 0; i < nb_pts; i++)
+	{
+		new_vert = create_vert(randf(), randf(), randf());
+		for (j = 0; j < 2; j++)
+		{
+			if ( inside_simplex( simp[j], new_vert ) )
+				break;
+		}
+
+		new_vert->zdist = randf() ; //compute_zdist( simp[j], new_vert->coords[0], new_vert->coords[1] );
+
+		// printf("%f ", compute_zdist( simp[j], new_vert->coords[0], new_vert->coords[1] ) );
+
+		if ( simp[j]->candidats->length[STD] > 0 && is_superior_vertex( new_vert, simp[j]->candidats->root->links[STD][FWD]) )
+			add_begin_dll( simp[j]->candidats, new_vert, STD );
+		else
+			add_end_dll( simp[j]->candidats, new_vert, STD );
+	}
 	
-	grid->fdp = create_fdp( size );
-	insert_in_fdp( grid->fdp, first );
-	insert_in_fdp( grid->fdp, second );
+	print_simplex(simp[0]);
+	print_simplex(simp[1]);
+
+	// grid->fdp = create_fdp( size );
 }
 
 Grid* create_grid( int nb_pts, int size )
