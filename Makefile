@@ -48,7 +48,7 @@ ln       = ln -sf
 
 
 $(BINDIR)/$(TARGET): $(OBJECTS)
-	@$(CC) $(LFLAGS) $(GL_LIBRARIES) $(OBJECTS) $(GL_LIBDIR) -o $@ 
+	@$(CC) $(LFLAGS) $(OBJECTS) $(GL_LIBDIR) $(GL_LIBRARIES) -o $@ 
 	@echo "Linking complete !"
 	@$(ln) $(BINDIR)/$(TARGET)
 	@echo "You can now run ./"$(TARGET)
