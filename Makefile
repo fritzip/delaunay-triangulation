@@ -54,6 +54,7 @@ $(BINDIR)/$(TARGET): $(OBJECTS)
 	@echo "You can now run ./"$(TARGET)
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+	@mkdir -p $(OBJDIR)
 	@$(CC) $(CFLAGS) $(GL_INCLUDE) -c $< -o $@
 	@echo "Successfully compiled "$<
 

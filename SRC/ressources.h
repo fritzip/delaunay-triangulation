@@ -33,6 +33,6 @@
 #define maxX	1
 #define minY	0
 #define maxY	1
-#define margin	0
+#define margin	0.1
 
 #endif

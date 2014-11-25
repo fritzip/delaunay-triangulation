@@ -79,6 +79,8 @@ void display (void)
 	// remove_data_struct(dll_lnk); //ne s'utilise pas ici, pas comme ça !
 
 	glFlush();
+    //glutSwapBuffers();   // swapping image buffer for double buffering
+    //glutPostRedisplay();
 }
 
 
@@ -115,9 +117,10 @@ int main(int argc, char **argv)
 	glutInitWindowPosition(5,5);  
 	glutInitWindowSize(maxX*500,maxY*500);  
 
-	glutCreateWindow("My first OpenGL window...");  
+	glutCreateWindow("Delaunay grid");  
 	
-	gluOrtho2D(minX-0.1, maxX+0.1, minY-0.1, maxY+0.1);
+	gluOrtho2D(minX-margin, maxX+margin, minY-margin, maxY+margin);
+
 
 	glutDisplayFunc(display);  
 
