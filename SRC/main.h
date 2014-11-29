@@ -30,7 +30,11 @@ char *lineOption[] = { "GL_POINTS", "GL_LINES", "GL_LINE_STRIP", "GL_LINE_LOOP",
 
 #endif
 
-void affiche(Dllist *dll, int LNK, int GL_DRAW_STYLE, double r, double g, double b);
+void affiche_dll(Dllist *dll, int LNK, int GL_DRAW_STYLE, double r, double g, double b);
+
+void affiche_simplex(Simplex *simp, double r, double g, double b);
+
+void affiche_grid(Grid *grid, double r, double g, double b);
 
 void display (void);
 

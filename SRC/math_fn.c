@@ -50,23 +50,47 @@ int orientation(Vertex const *p1, Vertex const *p2, Vertex const *p3)
 			    - (p2->coords[1] - p1->coords[1]) * (p3->coords[0] - p1->coords[0]) );
 }
 
-double compute_zdist( Simplex const *s1, double x, double y )
+void compute_plan( Simplex *simp )
 {
-	return s1->sommet[0]->coords[2]
-		   - (((( s1->sommet[1]->coords[1] - s1->sommet[0]->coords[1] ) 
-		   *    ( s1->sommet[2]->coords[2] - s1->sommet[0]->coords[2] )
-		   -    ( s1->sommet[1]->coords[2] - s1->sommet[0]->coords[2] ) 
-		   *    ( s1->sommet[2]->coords[1] - s1->sommet[0]->coords[1] ))
-		   *    (                        x - s1->sommet[0]->coords[0] ))
+	simp->na =  ( simp->sommet[1]->coords[1] - simp->sommet[0]->coords[1] ) 
+		   *    ( simp->sommet[2]->coords[2] - simp->sommet[0]->coords[2] )
+		   -    ( simp->sommet[1]->coords[2] - simp->sommet[0]->coords[2] ) 
+		   *    ( simp->sommet[2]->coords[1] - simp->sommet[0]->coords[1] );
 
-		   +  ((( s1->sommet[1]->coords[2] - s1->sommet[0]->coords[2] ) 
-		   *    ( s1->sommet[2]->coords[0] - s1->sommet[0]->coords[0] )
-		   -    ( s1->sommet[1]->coords[0] - s1->sommet[0]->coords[0] ) 
-		   *    ( s1->sommet[2]->coords[2] - s1->sommet[0]->coords[2] ))
-		   *    (                        y - s1->sommet[0]->coords[1] )))
+	simp->nb =  ( simp->sommet[1]->coords[2] - simp->sommet[0]->coords[2] ) 
+		   *    ( simp->sommet[2]->coords[0] - simp->sommet[0]->coords[0] )
+		   -    ( simp->sommet[1]->coords[0] - simp->sommet[0]->coords[0] ) 
+		   *    ( simp->sommet[2]->coords[2] - simp->sommet[0]->coords[2] );
+
+	simp->nc =  ( simp->sommet[1]->coords[0] - simp->sommet[0]->coords[0] ) 
+		   *    ( simp->sommet[2]->coords[1] - simp->sommet[0]->coords[1] )
+		   -    ( simp->sommet[1]->coords[1] - simp->sommet[0]->coords[1] ) 
+		   *    ( simp->sommet[2]->coords[0] - simp->sommet[0]->coords[0] );
+}
+
+double compute_zdist( Simplex const *simp, Vertex const *vert ) //double x, double y )
+{
+	// mettre equation dans simplex
+	// return vert->coords[2] - simp->sommet[0]->coords[2]
+	// 	   - (((( simp->sommet[1]->coords[1] - simp->sommet[0]->coords[1] ) 
+	// 	   *    ( simp->sommet[2]->coords[2] - simp->sommet[0]->coords[2] )
+	// 	   -    ( simp->sommet[1]->coords[2] - simp->sommet[0]->coords[2] ) 
+	// 	   *    ( simp->sommet[2]->coords[1] - simp->sommet[0]->coords[1] ))
+	// 	   *    (            vert->coords[0] - simp->sommet[0]->coords[0] ))
+
+	// 	   +  ((( simp->sommet[1]->coords[2] - simp->sommet[0]->coords[2] ) 
+	// 	   *    ( simp->sommet[2]->coords[0] - simp->sommet[0]->coords[0] )
+	// 	   -    ( simp->sommet[1]->coords[0] - simp->sommet[0]->coords[0] ) 
+	// 	   *    ( simp->sommet[2]->coords[2] - simp->sommet[0]->coords[2] ))
+	// 	   *    (            vert->coords[1] - simp->sommet[0]->coords[1] )))
 		 
-		   /  (( s1->sommet[1]->coords[0] - s1->sommet[0]->coords[0] ) 
-		   *   ( s1->sommet[2]->coords[1] - s1->sommet[0]->coords[1] )
-		   -   ( s1->sommet[1]->coords[1] - s1->sommet[0]->coords[1] ) 
-		   *   ( s1->sommet[2]->coords[0] - s1->sommet[0]->coords[0] ));
+	// 	   /   (( simp->sommet[1]->coords[0] - simp->sommet[0]->coords[0] ) 
+	// 	   *    ( simp->sommet[2]->coords[1] - simp->sommet[0]->coords[1] )
+	// 	   -    ( simp->sommet[1]->coords[1] - simp->sommet[0]->coords[1] ) 
+	// 	   *    ( simp->sommet[2]->coords[0] - simp->sommet[0]->coords[0] ));
+
+	return vert->coords[2] - simp->sommet[0]->coords[2]
+		   + ((( simp->na * ( vert->coords[0] - simp->sommet[0]->coords[0] ))
+		     + ( simp->nb * ( vert->coords[1] - simp->sommet[0]->coords[1] )) )
+		     /   simp->nc );
 }

@@ -50,8 +50,9 @@ void print_vertex(Vertex const *vert)
 	printf("(V) coords = ");
 	for (int i = 0; i < DIM; i++)
 	{
-		printf("%.2f ", vert->coords[i]);
+		printf("%.3f ", vert->coords[i]);
 	}
+	printf(" ||  zdist = %.3f", vert->zdist);
 	printf("\n");
 	// printf("(V) zdist = %.2f\n", vert->zdist);
 }
@@ -82,10 +83,31 @@ void print_simplex(Simplex const *simp)
 	Vertex *temp = simp->candidats->root->links[STD][FWD];
 	for (int i = 0; i < simp->candidats->length[STD]; i++)
 	{
-		printf("%.2f ", temp->zdist);
+		// print_vertex(temp);
+		printf("%.3f ", temp->zdist);
 		temp = temp->links[STD][FWD];
 	}
 	printf("\n===============\n");
+}
+
+void print_fdp(FDP const *fdp )
+{
+	printf("===== FDP =====\n");
+	Vertex *vert = NULL;
+	int n;
+	for (int i = 1; i <= fdp->nb; i++)
+	{
+		n = fdp->table[i]->candidats->length[STD];
+		printf("(%3d) ",n );
+		vert = fdp->table[i]->candidats->root->links[STD][FWD];
+		for (int j = 0; j < n; j++)
+		{
+			printf("%.3f ", vert->zdist);
+			vert = vert->links[STD][FWD];
+		}
+		printf("\n");
+	}
+	printf("===============\n");
 }
 
 void print_dll(Dllist const *dll, int const LNK)

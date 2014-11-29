@@ -17,7 +17,7 @@
 
 void init_dll(Dllist *dll)
 {
-	dll->root = create_vert(0.0, 0.0, 0.0 );
+	dll->root = create_vert(0.0, 0.0, 0.0);
 
 	for(int i=0; i<NBL; i++)
 	{
@@ -232,16 +232,37 @@ Vertex* create_vert( double x, double y, double z )
 //                                  Simplex functions
 /*----------------------------------------------------------------------------------*/
 
+int is_superior_vertex_lex(Vertex const *p, Vertex const *q )
+{
+	if ( ( p->coords[0] > q->coords[0] ) || ( p->coords[0] == q->coords[0] && p->coords[1] >= q->coords[1] ) ) return 1;
+	else return 0;
+}
+
 void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2 )
 {
-	simp->sommet[0] = v0;
-	simp->sommet[1] = v1;
-	simp->sommet[2] = v2;
+	// Vertex *tab[3] = {v0, v1, v2};
+	// int ind = is_superior_vertex_lex(tab[0], tab[1]); // return index of min lexico between v1 and v2
+	// if ( !is_superior_vertex_lex( tab[2], tab[ind] ) ) ind = 2;
+
+	// int ind2 = (ind+1)%3;
+	// int ind3 = (ind+2)%3;
+	// if ( orientation( tab[ind], tab[ind2], tab[ind3] ) != -1 )
+	// {
+	// 	ind2 = ind3;
+	// 	ind3 = (ind+1)%3;
+	// }
+
+	simp->sommet[0] = v0; // tab[ind];
+	simp->sommet[1] = v1; // tab[ind2];
+	simp->sommet[2] = v2; // tab[ind3];
+
+	compute_plan(simp);
 
 	for(int i=0; i<3; i++)
 		simp->voisin[i] = NULL;
 
 	simp->candidats = create_dll();
+	simp->datation = 0;
 }
 
 Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
@@ -264,6 +285,121 @@ int inside_simplex( Simplex *simp, Vertex *vert )
 	return ( fabs(ori) == 3 ) ;
 }
 
+void split_in_3( FDP *fdp )
+{
+	Simplex *simp = fdp->table[1];
+	// print_simplex(simp);
+
+	Vertex *vert = simp->candidats->root->links[STD][FWD];
+	vert->zdist = 0;
+	rm_after(simp->candidats, simp->candidats->root, STD);
+	Simplex *new_simp1 = create_simplex(vert, simp->sommet[1], simp->sommet[2]);
+	Simplex *new_simp2 = create_simplex(vert, simp->sommet[2], simp->sommet[0]);
+	simp->sommet[2] = vert;
+
+	new_simp1->voisin[0] = simp->voisin[0];
+	new_simp1->voisin[1] = new_simp2;
+	new_simp1->voisin[2] = simp;
+
+	new_simp2->voisin[0] = simp->voisin[1];
+	new_simp2->voisin[1] = simp;
+	new_simp2->voisin[2] = new_simp1;
+
+	simp->voisin[0] = new_simp1;
+	simp->voisin[1] = new_simp2;
+
+	simp->datation = 0;
+
+	compute_plan(simp);
+
+	Simplex *tab[3] = {new_simp1, new_simp2, simp};
+
+	int i, j;
+	int n = simp->candidats->length[STD];
+	Vertex *current = simp->candidats->root->links[STD][FWD];
+	Vertex *next = NULL;
+
+	for (i = 0; i < n; i++)
+	{
+		// print_simplex(tab[0]);
+		// print_simplex(tab[1]);
+		// print_simplex(tab[2]);
+		// printf("%d/%d\n", i+1, n);
+		for (j = 0; j < 3; j++)
+		{
+			if ( inside_simplex( tab[j], current ) )
+				break;
+		}
+
+		// si j==3, on le pousse de 10-13 !
+		// printf("j = %d\n", j);
+		current->zdist = compute_zdist( tab[j], current );
+		
+		if ( j == 2 )
+		{
+			current = current->links[STD][FWD];
+		}
+		else
+		{
+			next = current->links[STD][FWD];
+			// print_dll(tab[2]->candidats, STD);
+			rm_after(tab[2]->candidats, current->links[STD][BWD], STD);
+			// print_dll(tab[2]->candidats, STD);
+			// print_vertex(current);
+			if ( tab[j]->candidats->length[STD] > 0 && is_superior_vertex( current, tab[j]->candidats->root->links[STD][FWD]) )
+			{
+				// print_dll(tab[j]->candidats, STD);
+				add_begin_dll( tab[j]->candidats, current, STD );
+				// print_dll(tab[j]->candidats, STD);
+			}
+			else
+			{
+				// print_dll(tab[j]->candidats, STD);
+				add_end_dll( tab[j]->candidats, current, STD );
+				// print_dll(tab[j]->candidats, STD);
+			}
+			current = next;
+			// print_vertex(current);
+		}
+	}
+
+
+	// printf("\n============================================================\n");
+
+	// parcourir tab[2] et mettre le max en 1 de la dll
+	n = 0;
+	current = simp->candidats->root->links[STD][FWD];
+	Vertex *max = current;
+	// printf("len = %d\n", simp->candidats->length[STD] );
+	while (n < simp->candidats->length[STD])
+	{
+		// printf("n = %d\n", n);
+		// print_vertex(current);
+		if ( is_superior_vertex( current, max ) ) max = current;
+		current = current->links[STD][FWD];
+		n++;
+	}
+
+	switch_cells(max, simp->candidats->root->links[STD][FWD], STD);
+
+	// printf("=========================!!!================================\n");
+
+	// print_simplex(tab[0]);
+	// print_simplex(tab[1]);
+	// print_simplex(tab[2]);
+
+	// print_fdp(fdp);
+	// downheap sur tab[2]
+	down_heap(fdp, 2, 1);
+	// print_fdp(fdp);
+
+	insert_in_fdp(fdp, tab[0]);
+	// print_fdp(fdp);
+
+	insert_in_fdp(fdp, tab[1]);
+	// printf("#####################################\n");
+	// print_fdp(fdp);
+}
 
 /*----------------------------------------------------------------------------------*/
 //                                  Priority Queue
@@ -296,7 +432,6 @@ void switch_cells_fdp( FDP *fdp, int const a, int const b )
 	fdp->table[b] = c;
 }
 
-
 int get_number_of_sons( int const i, int const n )
 {
 	int nb_leafs = (n + 1) / 2;
@@ -305,9 +440,14 @@ int get_number_of_sons( int const i, int const n )
 	else return 2;
 }
 
+int is_empty( Simplex *simp )
+{
+	return 1 - sgn(simp->candidats->length[STD]);
+}
+
 int is_superior_vertex( Vertex *p1, Vertex *p2 )
 {
-	return (p1->zdist > p2->zdist);
+	return (fabs(p1->zdist) > fabs(p2->zdist));
 }
 
 int is_superior_simplex( Simplex *s1, Simplex *s2 )
@@ -317,7 +457,12 @@ int is_superior_simplex( Simplex *s1, Simplex *s2 )
 
 int is_superior_fdp( FDP *fdp, int const a, int const b )
 {
-	return is_superior_simplex(fdp->table[a], fdp->table[b]);
+	if ( !is_empty(fdp->table[a]) && !is_empty(fdp->table[b]) )
+		return is_superior_simplex(fdp->table[a], fdp->table[b]);
+	else if ( !is_empty(fdp->table[a]) )
+		return 1;
+	else 
+		return 0;
 }
 
 void up_heap( FDP *fdp, int son, int father )
@@ -426,7 +571,7 @@ void init_grid( Grid *grid, int nb_pts, int size )
 				break;
 		}
 
-		new_vert->zdist = new_vert->coords[2] - compute_zdist( simp[j], new_vert->coords[0], new_vert->coords[1] );
+		new_vert->zdist = compute_zdist( simp[j], new_vert );
 
 		if ( simp[j]->candidats->length[STD] > 0 && is_superior_vertex( new_vert, simp[j]->candidats->root->links[STD][FWD]) )
 			add_begin_dll( simp[j]->candidats, new_vert, STD );

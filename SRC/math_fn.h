@@ -22,6 +22,8 @@ double determinant3d(Vertex const *p1, Vertex const *p2, Vertex const *p3);
 
 int orientation(Vertex const *p1, Vertex const *p2, Vertex const *p3);
 
-double compute_zdist( Simplex const *s1, double x, double y );
+void compute_plan( Simplex *simp );
+
+double compute_zdist( Simplex const *simp, Vertex const *vert );
 
 #endif

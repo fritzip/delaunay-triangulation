@@ -32,6 +32,9 @@ typedef struct simplex
 	struct simplex *voisin[3];
 	Dllist *candidats;
 	unsigned long int datation;
+	double na;
+	double nb;
+	double nc;
 } Simplex ;
 
 typedef struct fdprior
@@ -94,6 +97,9 @@ Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 );
 
 int inside_simplex( Simplex *simp, Vertex *vert);
 
+void split_in_3( FDP *fdp );
+
+
 /*----------------------------------------------------------------------------------*/
 //                                  Priority Queue functions prototypes
 /*----------------------------------------------------------------------------------*/
@@ -105,6 +111,8 @@ FDP* create_fdp( int size );
 void switch_cells_fdp(FDP *fdp, int const a, int const b);
 
 int get_number_of_sons(int const i, int const n);
+
+int is_empty( Simplex *simp );
 
 int is_superior_vertex( Vertex *p1, Vertex *p2 );
 
