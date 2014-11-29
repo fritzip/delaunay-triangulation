@@ -232,29 +232,11 @@ Vertex* create_vert( double x, double y, double z )
 //                                  Simplex functions
 /*----------------------------------------------------------------------------------*/
 
-int is_superior_vertex_lex(Vertex const *p, Vertex const *q )
-{
-	if ( ( p->coords[0] > q->coords[0] ) || ( p->coords[0] == q->coords[0] && p->coords[1] >= q->coords[1] ) ) return 1;
-	else return 0;
-}
-
 void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2 )
 {
-	// Vertex *tab[3] = {v0, v1, v2};
-	// int ind = is_superior_vertex_lex(tab[0], tab[1]); // return index of min lexico between v1 and v2
-	// if ( !is_superior_vertex_lex( tab[2], tab[ind] ) ) ind = 2;
-
-	// int ind2 = (ind+1)%3;
-	// int ind3 = (ind+2)%3;
-	// if ( orientation( tab[ind], tab[ind2], tab[ind3] ) != -1 )
-	// {
-	// 	ind2 = ind3;
-	// 	ind3 = (ind+1)%3;
-	// }
-
-	simp->sommet[0] = v0; // tab[ind];
-	simp->sommet[1] = v1; // tab[ind2];
-	simp->sommet[2] = v2; // tab[ind3];
+	simp->sommet[0] = v0;
+	simp->sommet[1] = v1;
+	simp->sommet[2] = v2;
 
 	compute_plan(simp);
 
@@ -288,7 +270,6 @@ int inside_simplex( Simplex *simp, Vertex *vert )
 void split_in_3( FDP *fdp )
 {
 	Simplex *simp = fdp->table[1];
-	// print_simplex(simp);
 
 	Vertex *vert = simp->candidats->root->links[STD][FWD];
 	vert->zdist = 0;
@@ -319,86 +300,48 @@ void split_in_3( FDP *fdp )
 	Vertex *current = simp->candidats->root->links[STD][FWD];
 	Vertex *next = NULL;
 
+	// redistributes candidates through 3 new triangles and update zdist
 	for (i = 0; i < n; i++)
 	{
-		// print_simplex(tab[0]);
-		// print_simplex(tab[1]);
-		// print_simplex(tab[2]);
-		// printf("%d/%d\n", i+1, n);
 		for (j = 0; j < 3; j++)
-		{
-			if ( inside_simplex( tab[j], current ) )
-				break;
-		}
+			if ( inside_simplex( tab[j], current ) ) break;
 
 		// si j==3, on le pousse de 10-13 !
-		// printf("j = %d\n", j);
+
 		current->zdist = compute_zdist( tab[j], current );
 		
 		if ( j == 2 )
-		{
 			current = current->links[STD][FWD];
-		}
 		else
 		{
 			next = current->links[STD][FWD];
-			// print_dll(tab[2]->candidats, STD);
 			rm_after(tab[2]->candidats, current->links[STD][BWD], STD);
-			// print_dll(tab[2]->candidats, STD);
-			// print_vertex(current);
+
 			if ( tab[j]->candidats->length[STD] > 0 && is_superior_vertex( current, tab[j]->candidats->root->links[STD][FWD]) )
-			{
-				// print_dll(tab[j]->candidats, STD);
 				add_begin_dll( tab[j]->candidats, current, STD );
-				// print_dll(tab[j]->candidats, STD);
-			}
 			else
-			{
-				// print_dll(tab[j]->candidats, STD);
 				add_end_dll( tab[j]->candidats, current, STD );
-				// print_dll(tab[j]->candidats, STD);
-			}
 			current = next;
-			// print_vertex(current);
 		}
 	}
 
-
-	// printf("\n============================================================\n");
-
-	// parcourir tab[2] et mettre le max en 1 de la dll
+	// put max of candidates in top of dll
 	n = 0;
 	current = simp->candidats->root->links[STD][FWD];
 	Vertex *max = current;
-	// printf("len = %d\n", simp->candidats->length[STD] );
 	while (n < simp->candidats->length[STD])
 	{
-		// printf("n = %d\n", n);
-		// print_vertex(current);
 		if ( is_superior_vertex( current, max ) ) max = current;
 		current = current->links[STD][FWD];
 		n++;
 	}
-
 	switch_cells(max, simp->candidats->root->links[STD][FWD], STD);
 
-	// printf("=========================!!!================================\n");
-
-	// print_simplex(tab[0]);
-	// print_simplex(tab[1]);
-	// print_simplex(tab[2]);
-
-	// print_fdp(fdp);
-	// downheap sur tab[2]
+	// update fdp and add new triangle to it
 	down_heap(fdp, 2, 1);
-	// print_fdp(fdp);
 
 	insert_in_fdp(fdp, tab[0]);
-	// print_fdp(fdp);
-
 	insert_in_fdp(fdp, tab[1]);
-	// printf("#####################################\n");
-	// print_fdp(fdp);
 }
 
 /*----------------------------------------------------------------------------------*/
