@@ -25,11 +25,6 @@ char *lineOption[] = { "GL_POINTS", "GL_LINES", "GL_LINE_STRIP", "GL_LINE_LOOP",
 /*----------------------------------------------------------------------------------*/
 
 
-#if(DEBUG == 1)
-	void debug()
-
-#endif
-
 void affiche_dll(Dllist *dll, int LNK, int GL_DRAW_STYLE, double r, double g, double b);
 
 void affiche_simplex(Simplex *simp, double r, double g, double b);

@@ -16,19 +16,7 @@ void print_lnk(int const LNK)
 {
 	switch (LNK)
 	{
-		case STD: printf("  Unsorted\n");
-			break;
-		case LEX: printf("  Lexico\n");
-			break;
-		case POL: printf("  Polar\n");
-			break;
-		case GRA: printf("  Graham\n");
-			break;
-		case JAR: printf("  Jarvis\n");
-			break;
-		case LXC: printf("  Insertion Lexico\n");
-			break;
-		case DAC: printf("  Divide & Conquer\n");
+		case STD: printf("  Standard\n");
 			break;
 		default : printf("  Nothing to print\n");
 			break;
@@ -40,7 +28,7 @@ void print_info(Dllist const *dll, int const LNK)
 {
 	printf("=====================\n");
 	print_lnk(LNK);
-	printf("  Length : %d \n", dll->length[LNK]);
+	printf("  Length : %d \n", dll->length);
 	printf("=====================\n");
 }
 
@@ -81,7 +69,7 @@ void print_simplex(Simplex const *simp)
 	printf("\n");
 	printf("(S) zdist = ");
 	Vertex *temp = simp->candidats->root->links[STD][FWD];
-	for (int i = 0; i < simp->candidats->length[STD]; i++)
+	for (int i = 0; i < simp->candidats->length; i++)
 	{
 		// print_vertex(temp);
 		printf("%.3f ", temp->zdist);
@@ -97,7 +85,7 @@ void print_fdp(FDP const *fdp )
 	int n;
 	for (int i = 1; i <= fdp->nb; i++)
 	{
-		n = fdp->table[i]->candidats->length[STD];
+		n = fdp->table[i]->candidats->length;
 		printf("(%3d) ",n );
 		vert = fdp->table[i]->candidats->root->links[STD][FWD];
 		for (int j = 0; j < n; j++)
@@ -117,7 +105,7 @@ void print_dll(Dllist const *dll, int const LNK)
 
 	print_info(dll, LNK);
 	
-	while ( n++ < dll->length[LNK] ) //temp != NULL)
+	while ( n++ < dll->length) //temp != NULL)
 	{
 		print_vertex(temp); 
 		temp = temp->links[LNK][FWD];
@@ -133,13 +121,13 @@ void print_dll_full(Dllist const *dll, int const LNK)
 
 	print_info(dll, LNK);
 	
-	for (int i = 0; i <= dll->length[LNK] + 1; ++i)
+	for (int i = 0; i <= dll->length+ 1; ++i)
 	{
 		print_vertex(tempfw); 
 		tempfw = tempfw->links[LNK][FWD];
 	}
 	printf("\n");
-	for (int i = 0; i <= dll->length[LNK] + 1; ++i)
+	for (int i = 0; i <= dll->length+ 1; ++i)
 	{
 		print_vertex(tempbw); 
 		tempbw = tempbw->links[LNK][BWD];

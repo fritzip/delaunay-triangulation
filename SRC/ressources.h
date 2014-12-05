@@ -9,20 +9,12 @@
 //                                  #define
 /*----------------------------------------------------------------------------------*/
 
-// #define DEBUG 0
-
 #define DIM 3
 
 #define BWD 0 
 #define FWD 1
 
 #define STD 0
-#define LEX 1
-#define POL 2
-#define GRA 3
-#define JAR 4
-#define LXC 5
-#define DAC 6
 #define NBL 1 // Nb de Liens : A incrémenter manuellement, LAST + 1
 
 #define NB_H 4

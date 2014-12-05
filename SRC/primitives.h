@@ -21,8 +21,7 @@ typedef struct vertex
 
 typedef struct dllist
 {
-	int length[NBL];
-	int up2date[NBL];
+	int length;
 	Vertex *root;
 } Dllist ;
 
@@ -30,6 +29,7 @@ typedef struct simplex
 {
 	Vertex *sommet[3];
 	struct simplex *voisin[3];
+	struct simplex *next_pile;
 	Dllist *candidats;
 	unsigned long int datation;
 	double na;
@@ -53,7 +53,7 @@ typedef struct grid
 //                                  DLL functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_dll( Dllist *dll ) ;
+void init_dll( Dllist *dll, Vertex* root) ;
 
 Dllist* create_dll( void ) ;
 
@@ -91,7 +91,7 @@ Vertex* create_vert( double x, double y, double z );
 //                                  Simplex functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_simplex(Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2 );
+void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *candidats ) ;
 
 Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 );
 
@@ -142,8 +142,6 @@ Grid* create_grid( int nb_pts, int size );
 /*----------------------------------------------------------------------------------*/
 //                      Create and remove data struct functions
 /*----------------------------------------------------------------------------------*/
-
-void init_links(Dllist *dll, int const LNK);
 
 Dllist* create_rd_data_struct();
 

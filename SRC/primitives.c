@@ -8,32 +8,33 @@
 #include <math.h>
 
 #include "primitives.h"
-#include "geoalgo.h"
+#include "math_fn.h"
 #include "print_fn.h"
 
 /*----------------------------------------------------------------------------------*/
 //                                  DLL Functions
 /*----------------------------------------------------------------------------------*/
 
-void init_dll(Dllist *dll)
+void init_dll(Dllist *dll, Vertex* root)
 {
-	dll->root = create_vert(0.0, 0.0, 0.0);
+	dll->root = root;
 
 	for(int i=0; i<NBL; i++)
 	{
 		dll->root->links[i][BWD] = dll->root;	
 		dll->root->links[i][FWD] = dll->root;
-		dll->length[i] = 0;
-		dll->up2date[i] = 0;
+		dll->length = 0;
 	}
 }
 
 Dllist* create_dll(void)
 {
 	Dllist *new_dll = (Dllist *) malloc(sizeof(Dllist));
-	if (new_dll != NULL)
+	Vertex *new_vert = create_vert(0.0, 0.0, 0.0);
+
+	if (new_dll != NULL && new_vert != NULL)
 	{
-		init_dll(new_dll);
+		init_dll(new_dll, new_vert);
 	}
 	return new_dll;
 }
@@ -46,7 +47,7 @@ void add_end_dll(Dllist *dll, Vertex *vert, int const LNK)
 	vert->links[LNK][FWD] = dll->root;
 	dll->root->links[LNK][BWD]->links[LNK][FWD] = vert;
 	dll->root->links[LNK][BWD] = vert;
-	dll->length[LNK]++;
+	dll->length++;
 }
 
 void add_begin_dll(Dllist *dll, Vertex *vert, int const LNK)
@@ -57,21 +58,21 @@ void add_begin_dll(Dllist *dll, Vertex *vert, int const LNK)
 	vert->links[LNK][FWD] = dll->root->links[LNK][FWD];
 	dll->root->links[LNK][FWD]->links[LNK][BWD] = vert;
 	dll->root->links[LNK][FWD] = vert;
-	dll->length[LNK]++;
+	dll->length++;
 }
 
 void rm_end_dll(Dllist *dll, int const LNK)
 {
 	// root <=> a <=> b <=> c <=> d <=> e <=> f <=> root 
 	// root <=> a <=> b <=> c <=> d <=> e    <=>    root 
-	if ( dll->length[LNK] > 0 )
+	if ( dll->length > 0 )
 	{
 		Vertex *temp = dll->root->links[LNK][BWD];
 		dll->root->links[LNK][BWD]->links[LNK][BWD]->links[LNK][FWD] = dll->root;
 		dll->root->links[LNK][BWD] = dll->root->links[LNK][BWD]->links[LNK][BWD];
 		temp->links[LNK][FWD] = NULL;
 		temp->links[LNK][BWD] = NULL;
-		dll->length[LNK]--;
+		dll->length--;
 	}
 	else
 		printf("Cannot remove in empty list\n");
@@ -81,14 +82,14 @@ void rm_begin_dll(Dllist *dll, int const LNK)
 {
 	// root <=> a <=> b <=> c <=> d <=> e <=> f <=> root 
 	// root    <=>    b <=> c <=> d <=> e <=> f <=> root 
-	if ( dll->length[LNK] > 0 )
+	if ( dll->length > 0 )
 	{
 		Vertex *temp = dll->root->links[LNK][FWD];
 		dll->root->links[LNK][FWD]->links[LNK][FWD]->links[LNK][BWD] = dll->root;
 		dll->root->links[LNK][FWD] = dll->root->links[LNK][FWD]->links[LNK][FWD];
 		temp->links[LNK][FWD] = NULL;
 		temp->links[LNK][BWD] = NULL;
-		dll->length[LNK]--;
+		dll->length--;
 	}
 	else
 		printf("Cannot remove in empty list\n");
@@ -102,7 +103,7 @@ void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, int const LNK)
 	ins->links[LNK][FWD]->links[LNK][BWD] = ins;
 	ins->links[LNK][BWD] = prev;
 	prev->links[LNK][FWD] = ins;
-	dll->length[LNK]++;
+	dll->length++;
 }
 
 void rm_after(Dllist *dll, Vertex *prev, int const LNK)
@@ -114,7 +115,7 @@ void rm_after(Dllist *dll, Vertex *prev, int const LNK)
 	rm->links[LNK][BWD]->links[LNK][FWD] = rm->links[LNK][FWD];
 	rm->links[LNK][FWD] = NULL;
 	rm->links[LNK][BWD] = NULL;
-	dll->length[LNK]--;
+	dll->length--;
 }	
 
 
@@ -188,13 +189,13 @@ void copy_order(Dllist *dll, int const SRC, int const DEST)
 	// copy_order : 
 	// DEST : root <=> a <=> b <=> c <=> d <=> e <=> f <=> root 
 	Vertex *temp = dll->root;
-	for (int i = 0; i <= dll->length[STD]; i++)
+	for (int i = 0; i <= dll->length; i++)
 	{
 		temp->links[DEST][FWD] = temp->links[SRC][FWD];
 		temp->links[DEST][BWD] = temp->links[SRC][BWD];
 		temp = temp->links[SRC][FWD];
 	}
-	dll->length[DEST] = dll->length[SRC];
+	dll->length = dll->length;
 }
 
 
@@ -232,7 +233,7 @@ Vertex* create_vert( double x, double y, double z )
 //                                  Simplex functions
 /*----------------------------------------------------------------------------------*/
 
-void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2 )
+void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *candidats )
 {
 	simp->sommet[0] = v0;
 	simp->sommet[1] = v1;
@@ -243,16 +244,17 @@ void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2 )
 	for(int i=0; i<3; i++)
 		simp->voisin[i] = NULL;
 
-	simp->candidats = create_dll();
+	simp->candidats = candidats;
 	simp->datation = 0;
 }
 
 Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
 {
 	Simplex *new_simp = (Simplex *) malloc(sizeof(Simplex));
-	if (new_simp != NULL)
+	Dllist *new_dll = create_dll();
+	if (new_simp != NULL && new_dll != NULL)
 	{
-		init_simplex( new_simp, v0, v1, v2);
+		init_simplex( new_simp, v0, v1, v2, new_dll);
 	}
 	return new_simp;
 }
@@ -271,13 +273,26 @@ void split_in_3( FDP *fdp )
 {
 	Simplex *simp = fdp->table[1];
 
+	// Vertex to insert (first candidat)
 	Vertex *vert = simp->candidats->root->links[STD][FWD];
 	vert->zdist = 0;
+
+	// save dllist of candidates for later
+	int n = simp->candidats->length - 1;
+	Vertex *current = vert->links[STD][FWD]; // new first candidate
+	Vertex *next = NULL;
+
 	rm_after(simp->candidats, simp->candidats->root, STD);
+
+	// reinit dll
+	init_dll(simp->candidats, simp->candidats->root);
+
+	// define new vertices of new simplex
 	Simplex *new_simp1 = create_simplex(vert, simp->sommet[1], simp->sommet[2]);
 	Simplex *new_simp2 = create_simplex(vert, simp->sommet[2], simp->sommet[0]);
 	simp->sommet[2] = vert;
 
+	// define new neighbors
 	new_simp1->voisin[0] = simp->voisin[0];
 	new_simp1->voisin[1] = new_simp2;
 	new_simp1->voisin[2] = simp;
@@ -289,16 +304,11 @@ void split_in_3( FDP *fdp )
 	simp->voisin[0] = new_simp1;
 	simp->voisin[1] = new_simp2;
 
-	simp->datation = 0;
-
 	compute_plan(simp);
 
 	Simplex *tab[3] = {new_simp1, new_simp2, simp};
 
 	int i, j;
-	int n = simp->candidats->length[STD];
-	Vertex *current = simp->candidats->root->links[STD][FWD];
-	Vertex *next = NULL;
 
 	// redistributes candidates through 3 new triangles and update zdist
 	for (i = 0; i < n; i++)
@@ -309,33 +319,13 @@ void split_in_3( FDP *fdp )
 		// si j==3, on le pousse de 10-13 !
 
 		current->zdist = compute_zdist( tab[j], current );
-		
-		if ( j == 2 )
-			current = current->links[STD][FWD];
+		next = current->links[STD][FWD];
+		if ( tab[j]->candidats->length > 0 && is_superior_vertex( current, tab[j]->candidats->root->links[STD][FWD]) )
+			add_begin_dll( tab[j]->candidats, current, STD );
 		else
-		{
-			next = current->links[STD][FWD];
-			rm_after(tab[2]->candidats, current->links[STD][BWD], STD);
-
-			if ( tab[j]->candidats->length[STD] > 0 && is_superior_vertex( current, tab[j]->candidats->root->links[STD][FWD]) )
-				add_begin_dll( tab[j]->candidats, current, STD );
-			else
-				add_end_dll( tab[j]->candidats, current, STD );
-			current = next;
-		}
+			add_end_dll( tab[j]->candidats, current, STD );
+		current = next;
 	}
-
-	// put max of candidates in top of dll
-	n = 0;
-	current = simp->candidats->root->links[STD][FWD];
-	Vertex *max = current;
-	while (n < simp->candidats->length[STD])
-	{
-		if ( is_superior_vertex( current, max ) ) max = current;
-		current = current->links[STD][FWD];
-		n++;
-	}
-	switch_cells(max, simp->candidats->root->links[STD][FWD], STD);
 
 	// update fdp and add new triangle to it
 	down_heap(fdp, 2, 1);
@@ -385,7 +375,7 @@ int get_number_of_sons( int const i, int const n )
 
 int is_empty( Simplex *simp )
 {
-	return 1 - sgn(simp->candidats->length[STD]);
+	return 1 - sgn(simp->candidats->length);
 }
 
 int is_superior_vertex( Vertex *p1, Vertex *p2 )
@@ -516,7 +506,7 @@ void init_grid( Grid *grid, int nb_pts, int size )
 
 		new_vert->zdist = compute_zdist( simp[j], new_vert );
 
-		if ( simp[j]->candidats->length[STD] > 0 && is_superior_vertex( new_vert, simp[j]->candidats->root->links[STD][FWD]) )
+		if ( simp[j]->candidats->length > 0 && is_superior_vertex( new_vert, simp[j]->candidats->root->links[STD][FWD]) )
 			add_begin_dll( simp[j]->candidats, new_vert, STD );
 		else
 			add_end_dll( simp[j]->candidats, new_vert, STD );
@@ -544,78 +534,6 @@ Grid* create_grid( int nb_pts, int size )
 //                      Create and remove data struct functions
 /*----------------------------------------------------------------------------------*/
 
-void init_links( Dllist *dll, int const LNK )
-{
-	switch (LNK)
-	{
-		case LEX: 
-			copy_order(dll, STD, LEX);
-			sort(dll->root, dll->length[LEX], dll, LEX);
-			break;
-
-		case POL: 
-			if (dll->up2date[LEX])
-			{
-				copy_order(dll, LEX, POL);
-				sort(dll->root->links[POL][FWD], dll->length[POL]-1, dll, POL);
-			}
-			else 
-			{
-				init_links(dll, LEX);
-				init_links(dll, POL);
-			}
-			break;
-
-		case GRA:
-			if (dll->up2date[POL])
-				graham(dll); 
-			else
-			{
-				init_links(dll, POL);
-				init_links(dll, GRA);
-			}
-			break;
-
-		case JAR:
-			if (dll->up2date[POL])
-				jarvis(dll); 
-			else
-			{
-				init_links(dll, POL);
-				init_links(dll, JAR);
-			}
-			break;
-
-		case LXC:
-			if (dll->up2date[LEX]) 
-			{
-				lexconvex(dll);
-			}
-			else
-			{
-				init_links(dll, LEX);
-				init_links(dll, LXC);
-			}
-			break;
-
-		case DAC:
-			if (dll->up2date[LEX]) 
-			{
-				inittab(dll);
-				divac(dll);
-			}
-			else
-			{
-				init_links(dll, LEX);
-				init_links(dll, DAC);
-			}
-			break;
-
-		default: printf("Error in init_links function\n");
-			break;
-	}
-}
-
 
 Dllist* create_rd_data_struct( )
 {
@@ -626,7 +544,6 @@ Dllist* create_rd_data_struct( )
 		Vertex *new_vert = create_vert( randf(), randf(), randf() );
 		add_end_dll( dll, new_vert, STD );
 	}
-	dll->up2date[STD] = 1;
 	return dll;
 }
 
@@ -649,7 +566,7 @@ void remove_data_struct( Dllist *dll )
 			del->links[STD][BWD] = NULL;
 
 			del = temp;
-			dll->length[STD]--;
+			dll->length--;
 		}
 		free(dll->root);
 		free(dll);	

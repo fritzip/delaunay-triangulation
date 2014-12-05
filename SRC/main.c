@@ -18,16 +18,17 @@
 float angle = 0.0f;
 
 // actual vector representing the camera's direction
-float lx=0.0f,ly=-1.0f;
+float lx=0.0f, ly=-1.0f, lz=0.2f;
 
 // XZ position of the camera
-float x=0.5f, y=0.4f;
+float x=0.5f, y=0.4f, z=0.5f;
 
 // the key states. These variables will be zero
 //when no key is being presses
 float deltaAngle = 0.0f;
-float deltaMove = 0;
-int xOrigin = -1;
+float deltaMoveZ = 0;
+float deltaMoveY = 0;
+// int xOrigin = 1;
 
 
 Grid* mygrid;
@@ -35,6 +36,30 @@ Grid* mygrid;
 /*----------------------------------------------------------------------------------*/
 //                                  Graphic functions
 /*----------------------------------------------------------------------------------*/
+void changeSize(int w, int h) {
+
+  // Prevent a divide by zero, when window is too short
+  // (you cant make a window of zero width).
+  if (h == 0)
+    h = 1;
+
+  float ratio =  w * 1.0 / h;
+
+  // Use the Projection Matrix
+  glMatrixMode(GL_PROJECTION);
+
+  // Reset Matrix
+  glLoadIdentity();
+
+  // Set the viewport to be the entire window
+  glViewport(0, 0, w, h);
+
+  // Set the correct perspective.
+  gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+
+  // Get Back to the Modelview
+  glMatrixMode(GL_MODELVIEW);
+}
 
 
 void processNormalKeys(unsigned char key, int xx, int yy) {   
@@ -47,8 +72,9 @@ void processNormalKeys(unsigned char key, int xx, int yy) {
 void pressKey(int key, int xx, int yy) {
 
        switch (key) {
-             case GLUT_KEY_UP : y+=0.05f; break; //deltaMove = 0.5f; break; // xOrigin = xx; break;
-             case GLUT_KEY_DOWN : y-=0.05f; break; //deltaMove = -0.5f; break;
+             case GLUT_KEY_UP : deltaMoveZ = 0.5f; break; //y+=0.01f; break;  // xOrigin = xx; break;
+             case GLUT_KEY_DOWN : deltaMoveZ = -0.5f; break; //y-=0.01f; break;
+             // case GLUT_KEY_LEFT : deltaAngle = 0.5f; break;
        }
 } 
 
@@ -56,7 +82,8 @@ void releaseKey(int key, int x, int y) {
 
         switch (key) {
              case GLUT_KEY_UP :
-             case GLUT_KEY_DOWN : deltaMove = 0;break;
+             case GLUT_KEY_DOWN : deltaMoveZ = 0; break;
+             // case GLUT_KEY_LEFT : deltaAngle = 0; break;
         }
 } 
 
@@ -64,32 +91,33 @@ void releaseKey(int key, int x, int y) {
 void mouseMove(int x, int y) {  
 
 	// this will only be true when the left button is down
-	if (xOrigin >= 0) {
+	// if (xOrigin >= 0) {
 
 	// update deltaAngle
-	deltaAngle = (x - xOrigin) * 0.001f;
+	deltaAngle = x * 0.005f;
 
 	// update camera's direction
 	lx = sin(angle + deltaAngle);
 	ly = -cos(angle + deltaAngle);
-	}
+	// lz = ;
+	// }
 }
 
-void mouseButton(int button, int state, int x, int y) {
+// void mouseButton(int button, int state, int x, int y) {
 
-  // only start motion if the left button is pressed
-  if (button == GLUT_LEFT_BUTTON) {
+//   // // only start motion if the left button is pressed
+//   // if (button == GLUT_LEFT_BUTTON) {
 
-    // when the button is released
-   if (state == GLUT_UP) {
-      angle += deltaAngle;
-      xOrigin = -1;
-    }
-    else  {// state = GLUT_DOWN
-      xOrigin = x;
-    }
-  }
-}
+//   //   // when the button is released
+//   //  if (state == GLUT_UP) {
+//   //     angle += deltaAngle;
+//   //     xOrigin = -1;
+//   //   }
+//   //   else  {// state = GLUT_DOWN
+//       xOrigin = x;
+//     // }
+//   // }
+// }
 
 void affiche_dll(Dllist *dll, int LNK, int GL_DRAW_STYLE, double r, double g, double b)
 {
@@ -98,7 +126,7 @@ void affiche_dll(Dllist *dll, int LNK, int GL_DRAW_STYLE, double r, double g, do
 
 	Vertex *current = dll->root->links[LNK][FWD];
 
-	for(int i = 0; i < dll->length[LNK]; i++)
+	for(int i = 0; i < dll->length; i++)
 	{
 		glVertex2f(current->coords[0], current->coords[1]);
 		current = current->links[LNK][FWD];
@@ -144,11 +172,12 @@ void computePos(float deltaMove) {
 
 	x += deltaMove * lx * 0.1f;
 	y += deltaMove * ly * 0.1f;
+	z += deltaMove * lz * 0.1f;
 }
 
 void display (void)
 {
-	// if (deltaMove) computePos(deltaMove);
+	if (deltaMoveZ) computePos(deltaMoveZ);
 
 	glColor3f(0.0, 0.0, 0.0);
 	// glClear(GL_COLOR_BUFFER_BIT);
@@ -156,14 +185,14 @@ void display (void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		// Reset transformations
-	// 	glLoadIdentity();
-	// 	// Set the camera
-	// 	gluLookAt(  x, y, 0.5f,
-	// 		x+lx, y+ly, 0.7f, 
-	// 		0.0f, 0.0f,  1.0f);
+		// // Reset transformations
+		// glLoadIdentity();
+		// // Set the camera
+		// gluLookAt(  x, y, z,
+		// 	lx, ly, lz, 
+		// 	0.0f, 0.0f,  1.0f);
+
 	affiche_grid(mygrid, 0.0, 1.0, 0.0);
-	// affiche_simplex(mygrid->fdp->table[2], 0.0, 1.0, 0.0);
 
 	// glFlush();
 	glutSwapBuffers();   // swapping image buffer for double buffering
@@ -198,7 +227,7 @@ int main(int argc, char **argv)
 
 	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1 );
 
-	while (mygrid->fdp->table[1]->candidats->length[STD] != 0)
+	while (mygrid->fdp->table[1]->candidats->length != 0)
 		split_in_3(mygrid->fdp);
 
 	assert(displayChoice >= 0 && displayChoice <= 4);
@@ -215,7 +244,8 @@ int main(int argc, char **argv)
 	gluOrtho2D(minX-margin, maxX+margin, minY-margin, maxY+margin);
 
 	glutIdleFunc(display);
-	glutDisplayFunc(display);  
+	glutDisplayFunc(display); 
+	// glutReshapeFunc(changeSize); 
 
 	// glutIgnoreKeyRepeat(1);
 	glutKeyboardFunc(processNormalKeys);
@@ -223,8 +253,8 @@ int main(int argc, char **argv)
 	glutSpecialUpFunc(releaseKey);
 
 	// here are the two new functions
-	glutMouseFunc(mouseButton);
-	glutMotionFunc(mouseMove);
+	// glutMouseFunc(mouseButton);
+	// glutPassiveMotionFunc(mouseMove);
 
 	glutFullScreen();  
 
