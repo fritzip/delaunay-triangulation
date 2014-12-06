@@ -45,6 +45,7 @@ typedef struct fdprior
 
 typedef struct grid
 {
+	Dllist *candidats_to_redistribute;
 	FDP *fdp;
 	double gof;
 } Grid ;
@@ -53,9 +54,9 @@ typedef struct grid
 //                                  DLL functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_dll( Dllist *dll, Vertex* root) ;
+void init_dll( Dllist *dll, Vertex* root ) ;
 
-Dllist* create_dll( void ) ;
+Dllist* create_dll( ) ;
 
 void add_end_dll( Dllist *dll, Vertex *vert, int const LNK ) ;
 
@@ -82,9 +83,9 @@ void swich_cells( Vertex *p, Vertex *q, int const LNK ) ;
 //                                  Vertex functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_vert( Vertex *vert, double x, double y, double z );
+void init_vertex( Vertex *vert, double x, double y, double z ) ;
 
-Vertex* create_vert( double x, double y, double z );
+Vertex* create_vertex( double x, double y, double z ) ;
 
 
 /*----------------------------------------------------------------------------------*/
@@ -93,58 +94,58 @@ Vertex* create_vert( double x, double y, double z );
 
 void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *candidats ) ;
 
-Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 );
+Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 ) ;
 
-int inside_simplex( Simplex *simp, Vertex *vert);
+int inside_simplex( Simplex *simp, Vertex *vert) ;
 
-void split_in_3( FDP *fdp );
+void split_in_3( FDP *fdp ) ;
 
 
 /*----------------------------------------------------------------------------------*/
 //                                  Priority Queue functions prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_fdp( FDP *fdp, int size );
+void init_fdp( FDP *fdp, Simplex **tab, int size ) ;
 
-FDP* create_fdp( int size );
+FDP* create_fdp( int size ) ;
 
-void switch_cells_fdp(FDP *fdp, int const a, int const b);
+void switch_cells_fdp( FDP *fdp, int const a, int const b ) ;
 
-int get_number_of_sons(int const i, int const n);
+int get_number_of_sons( int const i, int const n ) ;
 
-int is_empty( Simplex *simp );
+int is_empty( Simplex *simp ) ;
 
-int is_superior_vertex( Vertex *p1, Vertex *p2 );
+int is_superior_vertex( Vertex *p1, Vertex *p2 ) ;
 
-int is_superior_simplex( Simplex *s1, Simplex *s2 );
+int is_superior_simplex( Simplex *s1, Simplex *s2 ) ;
 
-int is_superior(FDP *fdp, int const a, int const b);
+int is_superior( FDP *fdp, int const a, int const b ) ;
 
-void up_heap(FDP *fdp, int son, int father);
+void up_heap( FDP *fdp, int son, int father ) ;
 
-void down_heap(FDP *fdp, int son, int father); 
+void down_heap( FDP *fdp, int son, int father) ;  
 
-void insert_in_fdp(FDP *fdp, Simplex *simp);
+void insert_in_fdp( FDP *fdp, Simplex *simp ) ;
 
-Simplex* extract_max(FDP *fdp);
+Simplex* extract_max( FDP *fdp ) ;
 
-void heap_sort(FDP *fdp);
+void heap_sort( FDP *fdp ) ;
 
 /*----------------------------------------------------------------------------------*/
 //                                  Grid prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_grid( Grid *grid, int nb_pts, int size );
+void init_grid( Grid *grid, Dllist *dll, int nb_pts, int size ) ;
 
-Grid* create_grid( int nb_pts, int size );
+Grid* create_grid( int nb_pts, int size ) ;
 
 
 /*----------------------------------------------------------------------------------*/
 //                      Create and remove data struct functions
 /*----------------------------------------------------------------------------------*/
 
-Dllist* create_rd_data_struct();
+Dllist* create_rd_data_struct( ) ;
 
-void remove_data_struct(Dllist *dll);
+void remove_data_struct( Dllist *dll ) ;
 
 #endif

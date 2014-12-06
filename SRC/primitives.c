@@ -27,15 +27,16 @@ void init_dll(Dllist *dll, Vertex* root)
 	}
 }
 
-Dllist* create_dll(void)
+Dllist* create_dll( )
 {
 	Dllist *new_dll = (Dllist *) malloc(sizeof(Dllist));
-	Vertex *new_vert = create_vert(0.0, 0.0, 0.0);
+	Vertex *new_vert = create_vertex(0.0, 0.0, 0.0);
 
 	if (new_dll != NULL && new_vert != NULL)
-	{
 		init_dll(new_dll, new_vert);
-	}
+	else
+		printf("Error in create_dll function\n");
+
 	return new_dll;
 }
 
@@ -203,7 +204,7 @@ void copy_order(Dllist *dll, int const SRC, int const DEST)
 //                                  Vertex functions
 /*----------------------------------------------------------------------------------*/
 
-void init_vert( Vertex *vert, double x, double y, double z )
+void init_vertex( Vertex *vert, double x, double y, double z )
 {
 	vert->coords[0] = x;
 	vert->coords[1] = y;
@@ -218,13 +219,15 @@ void init_vert( Vertex *vert, double x, double y, double z )
 	vert->zdist = 0;
 }
 
-Vertex* create_vert( double x, double y, double z )
+Vertex* create_vertex( double x, double y, double z )
 {
 	Vertex *new_vert = (Vertex *) malloc(sizeof(Vertex));
+
 	if (new_vert != NULL)
-	{
-		init_vert( new_vert, x, y, z );
-	}
+		init_vertex( new_vert, x, y, z );
+	else
+		printf("Error in create_vertex function\n");
+
 	return new_vert;
 }
 
@@ -252,10 +255,12 @@ Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
 {
 	Simplex *new_simp = (Simplex *) malloc(sizeof(Simplex));
 	Dllist *new_dll = create_dll();
+
 	if (new_simp != NULL && new_dll != NULL)
-	{
 		init_simplex( new_simp, v0, v1, v2, new_dll);
-	}
+	else
+		printf("Error in create_simplex function\n");
+
 	return new_simp;
 }
 
@@ -277,12 +282,16 @@ void split_in_3( FDP *fdp )
 	Vertex *vert = simp->candidats->root->links[STD][FWD];
 	vert->zdist = 0;
 
+	rm_after(simp->candidats, simp->candidats->root, STD);
 	// save dllist of candidates for later
-	int n = simp->candidats->length - 1;
-	Vertex *current = vert->links[STD][FWD]; // new first candidate
+	// grid->candidats_to_redistribute
+	// add_dll_end_dll(grid->candidats_to_redistribute, )
+	int n = simp->candidats->length ;
+	Vertex *current = simp->candidats->root->links[STD][FWD]; // new first candidate
 	Vertex *next = NULL;
 
-	rm_after(simp->candidats, simp->candidats->root, STD);
+	// print_dll(simp->candidats, STD);
+	// print_vertex(current);
 
 	// reinit dll
 	init_dll(simp->candidats, simp->candidats->root);
@@ -338,23 +347,22 @@ void split_in_3( FDP *fdp )
 //                                  Priority Queue
 /*----------------------------------------------------------------------------------*/
 
-void init_fdp( FDP *fdp, int size )
+void init_fdp( FDP *fdp, Simplex **tab, int size )
 {
-	Simplex **new_tab = (Simplex **)malloc(size*sizeof(Simplex *));
-	if (new_tab != NULL)
-	{
-		fdp->table = new_tab;
-		fdp->nb = 0;
-	}	
+	fdp->table = tab;
+	fdp->nb = 0;
 }
 
 FDP* create_fdp( int size )
 {
 	FDP *new_fdp = (FDP *) malloc(sizeof(FDP));
-	if (new_fdp != NULL)
-	{
-		init_fdp( new_fdp, size );
-	}
+	Simplex **new_tab = (Simplex **)malloc(size*sizeof(Simplex *));
+
+	if (new_fdp != NULL && new_tab != NULL)
+		init_fdp( new_fdp, new_tab, size );
+	else
+		printf("Error in create_fdp function\n");
+
 	return new_fdp;
 }
 
@@ -477,13 +485,13 @@ void heap_sort( FDP *fdp )
 //                                  Grid
 /*----------------------------------------------------------------------------------*/
 
-void init_grid( Grid *grid, int nb_pts, int size )
+void init_grid( Grid *grid, Dllist *dll, int nb_pts, int size )
 {
 	// 4 corners vertex
-	Vertex *ul = create_vert(0.0, 1.0, 0.0);
-	Vertex *ur = create_vert(1.0, 1.0, 0.0);
-	Vertex *dr = create_vert(1.0, 0.0, 0.0);
-	Vertex *dl = create_vert(0.0, 0.0, 0.0);
+	Vertex *ul = create_vertex(0.0, 1.0, 0.0);
+	Vertex *ur = create_vertex(1.0, 1.0, 0.0);
+	Vertex *dr = create_vertex(1.0, 0.0, 0.0);
+	Vertex *dl = create_vertex(0.0, 0.0, 0.0);
 
 	// 2 init triangles
 	Simplex *simp[2];
@@ -497,7 +505,7 @@ void init_grid( Grid *grid, int nb_pts, int size )
 	int i, j;
 	for (i = 0; i < nb_pts; i++)
 	{
-		new_vert = create_vert(randf(), randf(), randf());
+		new_vert = create_vertex(randf(), randf(), randf());
 		for (j = 0; j < 2; j++)
 		{
 			if ( inside_simplex( simp[j], new_vert ) )
@@ -514,8 +522,9 @@ void init_grid( Grid *grid, int nb_pts, int size )
 	
 	// print_simplex(simp[0]);
 	// print_simplex(simp[1]);
-
 	grid->fdp = create_fdp( size );
+	grid->candidats_to_redistribute = dll;
+
 	insert_in_fdp(grid->fdp, simp[0]);
 	insert_in_fdp(grid->fdp, simp[1]);
 }
@@ -523,10 +532,13 @@ void init_grid( Grid *grid, int nb_pts, int size )
 Grid* create_grid( int nb_pts, int size )
 {
 	Grid *new_grid = (Grid *) malloc(sizeof(Grid));
-	if (new_grid != NULL)
-	{
-		init_grid( new_grid, nb_pts, size );
-	}
+	Dllist *new_dll = create_dll();
+
+	if (new_grid != NULL && new_dll !=NULL)
+		init_grid( new_grid, new_dll, nb_pts, size );
+	else
+		printf("Error in create_grid function\n");
+
 	return new_grid;
 }
 
@@ -541,7 +553,7 @@ Dllist* create_rd_data_struct( )
 
 	for(int i=0; i<NB_VERTEX; i++)
 	{
-		Vertex *new_vert = create_vert( randf(), randf(), randf() );
+		Vertex *new_vert = create_vertex( randf(), randf(), randf() );
 		add_end_dll( dll, new_vert, STD );
 	}
 	return dll;
