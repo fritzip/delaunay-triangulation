@@ -18,8 +18,8 @@
 #define NBL 1 // Nb de Liens : A incrémenter manuellement, LAST + 1
 
 #define NB_H 4
-#define NB_VERTEX 3000
-#define NB_SIMPLEX ( 2*(NB_VERTEX - 1) + NB_H )
+#define NB_VERTEX 100
+#define NB_SIMPLEX ( 2*(NB_VERTEX+NB_H - 1) - NB_H )
 
 #define OFFSET 10
  
@@ -27,6 +27,6 @@
 #define maxX	1
 #define minY	0
 #define maxY	1
-#define margin	0.1
+#define margin	0.01
 
 #endif

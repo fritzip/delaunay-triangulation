@@ -369,6 +369,15 @@ void add_end_array( Simplex **tab, int *c_size, int *m_size, Simplex *simp )
 	*c_size = *c_size + 1;
 }
 
+int get_vertex_index(Vertex *vert, Simplex *simp)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		if (vert == simp->sommet[i]) break;
+
+	return i;
+}
+
 void delauney( Grid *grid, Simplex *simp )
 {
 	// print_fdp(grid->fdp);
