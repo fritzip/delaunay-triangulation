@@ -67,9 +67,9 @@ void print_simplex(Simplex const *simp)
 		}
 	}
 	printf("\n");
-	printf("(S) zdist = ");
-	Vertex *temp = simp->candidats->root->links[STD][FWD];
-	for (int i = 0; i < simp->candidats->length; i++)
+	printf("(%3d) zdist = ", simp->candidates->length);
+	Vertex *temp = simp->candidates->root->links[STD][FWD];
+	for (int i = 0; i < simp->candidates->length; i++)
 	{
 		// print_vertex(temp);
 		printf("%.3f ", temp->zdist);
@@ -85,9 +85,9 @@ void print_fdp(FDP const *fdp )
 	int n;
 	for (int i = 1; i <= fdp->nb; i++)
 	{
-		n = fdp->table[i]->candidats->length;
+		n = fdp->table[i]->candidates->length;
 		printf("(%3d) ",n );
-		vert = fdp->table[i]->candidats->root->links[STD][FWD];
+		vert = fdp->table[i]->candidates->root->links[STD][FWD];
 		for (int j = 0; j < n; j++)
 		{
 			printf("%.3f ", vert->zdist);

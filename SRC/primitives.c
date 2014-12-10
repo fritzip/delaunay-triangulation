@@ -40,7 +40,7 @@ Dllist* create_dll( )
 	return new_dll;
 }
 
-void add_end_dll(Dllist *dll, Vertex *vert, int const LNK)
+void add_end_dll(Dllist *dll, Vertex *vert, const int LNK)
 {
 	// root <=> a <=> b <=> c <=> d      <=>     root
 	// root <=> a <=> b <=> c <=> d <=> vert <=> root
@@ -51,7 +51,7 @@ void add_end_dll(Dllist *dll, Vertex *vert, int const LNK)
 	dll->length++;
 }
 
-void add_begin_dll(Dllist *dll, Vertex *vert, int const LNK)
+void add_begin_dll(Dllist *dll, Vertex *vert, const int LNK)
 {
 	// root     <=>      a <=> b <=> c <=> d <=> root
 	// root <=> vert <=> a <=> b <=> c <=> d <=> root
@@ -62,7 +62,7 @@ void add_begin_dll(Dllist *dll, Vertex *vert, int const LNK)
 	dll->length++;
 }
 
-void rm_end_dll(Dllist *dll, int const LNK)
+void rm_end_dll(Dllist *dll, const int LNK)
 {
 	// root <=> a <=> b <=> c <=> d <=> e <=> f <=> root 
 	// root <=> a <=> b <=> c <=> d <=> e    <=>    root 
@@ -79,7 +79,7 @@ void rm_end_dll(Dllist *dll, int const LNK)
 		printf("Cannot remove in empty list\n");
 }
 
-void rm_begin_dll(Dllist *dll, int const LNK)
+void rm_begin_dll(Dllist *dll, const int LNK)
 {
 	// root <=> a <=> b <=> c <=> d <=> e <=> f <=> root 
 	// root    <=>    b <=> c <=> d <=> e <=> f <=> root 
@@ -96,7 +96,7 @@ void rm_begin_dll(Dllist *dll, int const LNK)
 		printf("Cannot remove in empty list\n");
 }
 
-void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, int const LNK)
+void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, const int LNK)
 {
 	// root <=> a <=> prev     <=>     b <=> c <=> d <=> e <=> f <=> root 
 	// root <=> a <=> prev <=> ins <=> b <=> c <=> d <=> e <=> f <=> root 
@@ -107,7 +107,7 @@ void insert_after(Dllist *dll, Vertex *prev, Vertex *ins, int const LNK)
 	dll->length++;
 }
 
-void rm_after(Dllist *dll, Vertex *prev, int const LNK)
+void rm_after(Dllist *dll, Vertex *prev, const int LNK)
 {
 	// root <=> a <=> prev <=> b <=> c <=> d <=> e <=> f <=> root 
 	// root <=> a <=> prev    <=>    c <=> d <=> e <=> f <=> root 
@@ -120,7 +120,7 @@ void rm_after(Dllist *dll, Vertex *prev, int const LNK)
 }	
 
 
-void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int const LNK)
+void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, const int LNK)
 {
 	// root <=> a <=> inf <=> b <=> c <=> d <=> sup <=> e <=> f <=> root 
 	// root <=> a <=> inf <=>      ins      <=> sup <=> e <=> f <=> root 
@@ -132,7 +132,8 @@ void insert_btw(Dllist *dll, Vertex *inf, Vertex *sup, Vertex *ins, int const LN
 	}
 }
 
-void move_after(Vertex *prev, Vertex *move, int const LNK)
+
+void move_after(Vertex *prev, Vertex *move, const int LNK)
 {
 	// root <=> a <=> prev <=> b <=> c <=> d <=> move <=> e <=> f <=> root 
 	// root <=> a <=> prev <=> move <=> b <=> c <=> d <=> e <=> f <=> root 
@@ -147,7 +148,7 @@ void move_after(Vertex *prev, Vertex *move, int const LNK)
 	prev->links[LNK][FWD] = t;
 }
 
-void switch_cells(Vertex *p, Vertex *q, int const LNK)
+void switch_cells(Vertex *p, Vertex *q, const int LNK)
 {
 	// root <=> a <=> P <=> b <=> c <=> d <=> Q <=> e <=> f <=> root 
 	// root <=> a <=> Q <=> b <=> c <=> d <=> P <=> e <=> f <=> root 
@@ -183,7 +184,7 @@ void switch_cells(Vertex *p, Vertex *q, int const LNK)
 	}
 }
 
-void copy_order(Dllist *dll, int const SRC, int const DEST)
+void copy_order(Dllist *dll, const int SRC, const int DEST)
 {
 	// SRC  : root <=> a <=> b <=> c <=> d <=> e <=> f <=> root 
 	// DEST : root <=> c <=> f <=> d <=> a <=> b <=> e <=> root 
@@ -197,6 +198,19 @@ void copy_order(Dllist *dll, int const SRC, int const DEST)
 		temp = temp->links[SRC][FWD];
 	}
 	dll->length = dll->length;
+}
+
+void add_dll_end_dll(Dllist *dll, Vertex *inf, Vertex *sup, const int len, const int LNK)
+{
+	sew( dll->root->links[LNK][BWD], inf, LNK );
+	sew( sup, dll->root, LNK );
+	dll->length += len;
+}
+
+void sew( Vertex *left, Vertex *right, const int LNK )
+{
+	left->links[LNK][FWD] = right;
+	right->links[LNK][BWD] = left;
 }
 
 
@@ -236,7 +250,7 @@ Vertex* create_vertex( double x, double y, double z )
 //                                  Simplex functions
 /*----------------------------------------------------------------------------------*/
 
-void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *candidats )
+void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *candidates )
 {
 	simp->sommet[0] = v0;
 	simp->sommet[1] = v1;
@@ -247,8 +261,9 @@ void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *ca
 	for(int i=0; i<3; i++)
 		simp->voisin[i] = NULL;
 
-	simp->candidats = candidats;
+	simp->candidates = candidates;
 	simp->datation = 0;
+	simp->next_stk = NULL;
 }
 
 Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
@@ -274,28 +289,49 @@ int inside_simplex( Simplex *simp, Vertex *vert )
 	return ( fabs(ori) == 3 ) ;
 }
 
-void split_in_3( FDP *fdp )
+void redistribute_candidates( Dllist *dll, Simplex *tab[], const int nb_simp, const int LNK )
 {
-	Simplex *simp = fdp->table[1];
-
-	// Vertex to insert (first candidat)
-	Vertex *vert = simp->candidats->root->links[STD][FWD];
-	vert->zdist = 0;
-
-	rm_after(simp->candidats, simp->candidats->root, STD);
-	// save dllist of candidates for later
-	// grid->candidats_to_redistribute
-	// add_dll_end_dll(grid->candidats_to_redistribute, )
-	int n = simp->candidats->length ;
-	Vertex *current = simp->candidats->root->links[STD][FWD]; // new first candidate
+	int i, j;
+	int nb_candidates = dll->length;
+	Vertex *current = dll->root->links[LNK][FWD];
 	Vertex *next = NULL;
 
-	// print_dll(simp->candidats, STD);
-	// print_vertex(current);
+	// redistributes candidates through 3 new triangles and update zdist
+	for (i = 0; i < nb_candidates; i++)
+	{
+		for (j = 0; j < nb_simp; j++)
+			if ( inside_simplex( tab[j], current ) ) break;
 
-	// reinit dll
-	init_dll(simp->candidats, simp->candidats->root);
+		// si j==3, on le pousse de 10-13 !
 
+		current->zdist = compute_zdist( tab[j], current );
+		next = current->links[STD][FWD];
+		if ( tab[j]->candidates->length > 0 && is_superior_vertex( current, tab[j]->candidates->root->links[STD][FWD]) )
+			add_begin_dll( tab[j]->candidates, current, STD );
+		else
+			add_end_dll( tab[j]->candidates, current, STD );
+		current = next;
+	}
+}
+
+void stack( Grid *grid, Simplex *simp )
+{
+	simp->next_stk = grid->top_of_stack;
+	grid->top_of_stack = simp;
+	grid->stack_size++;
+}
+
+Simplex* unstack( Grid *grid )
+{
+	Simplex *top = grid->top_of_stack;
+	grid->top_of_stack = top->next_stk;
+	top->next_stk = NULL;
+	grid->stack_size--;
+	return top;
+}
+
+void split_in_3(Grid *grid, Simplex *simp, Vertex *vert)
+{
 	// define new vertices of new simplex
 	Simplex *new_simp1 = create_simplex(vert, simp->sommet[1], simp->sommet[2]);
 	Simplex *new_simp2 = create_simplex(vert, simp->sommet[2], simp->sommet[0]);
@@ -315,32 +351,117 @@ void split_in_3( FDP *fdp )
 
 	compute_plan(simp);
 
-	Simplex *tab[3] = {new_simp1, new_simp2, simp};
+	stack( grid, new_simp1 );
+	stack( grid, new_simp2 );
+	stack( grid, simp );
+}
 
-	int i, j;
-
-	// redistributes candidates through 3 new triangles and update zdist
-	for (i = 0; i < n; i++)
+void add_end_array( Simplex **tab, int *c_size, int *m_size, Simplex *simp )
+{
+	if ( *c_size >= *m_size )
 	{
-		for (j = 0; j < 3; j++)
-			if ( inside_simplex( tab[j], current ) ) break;
-
-		// si j==3, on le pousse de 10-13 !
-
-		current->zdist = compute_zdist( tab[j], current );
-		next = current->links[STD][FWD];
-		if ( tab[j]->candidats->length > 0 && is_superior_vertex( current, tab[j]->candidats->root->links[STD][FWD]) )
-			add_begin_dll( tab[j]->candidats, current, STD );
-		else
-			add_end_dll( tab[j]->candidats, current, STD );
-		current = next;
+		printf("OFFSET\n");
+		tab = (Simplex **) realloc(tab, (*m_size + OFFSET) * sizeof(Simplex *));
+		*m_size += OFFSET;
 	}
 
-	// update fdp and add new triangle to it
-	down_heap(fdp, 2, 1);
+	tab[*c_size] = simp;
+	*c_size = *c_size + 1;
+}
 
-	insert_in_fdp(fdp, tab[0]);
-	insert_in_fdp(fdp, tab[1]);
+void delauney( Grid *grid, Simplex *simp )
+{
+	// print_fdp(grid->fdp);
+	// printf("\nSimplex to split :\n");
+	// print_simplex(simp);
+
+	// Vertex to insert (first candidat)
+	Vertex *vert = simp->candidates->root->links[STD][FWD];
+	
+	// printf("\nChosen vertex :\n");
+	// print_vertex(vert);
+
+	vert->zdist = 0;
+
+	rm_begin_dll(simp->candidates, STD);
+
+	// printf("\ncandidates simplex to split :\n");
+	// print_dll(simp->candidates, STD);
+
+	// printf("\ncandidates to redistribute bef:\n");
+	// print_dll(grid->candidates_to_redistribute, STD);
+	// save dllist of candidates for later
+	add_dll_end_dll(grid->candidates_to_redistribute, simp->candidates->root->links[STD][FWD], simp->candidates->root->links[STD][BWD], simp->candidates->length, STD );
+
+	// printf("\ncandidates to redistribute aft:\n");
+	// print_dll(grid->candidates_to_redistribute, STD);
+
+	// reinit dll
+	init_dll(simp->candidates, simp->candidates->root);
+
+	// printf("\ncandidates simplex to split aft init :\n");
+	// print_dll(simp->candidates, STD);
+
+	split_in_3(grid, simp, vert);
+
+	Simplex *my_simp = unstack(grid);
+	Simplex *new_simp2 = unstack(grid);
+	Simplex *new_simp1 = unstack(grid);
+
+	// printf("\nSimplex ori :\n");
+	// print_simplex(simp);
+
+	// printf("\nSimplex new 1 :\n");
+	// print_simplex(new_simp1);
+
+	// printf("\nSimplex new 2 :\n");
+	// print_simplex(new_simp2);
+
+
+	add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, my_simp );
+	add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, new_simp1);
+	add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, new_simp2);
+
+	// for (int i = 0; i < grid->new_current_size; i++)
+	// {
+	// 	print_simplex(grid->new[i]);
+	// }
+
+	// redistribute candidates
+	redistribute_candidates(grid->candidates_to_redistribute, grid->new, grid->new_current_size, STD );
+
+	// printf("\nSimplex ori :\n");
+	// print_simplex(simp);
+
+	// printf("\nSimplex new 1 :\n");
+	// print_simplex(new_simp1);
+
+	// printf("\nSimplex new 2 :\n");
+	// print_simplex(new_simp2);
+
+	// update fdp and add new triangle to it
+	down_heap(grid->fdp, 2, 1);
+
+	insert_in_fdp(grid->fdp, new_simp1);
+	insert_in_fdp(grid->fdp, new_simp2);
+
+	// reinit
+	init_dll(grid->candidates_to_redistribute, grid->candidates_to_redistribute->root);
+	// int n; // = grid->stack_size;
+	// for (int i = 0; i < n; i++)
+	// {
+	// 	unstack(grid);
+	// }
+	int n = grid->new_current_size;
+	for (int i = 0; i < n; i++)
+	{
+		grid->new[i] = NULL;
+		grid->new_current_size--;
+	}
+	// printf("nnew = %d\n", grid->new_current_size);
+	// printf("nstack = %d\n", grid->stack_size);
+	// printf("grid->fdp->nb = %d\n", grid->fdp->nb);
+	// print_fdp(grid->fdp);
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -366,14 +487,14 @@ FDP* create_fdp( int size )
 	return new_fdp;
 }
 
-void switch_cells_fdp( FDP *fdp, int const a, int const b )
+void switch_cells_fdp( FDP *fdp, const int a, const int b )
 {
 	Simplex *c = fdp->table[a];
 	fdp->table[a] = fdp->table[b];
 	fdp->table[b] = c;
 }
 
-int get_number_of_sons( int const i, int const n )
+int get_number_of_sons( const int i, const int n )
 {
 	int nb_leafs = (n + 1) / 2;
 	if ( i > n - nb_leafs) return 0;
@@ -383,7 +504,7 @@ int get_number_of_sons( int const i, int const n )
 
 int is_empty( Simplex *simp )
 {
-	return 1 - sgn(simp->candidats->length);
+	return 1 - sgn(simp->candidates->length);
 }
 
 int is_superior_vertex( Vertex *p1, Vertex *p2 )
@@ -393,10 +514,10 @@ int is_superior_vertex( Vertex *p1, Vertex *p2 )
 
 int is_superior_simplex( Simplex *s1, Simplex *s2 )
 {
-	return is_superior_vertex(s1->candidats->root->links[STD][FWD], s2->candidats->root->links[STD][FWD] );
+	return is_superior_vertex(s1->candidates->root->links[STD][FWD], s2->candidates->root->links[STD][FWD] );
 }
 
-int is_superior_fdp( FDP *fdp, int const a, int const b )
+int is_superior_fdp( FDP *fdp, const int a, const int b )
 {
 	if ( !is_empty(fdp->table[a]) && !is_empty(fdp->table[b]) )
 		return is_superior_simplex(fdp->table[a], fdp->table[b]);
@@ -485,7 +606,7 @@ void heap_sort( FDP *fdp )
 //                                  Grid
 /*----------------------------------------------------------------------------------*/
 
-void init_grid( Grid *grid, Dllist *dll, int nb_pts, int size )
+void init_grid( Grid *grid, Dllist *dll, FDP *fdp, Simplex **tab, const int init_size_new_tab, const int nb_pts )
 {
 	// 4 corners vertex
 	Vertex *ul = create_vertex(0.0, 1.0, 0.0);
@@ -514,28 +635,38 @@ void init_grid( Grid *grid, Dllist *dll, int nb_pts, int size )
 
 		new_vert->zdist = compute_zdist( simp[j], new_vert );
 
-		if ( simp[j]->candidats->length > 0 && is_superior_vertex( new_vert, simp[j]->candidats->root->links[STD][FWD]) )
-			add_begin_dll( simp[j]->candidats, new_vert, STD );
+		if ( simp[j]->candidates->length > 0 && is_superior_vertex( new_vert, simp[j]->candidates->root->links[STD][FWD]) )
+			add_begin_dll( simp[j]->candidates, new_vert, STD );
 		else
-			add_end_dll( simp[j]->candidats, new_vert, STD );
+			add_end_dll( simp[j]->candidates, new_vert, STD );
 	}
-	
-	// print_simplex(simp[0]);
-	// print_simplex(simp[1]);
-	grid->fdp = create_fdp( size );
-	grid->candidats_to_redistribute = dll;
+
+	grid->fdp = fdp;
+
+	grid->candidates_to_redistribute = dll;
+
+	grid->top_of_stack = NULL;
+	grid->stack_size = 0;
+
+	grid->new = tab;
+	grid->new_current_size = 0;
+	grid->new_max_size = init_size_new_tab;
+
+	grid->gof = 0;
 
 	insert_in_fdp(grid->fdp, simp[0]);
 	insert_in_fdp(grid->fdp, simp[1]);
 }
 
-Grid* create_grid( int nb_pts, int size )
+Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab )
 {
 	Grid *new_grid = (Grid *) malloc(sizeof(Grid));
 	Dllist *new_dll = create_dll();
+	FDP *new_fdp = create_fdp( size_fdp );
+	Simplex **new_tab = (Simplex **)malloc(init_size_new_tab*sizeof(Simplex *));
 
-	if (new_grid != NULL && new_dll !=NULL)
-		init_grid( new_grid, new_dll, nb_pts, size );
+	if (new_grid != NULL && new_dll !=NULL && new_fdp !=NULL && new_tab !=NULL)
+		init_grid( new_grid, new_dll, new_fdp, new_tab, init_size_new_tab, nb_pts );
 	else
 		printf("Error in create_grid function\n");
 

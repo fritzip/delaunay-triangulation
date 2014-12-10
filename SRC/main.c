@@ -162,14 +162,16 @@ void affiche_simplex(Simplex *simp, double r, double g, double b)
 
 void affiche_grid(Grid *grid, double r, double g, double b)
 {
+	// print_fdp(grid->fdp);
+	// printf("size = %d\n", grid->fdp->nb);
 	for (int i = 1; i <= grid->fdp->nb; i++)
 		{
 			affiche_simplex( grid->fdp->table[i], r, g, b );
 		}	
 }
 
-void computePos(float deltaMove) {
-
+void computePos(float deltaMove) 
+{
 	x += deltaMove * lx * 0.1f;
 	y += deltaMove * ly * 0.1f;
 	z += deltaMove * lz * 0.1f;
@@ -225,11 +227,18 @@ int main(int argc, char **argv)
 	}	
 
 
-	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1 );
+	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET );
 
-	while (mygrid->fdp->table[1]->candidats->length != 0)
-		split_in_3(mygrid->fdp);
+	printf("%d\n", NB_SIMPLEX+1);
 
+	while (mygrid->fdp->table[1]->candidates->length != 0){
+		// printf("\n\n\n\n ******* NEW DELAUNEY *******\n\n\n\n");
+		delauney(mygrid, mygrid->fdp->table[1]);
+		// printf("main : %d\n", mygrid->fdp->table[1]->candidates->length );
+	}
+	// print_simplex(mygrid->fdp->table[1]);
+	// print_dll(mygrid->fdp->table[1]->candidates, STD);
+	printf("fdpnb = %d\n", mygrid->fdp->nb );
 	assert(displayChoice >= 0 && displayChoice <= 4);
 	printf("Executing %s with line option %d = %s.\n", argv[0], displayChoice, lineOption[displayChoice]);
 
