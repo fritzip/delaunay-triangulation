@@ -2,7 +2,7 @@
  * \author M. Sainlot & G. Schoder
  * \date 2014
  */
-
+// #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -13,6 +13,18 @@
 
 #include "main.h"
 #include "math_fn.h"
+
+/*! variable externe permettant de lire les parametres sur le ligne de commande.*/
+extern char *optarg;
+
+/*! bascule pour autoriser ou interdire (0) les messages d'erreurs envoyes par getopt. */
+extern int opterr;
+
+/* Display option */
+int displayChoice = 3;
+char *lineOption[] = { "GL_POINTS", "GL_LINES", "GL_LINE_STRIP", "GL_LINE_LOOP", "GL_POLYGON"};
+
+
 
 // angle of rotation for the camera direction
 float angle = 0.0f;
@@ -32,7 +44,7 @@ float deltaMoveY = 0;
 
 
 Grid* mygrid;
-
+int go_on;
 /*----------------------------------------------------------------------------------*/
 //                                  Graphic functions
 /*----------------------------------------------------------------------------------*/
@@ -147,6 +159,12 @@ void affiche_simplex(Simplex *simp, double r, double g, double b)
 
 	glEnd();
 
+	// scanf("%d", &go_on);
+	// glutSwapBuffers();   // swapping image buffer for double buffering
+	// glutPostRedisplay();
+	glFlush();
+
+
 	// printf("len = %d\n", simp->candidats->length[STD]);
 	// glBegin(GL_POINTS);
 
@@ -165,9 +183,9 @@ void affiche_grid(Grid *grid, double r, double g, double b)
 	// print_fdp(grid->fdp);
 	// printf("size = %d\n", grid->fdp->nb);
 	for (int i = 1; i <= grid->fdp->nb; i++)
-		{
-			affiche_simplex( grid->fdp->table[i], r, g, b );
-		}	
+	{
+		affiche_simplex( grid->fdp->table[i], r, g, b );
+	}	
 }
 
 void computePos(float deltaMove) 
@@ -179,14 +197,19 @@ void computePos(float deltaMove)
 
 void display (void)
 {
-	if (deltaMoveZ) computePos(deltaMoveZ);
+	// if (deltaMoveZ) computePos(deltaMoveZ);
 
 	glColor3f(0.0, 0.0, 0.0);
 	// glClear(GL_COLOR_BUFFER_BIT);
 	// Clear Color and Depth Buffers
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 
+	
+	while (mygrid->fdp->table[1]->candidates->length != 0)
+	{
+		delauney( mygrid );
+	}
 		// // Reset transformations
 		// glLoadIdentity();
 		// // Set the camera
@@ -194,11 +217,11 @@ void display (void)
 		// 	lx, ly, lz, 
 		// 	0.0f, 0.0f,  1.0f);
 
-	affiche_grid(mygrid, 0.0, 1.0, 0.0);
+	// affiche_grid(mygrid, 0.0, 1.0, 0.0);
 
-	// glFlush();
-	glutSwapBuffers();   // swapping image buffer for double buffering
-	glutPostRedisplay();
+	glFlush();
+	// glutSwapBuffers();   // swapping image buffer for double buffering
+	// glutPostRedisplay();
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -231,22 +254,28 @@ int main(int argc, char **argv)
 
 	printf("%d\n", NB_SIMPLEX+1);
 
-	while (mygrid->fdp->table[1]->candidates->length != 0){
+	// while (mygrid->fdp->table[1]->candidates->length != 0)
+	// {
+	// 	delauney( mygrid );
+	// }
+
+	// while (mygrid->fdp->table[1]->candidates->length != 0){
 		// printf("\n\n\n\n ******* NEW DELAUNEY *******\n\n\n\n");
-		delauney(mygrid, mygrid->fdp->table[1]);
+		// delauney(mygrid, mygrid->fdp->table[1]);
 		// printf("main : %d\n", mygrid->fdp->table[1]->candidates->length );
-	}
+	// }
 	// print_simplex(mygrid->fdp->table[1]);
 	// print_dll(mygrid->fdp->table[1]->candidates, STD);
 	printf("fdpnb = %d\n", mygrid->fdp->nb );
+
 	assert(displayChoice >= 0 && displayChoice <= 4);
 	printf("Executing %s with line option %d = %s.\n", argv[0], displayChoice, lineOption[displayChoice]);
 
 	glutInit(&argc, argv);  
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);  
+	glutInitDisplayMode(GLUT_SINGLE);  
 
 	glutInitWindowPosition(5,5);  
-	glutInitWindowSize(maxX*500,maxY*500);  
+	glutInitWindowSize(maxX*1000,maxY*1000);  
 
 	glutCreateWindow("Delaunay grid");  
 	
@@ -265,9 +294,9 @@ int main(int argc, char **argv)
 	// glutMouseFunc(mouseButton);
 	// glutPassiveMotionFunc(mouseMove);
 
-	glutFullScreen();  
+	// glutFullScreen();  
 
-	glEnable(GL_DEPTH_TEST);
+	// glEnable(GL_DEPTH_TEST);
 
 
 	glutMainLoop();  

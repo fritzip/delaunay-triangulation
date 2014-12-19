@@ -6,11 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <unistd.h>
 
 #include "primitives.h"
 #include "math_fn.h"
 #include "print_fn.h"
+#include "main.h"
 
+int ID = 1000;
 /*----------------------------------------------------------------------------------*/
 //                                  DLL Functions
 /*----------------------------------------------------------------------------------*/
@@ -202,9 +205,17 @@ void copy_order(Dllist *dll, const int SRC, const int DEST)
 
 void add_dll_end_dll(Dllist *dll, Vertex *inf, Vertex *sup, const int len, const int LNK)
 {
-	sew( dll->root->links[LNK][BWD], inf, LNK );
-	sew( sup, dll->root, LNK );
-	dll->length += len;
+	// printf("len = %d\n", len);
+	// print_dll(dll, LNK);
+
+	if (len > 0)
+	{
+		sew( dll->root->links[LNK][BWD], inf, LNK );
+		sew( sup, dll->root, LNK );
+		dll->length += len;
+	}
+	// print_dll(dll, LNK);
+
 }
 
 void sew( Vertex *left, Vertex *right, const int LNK )
@@ -264,6 +275,9 @@ void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *ca
 	simp->candidates = candidates;
 	simp->datation = 0;
 	simp->next_stk = NULL;
+	simp->index_in_fdp = 0;
+	simp->id = ID;
+	ID++;
 }
 
 Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
@@ -303,7 +317,13 @@ void redistribute_candidates( Dllist *dll, Simplex *tab[], const int nb_simp, co
 			if ( inside_simplex( tab[j], current ) ) break;
 
 		// si j==3, on le pousse de 10-13 !
-
+		// printf("current = %p\n", &current);
+		// printf("jmax = %d\n", nb_simp);
+		// printf("j = %d\n", j);
+		if (j == nb_simp)
+		{
+			print_vertex(current);
+		}
 		current->zdist = compute_zdist( tab[j], current );
 		next = current->links[STD][FWD];
 		if ( tab[j]->candidates->length > 0 && is_superior_vertex( current, tab[j]->candidates->root->links[STD][FWD]) )
@@ -349,7 +369,31 @@ void split_in_3(Grid *grid, Simplex *simp, Vertex *vert)
 	simp->voisin[0] = new_simp1;
 	simp->voisin[1] = new_simp2;
 
+	int ind_neighbor;
+	if (new_simp1->voisin[0] !=NULL)
+	{
+		ind_neighbor = get_neighbor_index( simp, new_simp1->voisin[0]);
+		// printf("ind_neighbor1 = %d\n", ind_neighbor); \\ revenir la dessus : test == 3 !
+		new_simp1->voisin[0]->voisin[ind_neighbor] = new_simp1;
+	}
+
+	if (new_simp2->voisin[0] !=NULL)
+	{
+		ind_neighbor = get_neighbor_index( simp, new_simp2->voisin[0]);
+		// printf("ind_neighbor1 = %d\n", ind_neighbor); \\ revenir la dessus : test == 3 !
+		new_simp2->voisin[0]->voisin[ind_neighbor] = new_simp2;
+	}
+
 	compute_plan(simp);
+
+	insert_in_fdp(grid->fdp, new_simp1);
+	insert_in_fdp(grid->fdp, new_simp2);
+
+	affiche_simplex(simp, 0.0, 1.0, 0.0);
+	affiche_simplex(new_simp1, 0.0, 1.0, 0.0);
+	affiche_simplex(new_simp2, 0.0, 1.0, 0.0);
+	// usleep(20000);
+
 
 	stack( grid, new_simp1 );
 	stack( grid, new_simp2 );
@@ -378,8 +422,60 @@ int get_vertex_index(Vertex *vert, Simplex *simp)
 	return i;
 }
 
-void delauney( Grid *grid, Simplex *simp )
+int get_neighbor_index( Simplex *neighbor, Simplex *simp)
 {
+	int i;
+	for (i = 0; i < 3; i++)
+		if (neighbor == simp->voisin[i]) break; // faire test sur les NULL
+
+	return i;
+}
+
+void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp)
+{
+	affiche_simplex(current, 0.0, 0.0, 0.0);
+	affiche_simplex(opp, 0.0, 0.0, 0.0);
+
+	int ind_neighbor;
+
+	current->voisin[ind_vert] = opp->voisin[(ind_opp+1)%3];
+	if (opp->voisin[(ind_opp+1)%3] !=NULL)
+	{
+		ind_neighbor = get_neighbor_index( opp, opp->voisin[(ind_opp+1)%3]);
+		// printf("ind_neighbor1 = %d\n", ind_neighbor); \\ revenir la dessus : test == 3 !
+		opp->voisin[(ind_opp+1)%3]->voisin[ind_neighbor] = current;
+	}
+	
+	opp->voisin[ind_opp] = current->voisin[(ind_vert+1)%3];
+	if (current->voisin[(ind_vert+1)%3] != NULL)
+	{
+		ind_neighbor = get_neighbor_index( current, current->voisin[(ind_vert+1)%3] );
+		// printf("ind_neighbor2 = %d\n", ind_neighbor);
+		current->voisin[(ind_vert+1)%3]->voisin[ind_neighbor] = opp;
+	}
+
+	current->voisin[(ind_vert+1)%3] = opp;
+	opp->voisin[(ind_opp+1)%3] = current;
+
+	current->sommet[(ind_vert+2)%3] = opp->sommet[ind_opp];
+	opp->sommet[(ind_opp+2)%3] = current->sommet[ind_vert];
+
+	compute_plan(current);
+	compute_plan(opp);
+
+	affiche_simplex(current, 0.0, 1.0, 0.0);
+	affiche_simplex(opp, 0.0, 1.0, 0.0);
+	// usleep(70000);
+
+	stack( grid, current);
+	stack( grid, opp);
+}
+
+void delauney( Grid *grid )
+{
+	// printf("ENTER DELAUNEY\n");
+	Simplex *simp =	grid->fdp->table[1] ;
+	// affiche_simplex(simp, 0.5, 0.0, 1.0);
 	// print_fdp(grid->fdp);
 	// printf("\nSimplex to split :\n");
 	// print_simplex(simp);
@@ -413,9 +509,40 @@ void delauney( Grid *grid, Simplex *simp )
 
 	split_in_3(grid, simp, vert);
 
-	Simplex *my_simp = unstack(grid);
-	Simplex *new_simp2 = unstack(grid);
-	Simplex *new_simp1 = unstack(grid);
+	Simplex *current = NULL;
+	Simplex *opp = NULL;
+	int ind_vert;
+	int ind_opp;
+
+	while (grid->stack_size > 0)
+	{
+		current = unstack(grid);
+		ind_vert = get_vertex_index(vert, current);
+		// print_simplex(current);
+		// printf("indvert = %d\n", ind_vert);
+
+		opp = current->voisin[ind_vert];
+
+		if ( opp !=NULL && in_circle( opp->sommet[0], opp->sommet[1], opp->sommet[2], vert ) )
+		{
+			// print_simplex(opp);
+			ind_opp = (get_vertex_index(current->sommet[(ind_vert + 1)%3], opp) + 1) %3 ;
+			// printf("ind_opp = %d\n", ind_opp);
+			add_dll_end_dll(grid->candidates_to_redistribute, opp->candidates->root->links[STD][FWD], opp->candidates->root->links[STD][BWD], opp->candidates->length, STD );
+			init_dll(opp->candidates, opp->candidates->root);
+
+			flip(grid, current, ind_vert, opp, ind_opp);
+		}
+		else
+		{
+			add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, current );
+		}
+
+	}
+
+	// Simplex *my_simp = unstack(grid);
+	// Simplex *new_simp2 = unstack(grid);
+	// Simplex *new_simp1 = unstack(grid);
 
 	// printf("\nSimplex ori :\n");
 	// print_simplex(simp);
@@ -427,9 +554,9 @@ void delauney( Grid *grid, Simplex *simp )
 	// print_simplex(new_simp2);
 
 
-	add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, my_simp );
-	add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, new_simp1);
-	add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, new_simp2);
+	// add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, my_simp );
+	// add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, new_simp1);
+	// add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, new_simp2);
 
 	// for (int i = 0; i < grid->new_current_size; i++)
 	// {
@@ -437,6 +564,13 @@ void delauney( Grid *grid, Simplex *simp )
 	// }
 
 	// redistribute candidates
+
+	// printf("\n");
+	// for (int i = 0; i < grid->new_current_size; i++)
+	// {
+	// 	printf("%p ", &grid->candidates_to_redistribute[i]);
+	// }
+	// printf("\n");
 	redistribute_candidates(grid->candidates_to_redistribute, grid->new, grid->new_current_size, STD );
 
 	// printf("\nSimplex ori :\n");
@@ -449,10 +583,16 @@ void delauney( Grid *grid, Simplex *simp )
 	// print_simplex(new_simp2);
 
 	// update fdp and add new triangle to it
-	down_heap(grid->fdp, 2, 1);
+	// down_heap(grid->fdp, 2, 1);
+	for (int i = 0; i < grid->new_current_size; i++)
+	{
+		up_heap( grid->fdp, grid->new[i]->index_in_fdp, grid->new[i]->index_in_fdp/2 );
+		down_heap( grid->fdp, grid->new[i]->index_in_fdp*2, grid->new[i]->index_in_fdp );
+	}
 
-	insert_in_fdp(grid->fdp, new_simp1);
-	insert_in_fdp(grid->fdp, new_simp2);
+
+	// insert_in_fdp(grid->fdp, new_simp1);
+	// insert_in_fdp(grid->fdp, new_simp2);
 
 	// reinit
 	init_dll(grid->candidates_to_redistribute, grid->candidates_to_redistribute->root);
@@ -498,6 +638,10 @@ FDP* create_fdp( int size )
 
 void switch_cells_fdp( FDP *fdp, const int a, const int b )
 {
+	int ind = fdp->table[a]->index_in_fdp;
+	fdp->table[a]->index_in_fdp = fdp->table[b]->index_in_fdp;
+	fdp->table[b]->index_in_fdp = ind;
+
 	Simplex *c = fdp->table[a];
 	fdp->table[a] = fdp->table[b];
 	fdp->table[b] = c;
@@ -579,6 +723,7 @@ void down_heap( FDP *fdp, int son, int father )
 
 void insert_in_fdp( FDP *fdp, Simplex *simp )
 {
+	simp->index_in_fdp = fdp->nb + 1;
 	fdp->table[fdp->nb + 1] = simp;
 	fdp->nb++;
 	up_heap(fdp, fdp->nb, fdp->nb / 2);

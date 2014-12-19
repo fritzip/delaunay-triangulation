@@ -26,4 +26,7 @@ void compute_plan( Simplex *simp );
 
 double compute_zdist( Simplex const *simp, Vertex const *vert );
 
+int in_circle( Vertex const *a, Vertex const *b, Vertex const *c, Vertex const *z );
+
+
 #endif

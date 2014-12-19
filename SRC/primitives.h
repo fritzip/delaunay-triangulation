@@ -36,6 +36,9 @@ typedef struct simplex
 	double na;
 	double nb;
 	double nc;
+
+	int index_in_fdp;
+	int id;
 } Simplex ;
 
 typedef struct fdprior
@@ -121,7 +124,13 @@ void split_in_3(Grid *grid, Simplex *simp, Vertex *vert) ;
 
 void add_end_array( Simplex **tab, int *c_size, int *m_size, Simplex *simp );
 
-void delauney( Grid *grid, Simplex *simp ) ;
+void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp);
+
+int get_vertex_index(Vertex *vert, Simplex *simp);
+
+int get_neighbor_index( Simplex *neighbor, Simplex *simp);
+
+void delauney( Grid *grid ) ;
 
 
 /*----------------------------------------------------------------------------------*/

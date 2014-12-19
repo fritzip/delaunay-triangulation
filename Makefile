@@ -9,11 +9,11 @@ TARGET   = delauney
 CC       = gcc
 
 # compiling flags here
-CFLAGS   = -std=gnu99 -Wall -g 
+CFLAGS   = -std=gnu99 -Wall -pg 
 #-I.
 
 # linking flags here
-LFLAGS   = -Wall -I. -g
+LFLAGS   = -Wall -I. -pg
 
 # using OpenGL lib
 #GL_INCLUDE    = -I/usr/include/GL
