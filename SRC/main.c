@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
 #include <unistd.h>
 #include <math.h>
 #include <assert.h>
@@ -53,7 +54,7 @@ void changeSize(int w, int h) {
   // Prevent a divide by zero, when window is too short
   // (you cant make a window of zero width).
   if (h == 0)
-    h = 1;
+	h = 1;
 
   float ratio =  w * 1.0 / h;
 
@@ -76,27 +77,27 @@ void changeSize(int w, int h) {
 
 void processNormalKeys(unsigned char key, int xx, int yy) {   
 
-        if (key == 27)
-              exit(0);
+		if (key == 27)
+			  exit(0);
 
 } 
 
 void pressKey(int key, int xx, int yy) {
 
-       switch (key) {
-             case GLUT_KEY_UP : deltaMoveZ = 0.5f; break; //y+=0.01f; break;  // xOrigin = xx; break;
-             case GLUT_KEY_DOWN : deltaMoveZ = -0.5f; break; //y-=0.01f; break;
-             // case GLUT_KEY_LEFT : deltaAngle = 0.5f; break;
-       }
+	   switch (key) {
+			 case GLUT_KEY_UP : deltaMoveZ = 0.5f; break; //y+=0.01f; break;  // xOrigin = xx; break;
+			 case GLUT_KEY_DOWN : deltaMoveZ = -0.5f; break; //y-=0.01f; break;
+			 // case GLUT_KEY_LEFT : deltaAngle = 0.5f; break;
+	   }
 } 
 
 void releaseKey(int key, int x, int y) {  
 
-        switch (key) {
-             case GLUT_KEY_UP :
-             case GLUT_KEY_DOWN : deltaMoveZ = 0; break;
-             // case GLUT_KEY_LEFT : deltaAngle = 0; break;
-        }
+		switch (key) {
+			 case GLUT_KEY_UP :
+			 case GLUT_KEY_DOWN : deltaMoveZ = 0; break;
+			 // case GLUT_KEY_LEFT : deltaAngle = 0; break;
+		}
 } 
 
 
@@ -149,7 +150,7 @@ void affiche_dll(Dllist *dll, int LNK, int GL_DRAW_STYLE, double r, double g, do
 
 void affiche_simplex(Simplex *simp, double r, double g, double b)
 {
-	glBegin(GL_LINE_LOOP);
+	// glBegin(lineOption[displayChoice]);
 	glColor3f(r, g, b);
 
 	for(int i = 0; i < 3; i++)
@@ -157,12 +158,12 @@ void affiche_simplex(Simplex *simp, double r, double g, double b)
 		glVertex3f(simp->sommet[i]->coords[0], simp->sommet[i]->coords[1], simp->sommet[i]->coords[2]);
 	}
 
-	glEnd();
+	// glEnd();
 
 	// scanf("%d", &go_on);
 	// glutSwapBuffers();   // swapping image buffer for double buffering
 	// glutPostRedisplay();
-	glFlush();
+	// glFlush();
 
 
 	// printf("len = %d\n", simp->candidats->length[STD]);
@@ -200,16 +201,35 @@ void display (void)
 	// if (deltaMoveZ) computePos(deltaMoveZ);
 
 	glColor3f(0.0, 0.0, 0.0);
-	// glClear(GL_COLOR_BUFFER_BIT);
 	// Clear Color and Depth Buffers
 	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0.0, 1.0, 0.0);
 
-
-	
-	while (mygrid->fdp->table[1]->candidates->length != 0)
+	GLenum display_mode;
+	switch (displayChoice)
 	{
-		delauney( mygrid );
+		case 0: display_mode = GL_POINTS ;
+			break;
+		case 1: display_mode = GL_LINES ;
+			break;
+		case 2: display_mode = GL_LINE_STRIP ;
+			break;
+		case 3: display_mode = GL_LINE_LOOP ;
+			break;
+		default: display_mode = GL_POLYGON ;
+			break;
 	}
+	
+	for (int i = 1; i <= mygrid->fdp->nb; i++)
+	{
+		glBegin(display_mode);
+		for(int j = 0; j < 3; j++)
+		{
+			glVertex3f(mygrid->fdp->table[i]->sommet[j]->coords[0], mygrid->fdp->table[i]->sommet[j]->coords[1], mygrid->fdp->table[i]->sommet[j]->coords[2]);
+		}
+		glEnd();
+	}	
+
 		// // Reset transformations
 		// glLoadIdentity();
 		// // Set the camera
@@ -218,7 +238,7 @@ void display (void)
 		// 	0.0f, 0.0f,  1.0f);
 
 	// affiche_grid(mygrid, 0.0, 1.0, 0.0);
-
+	// glEnd();
 	glFlush();
 	// glutSwapBuffers();   // swapping image buffer for double buffering
 	// glutPostRedisplay();
@@ -231,28 +251,54 @@ void display (void)
 int main(int argc, char **argv)
 {
 	srand (time(NULL));
-	int option;
 
-	opterr = 0; /* set off std error messages in case wrong option is chosen */
-	while ((option = getopt(argc, argv, "c:")) != EOF)
-	{
-		switch (option)
+
+	int NB_VERTEX = 1000;
+
+	// opterr = 0; /* set off std error messages in case wrong option is chosen */
+	// while ((option = getopt(argc, argv, "cn")) != -1)
+	// {
+	// 	switch (option)
+	// 	{
+	// 		case 'c': 
+	// 			if ((sscanf(optarg, "%d", &displayChoice) == 1) && displayChoice >= 0 && displayChoice <= 4)
+	// 			break;
+	// 		case 'n': sscanf(optarg, "%d", &nb_vert);
+	// 			break;
+	// 		// case '?':  value returned by getopt if invalid option chosen 
+	// 		default : 
+	// 			printf("Usage: %s -cX, with X = 1, 2, 3 or 4.\n", argv[0]);
+	// 			displayChoice = 0;
+	// 			break;
+	// 	}
+	// }	
+
+	int opt;
+	while ((opt = getopt (argc, argv, "c:n:")) != -1)
+		switch (opt)
 		{
-			case 'c': 
-				if ((sscanf(optarg, "%d", &displayChoice) == 1) && displayChoice >= 0 && displayChoice <= 4)
+			case 'n':
+				sscanf(optarg, "%d", &NB_VERTEX);
 				break;
-			case '?': /* value returned by getopt if invalid option chosen */
-			default : 
-				printf("Usage: %s -cX, with X = 1, 2, 3 or 4.\n", argv[0]);
-				displayChoice = 0;
+			case 'c':
+				sscanf(optarg, "%d", &displayChoice);
 				break;
+			case '?':
+				if (optopt == 'c' || optopt == 'n')
+					fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+				else if (isprint (optopt))
+					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+				else
+					fprintf (stderr, "Unknown option character `\\x%x'.\n", optopt);
+				printf("Usage: %s -c DISPLAY_MODE{0,1,2,3} -n NB_VERTEX -i INPUT_FILE \n", argv[0]);
+				return 1;
+			default:
+				abort();
 		}
-	}	
 
+	int NB_SIMPLEX = ( 2*(NB_VERTEX+4 - 1) - 4 );
 
-	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET );
-
-	printf("%d\n", NB_SIMPLEX+1);
+	printf ("n = %d, c = %d\n", NB_VERTEX, displayChoice);
 
 	// while (mygrid->fdp->table[1]->candidates->length != 0)
 	// {
@@ -266,13 +312,19 @@ int main(int argc, char **argv)
 	// }
 	// print_simplex(mygrid->fdp->table[1]);
 	// print_dll(mygrid->fdp->table[1]->candidates, STD);
-	printf("fdpnb = %d\n", mygrid->fdp->nb );
+	// printf("fdpnb = %d\n", mygrid->fdp->nb );
 
 	assert(displayChoice >= 0 && displayChoice <= 4);
 	printf("Executing %s with line option %d = %s.\n", argv[0], displayChoice, lineOption[displayChoice]);
 
+	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET );
+	while (mygrid->fdp->table[1]->candidates->length != 0)
+	{
+		delauney( mygrid );
+	}
+
 	glutInit(&argc, argv);  
-	glutInitDisplayMode(GLUT_SINGLE);  
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);  
 
 	glutInitWindowPosition(5,5);  
 	glutInitWindowSize(maxX*1000,maxY*1000);  

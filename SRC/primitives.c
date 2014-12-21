@@ -389,9 +389,9 @@ void split_in_3(Grid *grid, Simplex *simp, Vertex *vert)
 	insert_in_fdp(grid->fdp, new_simp1);
 	insert_in_fdp(grid->fdp, new_simp2);
 
-	affiche_simplex(simp, 0.0, 1.0, 0.0);
-	affiche_simplex(new_simp1, 0.0, 1.0, 0.0);
-	affiche_simplex(new_simp2, 0.0, 1.0, 0.0);
+	// affiche_simplex(simp, 0.0, 1.0, 0.0);
+	// affiche_simplex(new_simp1, 0.0, 1.0, 0.0);
+	// affiche_simplex(new_simp2, 0.0, 1.0, 0.0);
 	// usleep(20000);
 
 
@@ -433,8 +433,8 @@ int get_neighbor_index( Simplex *neighbor, Simplex *simp)
 
 void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp)
 {
-	affiche_simplex(current, 0.0, 0.0, 0.0);
-	affiche_simplex(opp, 0.0, 0.0, 0.0);
+	// affiche_simplex(current, 0.0, 0.0, 0.0);
+	// affiche_simplex(opp, 0.0, 0.0, 0.0);
 
 	int ind_neighbor;
 
@@ -463,8 +463,8 @@ void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp)
 	compute_plan(current);
 	compute_plan(opp);
 
-	affiche_simplex(current, 0.0, 1.0, 0.0);
-	affiche_simplex(opp, 0.0, 1.0, 0.0);
+	// affiche_simplex(current, 0.0, 1.0, 0.0);
+	// affiche_simplex(opp, 0.0, 1.0, 0.0);
 	// usleep(70000);
 
 	stack( grid, current);
@@ -832,41 +832,41 @@ Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new
 /*----------------------------------------------------------------------------------*/
 
 
-Dllist* create_rd_data_struct( )
-{
-	Dllist *dll = create_dll();
+// Dllist* create_rd_data_struct( )
+// {
+// 	Dllist *dll = create_dll();
 
-	for(int i=0; i<NB_VERTEX; i++)
-	{
-		Vertex *new_vert = create_vertex( randf(), randf(), randf() );
-		add_end_dll( dll, new_vert, STD );
-	}
-	return dll;
-}
+// 	for(int i=0; i<NB_VERTEX; i++)
+// 	{
+// 		Vertex *new_vert = create_vertex( randf(), randf(), randf() );
+// 		add_end_dll( dll, new_vert, STD );
+// 	}
+// 	return dll;
+// }
 
-// TODO
-// create_data_struct_from_tab_of_coords()
+// // TODO
+// // create_data_struct_from_tab_of_coords()
 
-void remove_data_struct( Dllist *dll )
-{
-	if (dll != NULL)
-	{
-		Vertex *del = dll->root->links[STD][FWD];
-		Vertex *temp = NULL;
+// void remove_data_struct( Dllist *dll )
+// {
+// 	if (dll != NULL)
+// 	{
+// 		Vertex *del = dll->root->links[STD][FWD];
+// 		Vertex *temp = NULL;
 
-		while (del != dll->root)
-		{
-			temp = del->links[STD][FWD];
+// 		while (del != dll->root)
+// 		{
+// 			temp = del->links[STD][FWD];
 
-			free(del);
-			del->links[STD][FWD] = NULL;
-			del->links[STD][BWD] = NULL;
+// 			free(del);
+// 			del->links[STD][FWD] = NULL;
+// 			del->links[STD][BWD] = NULL;
 
-			del = temp;
-			dll->length--;
-		}
-		free(dll->root);
-		free(dll);	
-		dll = NULL;
-	}	
-}
+// 			del = temp;
+// 			dll->length--;
+// 		}
+// 		free(dll->root);
+// 		free(dll);	
+// 		dll = NULL;
+// 	}	
+// }
