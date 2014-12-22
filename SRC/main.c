@@ -167,25 +167,14 @@ void mouseButton(int button, int state, int x, int y)
 
 void compute_pos() 
 {
-	// phi += deltaphi;
-	// theta += deltatheta;
 	if (xrot > 0) xrot = 0;
 	if (xrot < -180) xrot = -180; 
 	if (zrot > 360) zrot -= 360;
 	if (zrot < 0) zrot += 360;
 
-
-	// camx = rho*sin(phi)*cos(theta);
-	// camy = rho*sin(phi)*sin(theta);
-	// camz = rho*cos(phi);
 	// printf("xrot = %f, zrot = %f, rho = %f\n", xrot, zrot, rho);
 	// printf("phi = %f, theta = %f, rho = %f\n", phi, theta, rho);
 	// printf("camx = %f, camy = %f, camz = %f\n", camx, camy, camz);
-	// move = 0;
-	// theta = 0;
-	// x += deltaMove * lx * 0.1f;
-	// y += deltaMove * ly * 0.1f;
-	// z += deltaMove * lz * 0.1f;
 }
 
 // void GlutShade(GLfloat r,GLfloat v,GLfloat b)
@@ -222,9 +211,6 @@ void compute_pos()
 
 void display (void)
 {
-
-
-
 	compute_pos();
 
 	glColor3f(0.0, 0.0, 0.0);
@@ -257,12 +243,6 @@ void display (void)
 
 	glTranslatef(0.0f, 0.0f, -rho);
 
-	// printf("zrot = %f\n", zrot);
-
-	// glTranslatef(0.5f, 0.5f, 0.0f);
-	// glRotatef(initrot,0.0, 0.0, 1.0);  //rotate our camera on teh x-axis (left and right)
-	// initrot += 0.7;
-
 	glPushMatrix();
 	glRotatef(xrot, 1.0, 0.0, 0.0);
 	glRotatef(zrot, 0.0, 0.0, 1.0); 
@@ -281,19 +261,8 @@ void display (void)
 	glPopMatrix();
 
 
-	// glRotatef(yrot,0.0,1.0,0.0);  //rotate our camera on the y-axis (up and down)
-	// glTranslatef(-xpos,-ypos,-zpos);
-	// // glRotatef(phi, 0.0f, 1.0f, 0.0f);
-	// // Set the camera
-	// // printf("x = %.2f, y = %.2f, z = %.2f \n", x, y, z );
-	// // printf("camx = %.2f, camy = %.2f, camz = %.2f \n", x+camx, y+camy, z+camz );
-	// // printf("rho = %f\n", rho);
-	// gluLookAt( x, y, z, 
-	// 		x+camx, y+camy, z+camz, 
-	// 		0.0f, 0.0f, 1.0f);
-
 	// // affiche_grid(mygrid, 0.0, 1.0, 0.0);
-	// // glEnd();
+
 	// // glFlush();
 	glutSwapBuffers();   // swapping image buffer for double buffering
 	// glutPostRedisplay();
@@ -392,7 +361,7 @@ int main(int argc, char **argv)
 
 	glutIdleFunc(display);
 	glutDisplayFunc(display); 
-	glutReshapeFunc(changeSize); 
+	// glutReshapeFunc(changeSize); 
 
 	// glutIgnoreKeyRepeat(1);
 	glutSetKeyRepeat( GLUT_KEY_REPEAT_ON );
