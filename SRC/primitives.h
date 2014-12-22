@@ -6,6 +6,7 @@
  */
 
 #include "ressources.h"
+#include "pgm.h"
 
 
 /*----------------------------------------------------------------------------------*/
@@ -31,14 +32,12 @@ typedef struct simplex
 	struct simplex *voisin[3];
 	struct simplex *next_stk;
 	Dllist *candidates;
-	unsigned long int datation;
 	
 	double na;
 	double nb;
 	double nc;
 
 	int index_in_fdp;
-	int id;
 } Simplex ;
 
 typedef struct fdprior
@@ -102,6 +101,10 @@ void add_dll_end_dll(Dllist *dll, Vertex *inf, Vertex *sup, const int len, const
 void init_vertex( Vertex *vert, double x, double y, double z ) ;
 
 Vertex* create_vertex( double x, double y, double z ) ;
+
+void init_vertex_img_based( Vertex *vert, const PGMData *pic ) ;
+
+Vertex* create_vertex_img_based( const PGMData *pic ) ;
 
 
 /*----------------------------------------------------------------------------------*/
@@ -167,9 +170,9 @@ void heap_sort( FDP *fdp ) ;
 //                                  Grid prototypes
 /*----------------------------------------------------------------------------------*/
 
-void init_grid( Grid *grid, Dllist *dll, FDP *fdp, Simplex **tab, const int init_size_new_tab, const int nb_pts );
+void init_grid( Grid *grid, Dllist *dll, FDP *fdp, Simplex **tab, const int init_size_new_tab, const int nb_pts, const PGMData *pic );
 
-Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab );
+Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic );
 
 
 /*----------------------------------------------------------------------------------*/

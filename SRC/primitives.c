@@ -11,9 +11,8 @@
 #include "primitives.h"
 #include "math_fn.h"
 #include "print_fn.h"
-#include "main.h"
+// #include "main.h"
 
-int ID = 1000;
 /*----------------------------------------------------------------------------------*/
 //                                  DLL Functions
 /*----------------------------------------------------------------------------------*/
@@ -244,6 +243,7 @@ void init_vertex( Vertex *vert, double x, double y, double z )
 	vert->zdist = 0;
 }
 
+
 Vertex* create_vertex( double x, double y, double z )
 {
 	Vertex *new_vert = (Vertex *) malloc(sizeof(Vertex));
@@ -256,6 +256,64 @@ Vertex* create_vertex( double x, double y, double z )
 	return new_vert;
 }
 
+void init_vertex_img_based( Vertex *vert, const PGMData *pic )
+{
+	double x = randf();
+	double y = randf();
+	double z;
+
+	int sizex = pic->row;
+	int sizey = pic->col;
+	int xpic = floor(x*sizex);
+	int ypic = floor(y*sizey);
+	double difx = (x*sizex)-xpic-0.5;
+	double dify = (y*sizey)-ypic-0.5;
+	int sensx = sgn(difx);
+	int sensy = sgn(dify);
+
+	// printf("sizex = %d, sizey = %d\n", sizex, sizey);
+	// printf("difx = %f, dify = %f\n", difx, dify);
+	// printf("xpic = %d, ypic = %d\n", xpic, ypic);
+
+	if (xpic <= 0 || xpic >= pic->row - 1 || ypic <=0 || ypic >= pic->col - 1)
+	{
+		// printf("fup\n");
+		z = (double) pic->matrix[xpic][ypic]/255;
+	}
+	else
+	{
+		int xy = pic->matrix[xpic][ypic];
+		int xul = pic->matrix[xpic+sensx][ypic];
+		int yul = pic->matrix[xpic][ypic+sensy];
+		z = ( (difx*sensx*xul + (1-difx*sensx)*xy) + (dify*sensy*yul + (1-dify*sensy)*xy) ) / (2*255);
+	}
+
+	// printf("z = %.4f\n", z);
+
+	vert->coords[0] = x;
+	vert->coords[1] = y;	
+	vert->coords[2] = z;
+
+	for(int i=0; i<NBL; i++)
+	{
+		vert->links[i][BWD] = NULL;	
+		vert->links[i][FWD] = NULL;
+	}
+
+	vert->zdist = 0;
+}
+
+Vertex* create_vertex_img_based( const PGMData *pic )
+{
+	Vertex *new_vert = (Vertex *) malloc(sizeof(Vertex));
+
+	if (new_vert != NULL)
+		init_vertex_img_based( new_vert, pic);
+	else
+		printf("Error in create_vertex_img_based function\n");
+
+	return new_vert;
+}
 
 /*----------------------------------------------------------------------------------*/
 //                                  Simplex functions
@@ -273,11 +331,8 @@ void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *ca
 		simp->voisin[i] = NULL;
 
 	simp->candidates = candidates;
-	simp->datation = 0;
 	simp->next_stk = NULL;
 	simp->index_in_fdp = 0;
-	simp->id = ID;
-	ID++;
 }
 
 Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
@@ -373,14 +428,12 @@ void split_in_3(Grid *grid, Simplex *simp, Vertex *vert)
 	if (new_simp1->voisin[0] !=NULL)
 	{
 		ind_neighbor = get_neighbor_index( simp, new_simp1->voisin[0]);
-		// printf("ind_neighbor1 = %d\n", ind_neighbor); \\ revenir la dessus : test == 3 !
 		new_simp1->voisin[0]->voisin[ind_neighbor] = new_simp1;
 	}
 
 	if (new_simp2->voisin[0] !=NULL)
 	{
 		ind_neighbor = get_neighbor_index( simp, new_simp2->voisin[0]);
-		// printf("ind_neighbor1 = %d\n", ind_neighbor); \\ revenir la dessus : test == 3 !
 		new_simp2->voisin[0]->voisin[ind_neighbor] = new_simp2;
 	}
 
@@ -392,8 +445,6 @@ void split_in_3(Grid *grid, Simplex *simp, Vertex *vert)
 	// affiche_simplex(simp, 0.0, 1.0, 0.0);
 	// affiche_simplex(new_simp1, 0.0, 1.0, 0.0);
 	// affiche_simplex(new_simp2, 0.0, 1.0, 0.0);
-	// usleep(20000);
-
 
 	stack( grid, new_simp1 );
 	stack( grid, new_simp2 );
@@ -442,7 +493,6 @@ void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp)
 	if (opp->voisin[(ind_opp+1)%3] !=NULL)
 	{
 		ind_neighbor = get_neighbor_index( opp, opp->voisin[(ind_opp+1)%3]);
-		// printf("ind_neighbor1 = %d\n", ind_neighbor); \\ revenir la dessus : test == 3 !
 		opp->voisin[(ind_opp+1)%3]->voisin[ind_neighbor] = current;
 	}
 	
@@ -450,7 +500,6 @@ void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp)
 	if (current->voisin[(ind_vert+1)%3] != NULL)
 	{
 		ind_neighbor = get_neighbor_index( current, current->voisin[(ind_vert+1)%3] );
-		// printf("ind_neighbor2 = %d\n", ind_neighbor);
 		current->voisin[(ind_vert+1)%3]->voisin[ind_neighbor] = opp;
 	}
 
@@ -465,7 +514,6 @@ void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp)
 
 	// affiche_simplex(current, 0.0, 1.0, 0.0);
 	// affiche_simplex(opp, 0.0, 1.0, 0.0);
-	// usleep(70000);
 
 	stack( grid, current);
 	stack( grid, opp);
@@ -760,7 +808,7 @@ void heap_sort( FDP *fdp )
 //                                  Grid
 /*----------------------------------------------------------------------------------*/
 
-void init_grid( Grid *grid, Dllist *dll, FDP *fdp, Simplex **tab, const int init_size_new_tab, const int nb_pts )
+void init_grid( Grid *grid, Dllist *dll, FDP *fdp, Simplex **tab, const int init_size_new_tab, const int nb_pts, const PGMData *pic )
 {
 	// 4 corners vertex
 	Vertex *ul = create_vertex(0.0, 1.0, 0.0);
@@ -780,7 +828,10 @@ void init_grid( Grid *grid, Dllist *dll, FDP *fdp, Simplex **tab, const int init
 	int i, j;
 	for (i = 0; i < nb_pts; i++)
 	{
-		new_vert = create_vertex(randf(), randf(), randf());
+		if (pic->matrix != NULL)
+			new_vert = create_vertex_img_based(pic);
+		else
+			new_vert = create_vertex(randf(), randf(), randf());
 		for (j = 0; j < 2; j++)
 		{
 			if ( inside_simplex( simp[j], new_vert ) )
@@ -812,7 +863,7 @@ void init_grid( Grid *grid, Dllist *dll, FDP *fdp, Simplex **tab, const int init
 	insert_in_fdp(grid->fdp, simp[1]);
 }
 
-Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab )
+Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *mypic )
 {
 	Grid *new_grid = (Grid *) malloc(sizeof(Grid));
 	Dllist *new_dll = create_dll();
@@ -820,7 +871,7 @@ Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new
 	Simplex **new_tab = (Simplex **)malloc(init_size_new_tab*sizeof(Simplex *));
 
 	if (new_grid != NULL && new_dll !=NULL && new_fdp !=NULL && new_tab !=NULL)
-		init_grid( new_grid, new_dll, new_fdp, new_tab, init_size_new_tab, nb_pts );
+		init_grid( new_grid, new_dll, new_fdp, new_tab, init_size_new_tab, nb_pts, mypic );
 	else
 		printf("Error in create_grid function\n");
 

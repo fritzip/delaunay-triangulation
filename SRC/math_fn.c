@@ -29,6 +29,11 @@ double randf( )
 	return ((double) rand() / RAND_MAX);
 }
 
+// double randf()
+// {
+// 	return ((double) rand() / RAND_MAX);
+// }
+
 double determinant2d(double const a, double const b, double const c, double const d)
 {
 	return a*d-c*b;
