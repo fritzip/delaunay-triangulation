@@ -3,7 +3,7 @@
 # ------------------------------------------------
 
 # project name (generate executable with this name)
-TARGET   = delauney
+TARGET   = delaunay
 
 # compiler
 CC       = gcc
