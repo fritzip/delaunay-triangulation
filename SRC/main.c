@@ -34,6 +34,9 @@ char *lineOption[] = { "GL_POINTS", "GL_LINES", "GL_LINE_STRIP", "GL_LINE_LOOP",
 // float deltaphi = 0.0f;
 // float deltatheta = 0.0f;
 
+int SCREEN_WIDTH = 1000, SCREEN_HEIGHT = 1000;
+int twoD = 0; 
+
 float rho = 2.0f;
 
 float xrot = -40.0f;
@@ -53,30 +56,72 @@ Grid* mygrid;
 /*----------------------------------------------------------------------------------*/
 //                                  Graphic functions
 /*----------------------------------------------------------------------------------*/
-void changeSize(int w, int h) {
+void changeSize(int w, int h)
+{
+	// if (threeD)
+	// {
+		// Prevent a divide by zero, when window is too short
+		// (you cant make a window of zero width).
+		if (h == 0)
+			h = 1;
 
-  // Prevent a divide by zero, when window is too short
-  // (you cant make a window of zero width).
-  if (h == 0)
-	h = 1;
+		float ratio =  w * 1.0 / h;
 
-  float ratio =  w * 1.0 / h;
+		// Use the Projection Matrix
+		glMatrixMode(GL_PROJECTION);
 
-  // Use the Projection Matrix
-  glMatrixMode(GL_PROJECTION);
+		// Reset Matrix
+		glLoadIdentity();
 
-  // Reset Matrix
-  glLoadIdentity();
+		// Set the viewport to be the entire window
+		glViewport(0, 0, w, h);
 
-  // Set the viewport to be the entire window
-  glViewport(0, 0, w, h);
+		// Set the correct perspective.
+		gluPerspective(60.0f, ratio, 0.01f, 10000.0f);
 
-  // Set the correct perspective.
-  gluPerspective(60.0f, ratio, 0.01f, 10000.0f);
+		// Get Back to the Modelview
+		glMatrixMode(GL_MODELVIEW);
+	// }
+	SCREEN_HEIGHT = h;
+	SCREEN_WIDTH = w;
+	// else
+	// {
+	// 	// Prevent a divide by zero, when window is too short
+	// 	// // (you cant make a window of zero width).
+	// 	// if (h == 0)
+	// 	// 	h = 1;
 
-  // Get Back to the Modelview
-  glMatrixMode(GL_MODELVIEW);
+	// 	// // Use the Projection Matrix
+	// 	// // glMatrixMode(GL_PROJECTION);
 
+	// 	// // Reset Matrix
+	// 	// glLoadIdentity();
+
+	// 	// // Set the viewport to be the entire window
+	// 	// glViewport(0, 0, w, h);
+
+	// 	// // Set the correct perspective.
+	// 	// // gluPerspective(60.0f, ratio, 0.01f, 10000.0f);
+
+	// 	// // Get Back to the Modelview
+	// 	// glMatrixMode(GL_MODELVIEW);
+
+
+	// 	glMatrixMode(GL_PROJECTION);
+	// 	glPushMatrix();
+	// 	glLoadIdentity();
+	// 	glOrtho(0.0, w, h, 0.0, -1.0, 10.0);
+	// 	glMatrixMode(GL_MODELVIEW);
+	// 	//glPushMatrix();        ----Not sure if I need this
+	// 	glLoadIdentity();
+	// 	glDisable(GL_CULL_FACE);
+
+	// 	glClear(GL_DEPTH_BUFFER_BIT);
+
+
+
+	// }
+	// glutPostRedisplay();
 }
 
 
@@ -84,6 +129,8 @@ void processNormalKeys(unsigned char key, int xx, int yy)
 {   
 	if (key == 27)
 		exit(0);
+	if (key == ' ')
+		twoD = 1 - twoD;
 } 
 
 void pressKey(int key, int xx, int yy)
@@ -113,24 +160,16 @@ void releaseKey(int key, int x, int y)
 } 
 
 
-void mouseMove(int x, int y) {  
-
+void mouseMove(int x, int y) 
+{
 	// this will only be true when the left button is down
 	if (xOrigin >= 0) 
 	{
-
-	// update deltaAngle
-	// deltaAngle = x * 0.005f;
-
 		zrot += 0.5f * (x - xOrigin);
 		xrot += 0.5f * (y - yOrigin);
 
 		xOrigin = x;
 		yOrigin = y;
-	// update camera's direction
-	// lx = sin(angle + deltaAngle);
-	// ly = -cos(angle + deltaAngle);
-	// lz = ;
 	}
 }
 
@@ -142,11 +181,8 @@ void mouseButton(int button, int state, int x, int y)
 		// when the button is released
 		if (state == GLUT_UP) 
 		{
-		// angle += deltaAngle;
 			xOrigin = -1;
 			yOrigin = -1;
-			// deltaphi = 0.0f;
-			// deltatheta = 0.0f;
 		}
 		else
 		{// state = GLUT_DOWN
@@ -248,6 +284,21 @@ void display (void)
 	glRotatef(zrot, 0.0, 0.0, 1.0); 
 
 	glTranslatef(-0.5, -0.5, -0.5);
+
+	if (twoD)
+	{
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		// glOrtho(0.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0, -1.0, 10.0);
+		gluOrtho2D(minX-margin, maxX+margin, minY-margin, maxY+margin);
+
+		glMatrixMode(GL_MODELVIEW);
+		//glPushMatrix();        ----Not sure if I need this
+		glLoadIdentity();
+		glDisable(GL_CULL_FACE);
+	}
+
 	for (int i = 1; i <= mygrid->fdp->nb; i++)
 	{
 		glBegin(display_mode);
@@ -258,12 +309,20 @@ void display (void)
 		glEnd();
 	}	
 
+	if (twoD)
+	{
+		// Making sure we can render 3d again
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		//glPopMatrix();        ----and this?
+	}
 	glPopMatrix();
 
 
 	// // affiche_grid(mygrid, 0.0, 1.0, 0.0);
 
-	// // glFlush();
+	// glFlush();
 	glutSwapBuffers();   // swapping image buffer for double buffering
 	// glutPostRedisplay();
 }
@@ -350,10 +409,7 @@ int main(int argc, char **argv)
 
 
 	glutInitWindowPosition(5,5);  
-	glutInitWindowSize(1000,1000);  
-
-	// glutSetCursor(GLUT_CURSOR_NONE);
-	// glutWarpPointer(g_viewport_width/2, g_viewport_height/2);
+	glutInitWindowSize(SCREEN_WIDTH,SCREEN_HEIGHT);  
 
 	glutCreateWindow("Delaunay grid");  
 	
@@ -361,7 +417,7 @@ int main(int argc, char **argv)
 
 	glutIdleFunc(display);
 	glutDisplayFunc(display); 
-	// glutReshapeFunc(changeSize); 
+	glutReshapeFunc(changeSize); 
 
 	// glutIgnoreKeyRepeat(1);
 	glutSetKeyRepeat( GLUT_KEY_REPEAT_ON );
