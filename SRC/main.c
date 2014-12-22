@@ -17,7 +17,6 @@
 #include "math_fn.h"
 #include "pgm.h"
 
-#define PI 3.14159265
 /*! variable externe permettant de lire les parametres sur le ligne de commande.*/
 extern char *optarg;
 
@@ -25,103 +24,65 @@ extern char *optarg;
 extern int opterr;
 
 /* Display option */
-int displayChoice = 3;
+GLenum display_mode = 3;
 char *lineOption[] = { "GL_POINTS", "GL_LINES", "GL_LINE_STRIP", "GL_LINE_LOOP", "GL_POLYGON"};
 
-// angles of rotation for the camera direction
-// float theta = 0.5f;
-// float phi = 0.5f;
-// float deltaphi = 0.0f;
-// float deltatheta = 0.0f;
-
 int SCREEN_WIDTH = 1000, SCREEN_HEIGHT = 1000;
+
 int twoD = 0; 
 
 float rho = 2.0f;
-
 float xrot = -40.0f;
 float zrot = 0.0f;
-float initrot = 0.0f;
-// Position of the camera
-// float camx = -2.5f, camy = -2.5f, camz = 2.5f;
-
-// Center of the grid (where we look at)
-// float x=0.5f, y=0.5f, z=0.5f;
 
 int xOrigin = -1, yOrigin = -1;
 
 
 Grid* mygrid;
 
+typedef struct color
+{
+	double r,g,b;
+} Color ;
+
+int nbval = 100;
+Color gradient_color[100] = {};
 /*----------------------------------------------------------------------------------*/
 //                                  Graphic functions
 /*----------------------------------------------------------------------------------*/
+
+Color getcol(double z)
+{
+	// printf("grad = %d\n",(int)floor(z*nbval));
+	return gradient_color[(int)floor(z*nbval)];
+}
+
 void changeSize(int w, int h)
 {
-	// if (threeD)
-	// {
-		// Prevent a divide by zero, when window is too short
-		// (you cant make a window of zero width).
-		if (h == 0)
-			h = 1;
+	// Prevent a divide by zero, when window is too short
+	// (you cant make a window of zero width).
+	if (h == 0)
+		h = 1;
 
-		float ratio =  w * 1.0 / h;
+	float ratio =  w * 1.0 / h;
 
-		// Use the Projection Matrix
-		glMatrixMode(GL_PROJECTION);
+	// Use the Projection Matrix
+	glMatrixMode(GL_PROJECTION);
 
-		// Reset Matrix
-		glLoadIdentity();
+	// Reset Matrix
+	glLoadIdentity();
 
-		// Set the viewport to be the entire window
-		glViewport(0, 0, w, h);
+	// Set the viewport to be the entire window
+	glViewport(0, 0, w, h);
 
-		// Set the correct perspective.
-		gluPerspective(60.0f, ratio, 0.01f, 10000.0f);
+	// Set the correct perspective.
+	gluPerspective(60.0f, ratio, 0.01f, 10000.0f);
 
-		// Get Back to the Modelview
-		glMatrixMode(GL_MODELVIEW);
-	// }
+	// Get Back to the Modelview
+	glMatrixMode(GL_MODELVIEW);
+
 	SCREEN_HEIGHT = h;
 	SCREEN_WIDTH = w;
-	// else
-	// {
-	// 	// Prevent a divide by zero, when window is too short
-	// 	// // (you cant make a window of zero width).
-	// 	// if (h == 0)
-	// 	// 	h = 1;
-
-	// 	// // Use the Projection Matrix
-	// 	// // glMatrixMode(GL_PROJECTION);
-
-	// 	// // Reset Matrix
-	// 	// glLoadIdentity();
-
-	// 	// // Set the viewport to be the entire window
-	// 	// glViewport(0, 0, w, h);
-
-	// 	// // Set the correct perspective.
-	// 	// // gluPerspective(60.0f, ratio, 0.01f, 10000.0f);
-
-	// 	// // Get Back to the Modelview
-	// 	// glMatrixMode(GL_MODELVIEW);
-
-
-	// 	glMatrixMode(GL_PROJECTION);
-	// 	glPushMatrix();
-	// 	glLoadIdentity();
-	// 	glOrtho(0.0, w, h, 0.0, -1.0, 10.0);
-	// 	glMatrixMode(GL_MODELVIEW);
-	// 	//glPushMatrix();        ----Not sure if I need this
-	// 	glLoadIdentity();
-	// 	glDisable(GL_CULL_FACE);
-
-	// 	glClear(GL_DEPTH_BUFFER_BIT);
-
-
-
-	// }
-	// glutPostRedisplay();
 }
 
 
@@ -131,6 +92,14 @@ void processNormalKeys(unsigned char key, int xx, int yy)
 		exit(0);
 	if (key == ' ')
 		twoD = 1 - twoD;
+	switch (key) 
+	{
+		case '0': display_mode = GL_POINTS ; break;
+		case '1': display_mode = GL_LINES ; break;
+		case '2': display_mode = GL_LINE_STRIP ; break;
+		case '3': display_mode = GL_LINE_LOOP ; break;
+		case '4': display_mode = GL_POLYGON ; break;
+	}
 } 
 
 void pressKey(int key, int xx, int yy)
@@ -141,13 +110,12 @@ void pressKey(int key, int xx, int yy)
 		case GLUT_KEY_DOWN : xrot += 2; break; //y-=0.01f; break;
 		case GLUT_KEY_LEFT : zrot += 2; break;
 		case GLUT_KEY_RIGHT : zrot -= 2; break;
+	}
 
 		// case GLUT_KEY_UP : glRotated(0.05, 0.0f, 1.0f, 0.0f); break;
 		// case GLUT_KEY_DOWN : glRotated(-0.05, 0.0f, 1.0f, 0.0f); break; //y-=0.01f; break;
 		// case GLUT_KEY_LEFT : glRotated(0.05, 0.0f, 0.0f, 1.0f); break;
 		// case GLUT_KEY_RIGHT : glRotated(-0.05, 0.0f, 0.0f, 1.0f); break;	
-
-	}
 } 
 
 void releaseKey(int key, int x, int y) 
@@ -244,6 +212,25 @@ void compute_pos()
 
 // 	glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, color);
 // }
+void compute_color_gradient(Color tab[], int nbval, double r1, double g1, double b1, double r2, double g2, double b2)
+{
+	// pour chaque canal, calcul du différenciel entre chaque teinte (nbVal est le nombre de teintes du dégradé)
+	double dr = ((r1 - r2) / nbval);
+	double dg = ((g1 - g2) / nbval);
+	double db = ((b1 - b2) / nbval);
+ 
+	// on boucle pour remplir un tableau contenant toutes les valeurs des teintes
+	for (int i = 0; i < nbval; ++i)
+	{
+		tab[i].r = r1;
+		tab[i].g = g1;
+		tab[i].b = b1; 
+		r1 -= dr;
+		g1 -= dg;
+		b1 -= db;
+		// printf("%f \n", r2);
+	}
+}
 
 void display (void)
 {
@@ -252,27 +239,10 @@ void display (void)
 	glColor3f(0.0, 0.0, 0.0);
 
 	// Clear Color and Depth Buffers
-	glClear(GL_COLOR_BUFFER_BIT);
-	// glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// glClear(GL_COLOR_BUFFER_BIT);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// GlutShade(0.0, 1.0, 0.0);
-
-	glColor3f(0.0, 1.0, 0.0);
-
-	GLenum display_mode;
-	switch (displayChoice)
-	{
-		case 0: display_mode = GL_POINTS ;
-			break;
-		case 1: display_mode = GL_LINES ;
-			break;
-		case 2: display_mode = GL_LINE_STRIP ;
-			break;
-		case 3: display_mode = GL_LINE_LOOP ;
-			break;
-		default: display_mode = GL_POLYGON ;
-			break;
-	}
 	
 	// Reset transformations
 	glLoadIdentity();
@@ -290,7 +260,7 @@ void display (void)
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		// glOrtho(0.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0, -1.0, 10.0);
+		// glOrtho(0.0, SCREEN_WIDTH, SCREEN_HEgit IGHT, 0.0, -1.0, 10.0);
 		gluOrtho2D(minX-margin, maxX+margin, minY-margin, maxY+margin);
 
 		glMatrixMode(GL_MODELVIEW);
@@ -304,7 +274,11 @@ void display (void)
 		glBegin(display_mode);
 		for(int j = 0; j < 3; j++)
 		{
-			glVertex3f(mygrid->fdp->table[i]->sommet[j]->coords[0], mygrid->fdp->table[i]->sommet[j]->coords[1], mygrid->fdp->table[i]->sommet[j]->coords[2]);
+			double z = mygrid->fdp->table[i]->sommet[j]->coords[2];
+			Color col = getcol(z);
+			glColor4f(col.r/255, col.g/255, col.b/255, 1);
+			// printf("r = %f, g = %f, b = %f\n", col.r, col.g, col.b);
+			glVertex3f(mygrid->fdp->table[i]->sommet[j]->coords[0], mygrid->fdp->table[i]->sommet[j]->coords[1], z);
 		}
 		glEnd();
 	}	
@@ -346,7 +320,7 @@ int main(int argc, char **argv)
 				sscanf(optarg, "%d", &NB_VERTEX);
 				break;
 			case 'c':
-				sscanf(optarg, "%d", &displayChoice);
+				sscanf(optarg, "%d", &display_mode);
 				break;
 			case 'i':
 				input_file = optarg;
@@ -366,7 +340,7 @@ int main(int argc, char **argv)
 
 	int NB_SIMPLEX = ( 2*(NB_VERTEX+4 - 1) - 4 );
 
-	printf ("n = %d, c = %d, i=%s\n", NB_VERTEX, displayChoice, input_file);
+	printf ("n = %d, c = %d, i=%s\n", NB_VERTEX, display_mode, input_file);
 
 	PGMData mydata = {};
 
@@ -392,8 +366,8 @@ int main(int argc, char **argv)
 		readPGM(input_file, &mydata);
 	}
 
-	assert(displayChoice >= 0 && displayChoice <= 4);
-	printf("Executing %s with line option %d = %s.\n", argv[0], displayChoice, lineOption[displayChoice]);
+	if (!(display_mode >= 0 && display_mode <= 4)) display_mode = 3;
+	printf("Executing %s with line option %d = %s.\n", argv[0], display_mode, lineOption[display_mode]);
 
 	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET, &mydata );
 	while (mygrid->fdp->table[1]->candidates->length != 0)
@@ -406,6 +380,8 @@ int main(int argc, char **argv)
 	glutInit(&argc, argv);  
 	// glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);  
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH);
+	// glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+
 
 
 	glutInitWindowPosition(5,5);  
@@ -419,13 +395,20 @@ int main(int argc, char **argv)
 	glutDisplayFunc(display); 
 	glutReshapeFunc(changeSize); 
 
-	// glutIgnoreKeyRepeat(1);
+	glEnable (GL_DEPTH_TEST);
+    // glEnable (GL_LIGHTING);
+    // glEnable (GL_LIGHT0);
+
+	compute_color_gradient(gradient_color, nbval, 39.0, 131.0, 29.0, 215.0, 226.0, 214.0);
+
+	// for (int i = 0; i < nbval; ++i)
+	// {
+	// 	printf("%f \n", gradient_color[i].r);
+	// }
 	glutSetKeyRepeat( GLUT_KEY_REPEAT_ON );
 	glutKeyboardFunc(processNormalKeys);
 	glutSpecialFunc(pressKey);
-	// glutSpecialUpFunc(releaseKey);
 
-	// here are the two new functions
 	glutMouseFunc(mouseButton);
 	glutMotionFunc(mouseMove);
 
