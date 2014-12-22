@@ -1,11 +1,14 @@
 #ifndef __PRINT_H__
 #define __PRINT_H__
 /*! \file print_fn.h
- * \author M. Sainlot & G. Schoder
+ * \author M. Sainlot
  * \date 2014
  */
 
-#include "primitives.h"
+#include "dll.h"
+#include "vertex.h"
+#include "simplex.h"
+#include "fdp.h"
 
 /*----------------------------------------------------------------------------------*/
 //                                  Print functions prototypes

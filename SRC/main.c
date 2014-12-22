@@ -1,8 +1,8 @@
 /*! \file main.c
- * \author M. Sainlot & G. Schoder
+ * \author M. Sainlot
  * \date 2014
  */
-// #include <unistd.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -30,6 +30,7 @@ char *lineOption[] = { "GL_POINTS", "GL_LINES", "GL_LINE_STRIP", "GL_LINE_LOOP",
 int SCREEN_WIDTH = 1000, SCREEN_HEIGHT = 1000;
 
 int twoD = 0; 
+int GRAD = 0;
 
 float rho = 2.0f;
 float xrot = -40.0f;
@@ -54,7 +55,18 @@ Color gradient_color[100] = {};
 Color getcol(double z)
 {
 	// printf("grad = %d\n",(int)floor(z*nbval));
-	return gradient_color[(int)floor(z*nbval)];
+	// if (z < 0.01)
+	// {
+	// 	Color col = {55.0, 40.0, 115.0};
+	// 	return col;
+	// }
+	if (GRAD)
+		return gradient_color[(int)floor(z*nbval)];
+	else
+	{
+		Color col = {0.0, 255.0, 0.0};
+		return col;
+	}
 }
 
 void changeSize(int w, int h)
@@ -92,7 +104,9 @@ void processNormalKeys(unsigned char key, int xx, int yy)
 		exit(0);
 	if (key == ' ')
 		twoD = 1 - twoD;
-	switch (key) 
+	if (key == 'c')
+		GRAD = 1 - GRAD;
+	switch (key)
 	{
 		case '0': display_mode = GL_POINTS ; break;
 		case '1': display_mode = GL_LINES ; break;

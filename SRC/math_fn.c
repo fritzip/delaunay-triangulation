@@ -1,5 +1,5 @@
 /*! \file math_fn.c
- * \author M. Sainlot & G. Schoder
+ * \author M. Sainlot
  * \date 2014
  */
 
@@ -29,10 +29,6 @@ double randf( )
 	return ((double) rand() / RAND_MAX);
 }
 
-// double randf()
-// {
-// 	return ((double) rand() / RAND_MAX);
-// }
 
 double determinant2d(double const a, double const b, double const c, double const d)
 {
@@ -49,8 +45,6 @@ double determinant3d(Vertex const *p1, Vertex const *p2, Vertex const *p3)
 int orientation(Vertex const *p1, Vertex const *p2, Vertex const *p3)
 {
 	// 1 : sens horaire , -1 : sens trigo
-	// (x2-x1)(y3-y1)-(y2-y1)(x3-x1)
-	// return -sgn(determinant3d(p1, p2, p3));
 	return - sgn( (p2->coords[0] - p1->coords[0]) * (p3->coords[1] - p1->coords[1])
 			    - (p2->coords[1] - p1->coords[1]) * (p3->coords[0] - p1->coords[0]) );
 }
@@ -75,25 +69,6 @@ void compute_plan( Simplex *simp )
 
 double compute_zdist( Simplex const *simp, Vertex const *vert ) //double x, double y )
 {
-	// mettre equation dans simplex
-	// return vert->coords[2] - simp->sommet[0]->coords[2]
-	// 	   - (((( simp->sommet[1]->coords[1] - simp->sommet[0]->coords[1] ) 
-	// 	   *    ( simp->sommet[2]->coords[2] - simp->sommet[0]->coords[2] )
-	// 	   -    ( simp->sommet[1]->coords[2] - simp->sommet[0]->coords[2] ) 
-	// 	   *    ( simp->sommet[2]->coords[1] - simp->sommet[0]->coords[1] ))
-	// 	   *    (            vert->coords[0] - simp->sommet[0]->coords[0] ))
-
-	// 	   +  ((( simp->sommet[1]->coords[2] - simp->sommet[0]->coords[2] ) 
-	// 	   *    ( simp->sommet[2]->coords[0] - simp->sommet[0]->coords[0] )
-	// 	   -    ( simp->sommet[1]->coords[0] - simp->sommet[0]->coords[0] ) 
-	// 	   *    ( simp->sommet[2]->coords[2] - simp->sommet[0]->coords[2] ))
-	// 	   *    (            vert->coords[1] - simp->sommet[0]->coords[1] )))
-		 
-	// 	   /   (( simp->sommet[1]->coords[0] - simp->sommet[0]->coords[0] ) 
-	// 	   *    ( simp->sommet[2]->coords[1] - simp->sommet[0]->coords[1] )
-	// 	   -    ( simp->sommet[1]->coords[1] - simp->sommet[0]->coords[1] ) 
-	// 	   *    ( simp->sommet[2]->coords[0] - simp->sommet[0]->coords[0] ));
-
 	return vert->coords[2] - simp->sommet[0]->coords[2]
 		   + ((( simp->na * ( vert->coords[0] - simp->sommet[0]->coords[0] ))
 		     + ( simp->nb * ( vert->coords[1] - simp->sommet[0]->coords[1] )) )
@@ -110,6 +85,6 @@ int in_circle (Vertex const *a, Vertex const *b, Vertex const *c, Vertex const *
 	double det = ((a->coords[0] + z->coords[0])*az_x + (a->coords[1] + z->coords[1])*az_y) * (bz_x*cz_y - bz_y*cz_x) +
 				 ((b->coords[0] + z->coords[0])*bz_x + (b->coords[1] + z->coords[1])*bz_y) * (cz_x*az_y - cz_y*az_x) +
 				 ((c->coords[0] + z->coords[0])*cz_x + (c->coords[1] + z->coords[1])*cz_y) * (az_x*bz_y - az_y*bz_x) ;
-  
-      return (det > 0.0) ? 1 : 0;
+
+	return (det > 0.0) ? 1 : 0;
 }

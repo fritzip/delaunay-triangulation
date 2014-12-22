@@ -1,11 +1,12 @@
-#ifndef __MATH_H__
-#define __MATH_H__
+#ifndef __MATH_FN_H__
+#define __MATH_FN_H__
 /*! \file math_fn.h
- * \author M. Sainlot & G. Schoder
+ * \author M. Sainlot
  * \date 2014
  */
 
-#include "primitives.h"
+#include "vertex.h"
+#include "simplex.h"
 /*----------------------------------------------------------------------------------*/
 //                                  Math functions prototypes
 /*----------------------------------------------------------------------------------*/

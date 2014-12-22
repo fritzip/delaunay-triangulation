@@ -1,5 +1,9 @@
 #ifndef __PGM_H__
 #define __PGM_H__
+/*! \file pgm.h
+ * \author M. Sainlot
+ * \date 2014
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,7 +22,5 @@ void deallocate_dynamic_matrix(int **matrix, int row);
 void SkipComments(FILE *fp);
 
 PGMData* readPGM(const char *file_name, PGMData *data);
-
-void writePGM(const char *filename, const PGMData *data);
 
 #endif

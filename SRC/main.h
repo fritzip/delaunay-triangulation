@@ -1,11 +1,11 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 /*! \file main.h
- * \author M. Sainlot & G. Schoder
+ * \author M. Sainlot
  * \date 2014
  */
 
-#include "primitives.h"
+#include "triangulation.h"
 #include "print_fn.h"
 #include "ressources.h"
 

@@ -1,5 +1,5 @@
 /*! \file print_fn.c
- * \author M. Sainlot & G. Schoder
+ * \author M. Sainlot
  * \date 2014
  */
 
