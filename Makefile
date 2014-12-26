@@ -43,7 +43,7 @@ DOCDIR   = DOC
 SOURCES  := $(wildcard $(SRCDIR)/*.c)
 INCLUDES := $(wildcard $(SRCDIR)/*.h)
 OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
-rm       = rm -f
+rm       = rm -rf
 ln       = ln -sf
 
 
