@@ -16,8 +16,10 @@
 //                                  Triangulation functions
 /*----------------------------------------------------------------------------------*/
 
-void init_grid( Grid *grid, Dllist *dll, FDP *fdp, Simplex **tab, const int init_size_new_tab, const int nb_pts, const PGMData *pic )
+Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic )
 {
+	Grid *grid = (Grid *) malloc(sizeof(Grid));
+
 	// 4 corners vertex
 	Vertex *ul = create_vertex(0.0, 1.0, 0.0);
 	Vertex *ur = create_vertex(1.0, 1.0, 0.0);
@@ -54,14 +56,14 @@ void init_grid( Grid *grid, Dllist *dll, FDP *fdp, Simplex **tab, const int init
 			add_end_dll( simp[j]->candidates, new_vert, STD );
 	}
 
-	grid->fdp = fdp;
+	grid->fdp = create_fdp( size_fdp );
 
-	grid->candidates_to_redistribute = dll;
+	grid->candidates_to_redistribute = create_dll();
 
 	grid->top_of_stack = NULL;
 	grid->stack_size = 0;
 
-	grid->new = tab;
+	grid->new = (Simplex **)malloc(init_size_new_tab*sizeof(Simplex *));
 	grid->new_current_size = 0;
 	grid->new_max_size = init_size_new_tab;
 
@@ -69,21 +71,8 @@ void init_grid( Grid *grid, Dllist *dll, FDP *fdp, Simplex **tab, const int init
 
 	insert_in_fdp(grid->fdp, simp[0]);
 	insert_in_fdp(grid->fdp, simp[1]);
-}
 
-Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *mypic )
-{
-	Grid *new_grid = (Grid *) malloc(sizeof(Grid));
-	Dllist *new_dll = create_dll();
-	FDP *new_fdp = create_fdp( size_fdp );
-	Simplex **new_tab = (Simplex **)malloc(init_size_new_tab*sizeof(Simplex *));
-
-	if (new_grid != NULL && new_dll !=NULL && new_fdp !=NULL && new_tab !=NULL)
-		init_grid( new_grid, new_dll, new_fdp, new_tab, init_size_new_tab, nb_pts, mypic );
-	else
-		printf("Error in create_grid function\n");
-
-	return new_grid;
+	return grid;
 }
 
 void redistribute_candidates( Dllist *dll, Simplex *tab[], const int nb_simp, const int LNK )
@@ -252,7 +241,6 @@ void delauney( Grid *grid )
 		{
 			add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, current );
 		}
-
 	}
 
 	redistribute_candidates(grid->candidates_to_redistribute, grid->new, grid->new_current_size, STD );
