@@ -61,7 +61,7 @@ typedef struct grid
  * @param pic  The heightmap picture which define the z coordinate of every vertex. If NULL, z is random.
  * @return The new grid created and initialized.
  */
-Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic );
+Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic, const double GOF );
 
 void redistribute_candidates( Dllist *dll, Simplex **tab, const int nb_simp, const int LNK );
 

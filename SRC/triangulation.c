@@ -16,7 +16,7 @@
 //                                  Triangulation functions
 /*----------------------------------------------------------------------------------*/
 
-Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic )
+Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic, const double GOF )
 {
 	Grid *grid = (Grid *) malloc(sizeof(Grid));
 
@@ -67,7 +67,7 @@ Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new
 	grid->new_current_size = 0;
 	grid->new_max_size = init_size_new_tab;
 
-	grid->gof = 0;
+	grid->gof = GOF;
 
 	insert_in_fdp(grid->fdp, simp[0]);
 	insert_in_fdp(grid->fdp, simp[1]);

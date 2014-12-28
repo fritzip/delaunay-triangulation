@@ -55,13 +55,17 @@ Color gradient_color[100] = {};
 Color getcol(double z)
 {
 	// printf("grad = %d\n",(int)floor(z*nbval));
-	// if (z < 0.01)
-	// {
-	// 	Color col = {55.0, 40.0, 115.0};
-	// 	return col;
-	// }
+
 	if (GRAD)
-		return gradient_color[(int)floor(z*nbval)];
+	{
+		if (z < 0.01)
+		{
+			Color col = {55.0, 40.0, 115.0};
+			return col;
+		}
+		else
+			return gradient_color[(int)floor(z*nbval)];
+	}
 	else
 	{
 		Color col = {0.0, 255.0, 0.0};
@@ -323,15 +327,26 @@ int main(int argc, char **argv)
 {
 	srand (time(NULL));
 
-	int NB_VERTEX = 1000;
+	int NB_VERTEX = 0;
+	int NB_SIMPLEX = 0;
+	int GOF = 0;
 	char *input_file = NULL;
+	char OUTPUT_CONDITION;
 
 	int opt;
-	while ((opt = getopt (argc, argv, "c:n:i:")) != -1)
+	while ((opt = getopt (argc, argv, "c:n:i:g:s:")) != -1)
 		switch (opt)
 		{
 			case 'n':
 				sscanf(optarg, "%d", &NB_VERTEX);
+				break;			
+			case 'g':
+				sscanf(optarg, "%d", &GOF);
+				OUTPUT_CONDITION = 'g';
+				break;			
+			case 's':
+				sscanf(optarg, "%d", &NB_SIMPLEX);
+				OUTPUT_CONDITION = 's';
 				break;
 			case 'c':
 				sscanf(optarg, "%d", &display_mode);
@@ -340,21 +355,31 @@ int main(int argc, char **argv)
 				input_file = optarg;
 				break;
 			case '?':
-				if (optopt == 'c' || optopt == 'n' || optopt == 'i')
+				if (optopt == 'c' || optopt == 'n' || optopt == 'i' || optopt == 's' || optopt == 'g')
 					fprintf (stderr, "Option -%c requires an argument.\n", optopt);
 				else if (isprint (optopt))
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
 				else
 					fprintf (stderr, "Unknown option character `\\%x'.\n", optopt);
-				printf("Usage: %s -c DISPLAY_MODE{0,1,2,3} -n NB_VERTEX -i INPUT_FILE \n", argv[0]);
+				printf("Usage: %s -c DISPLAY_MODE{0,1,2,3} -n NB_VERTEX -i INPUT_FILE [-g GOF (%%) || -s NB_SIMPLEX]\n", argv[0]);
 				return 1;
 			default:
 				abort();
 		}
 
-	int NB_SIMPLEX = ( 2*(NB_VERTEX+4 - 1) - 4 );
+	if (NB_SIMPLEX > 0 && GOF > 0)
+	{
+		printf("Maximum 1 output condition (2 given -s %d -g %d)\n", NB_SIMPLEX, GOF);
+		printf("Usage: %s -c DISPLAY_MODE{0,1,2,3} -n NB_VERTEX -i INPUT_FILE [-g GOF (%%) || -s NB_SIMPLEX]\n", argv[0]);
+		return 1;
+	}
 
-	printf ("n = %d, c = %d, i=%s\n", NB_VERTEX, display_mode, input_file);
+	if (NB_VERTEX <= 0)
+		NB_VERTEX = 10000;
+
+	if (NB_SIMPLEX <= 0 || NB_SIMPLEX > 2*(NB_VERTEX+4 - 1) - 4 )
+		NB_SIMPLEX = 2*(NB_VERTEX+4 - 1) - 4;
+
 
 	PGMData mydata = {};
 
@@ -381,13 +406,26 @@ int main(int argc, char **argv)
 	}
 
 	if (!(display_mode >= 0 && display_mode <= 4)) display_mode = 3;
+
+	printf ("n = %d, c = %d, i=%s\n", NB_VERTEX, display_mode, input_file);
 	printf("Executing %s with line option %d = %s.\n", argv[0], display_mode, lineOption[display_mode]);
 
-	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET, &mydata );
-	while (mygrid->fdp->table[1]->candidates->length != 0)
-	{
-		delauney( mygrid );
-	}
+
+
+	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET, &mydata, GOF/1000.f );
+
+	if (OUTPUT_CONDITION == 's')
+		while ( mygrid->fdp->nb < NB_SIMPLEX )
+			delauney( mygrid );
+	else if (OUTPUT_CONDITION == 'g')
+		while ( fabs(mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist) > mygrid->gof )
+			delauney( mygrid );
+	else		
+		while (mygrid->fdp->table[1]->candidates->length != 0)
+		{
+			// printf("%f\n", mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist);
+			delauney( mygrid );
+		}
 
 
 	// Display
