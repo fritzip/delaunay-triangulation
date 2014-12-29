@@ -330,7 +330,7 @@ int main(int argc, char **argv)
 	int NB_VERTEX = 0;
 	int NB_SIMPLEX = 0;
 	int GOF = 0;
-	char *input_file = NULL;
+	char *INPUT_FILE = NULL;
 	char OUTPUT_CONDITION;
 
 	int opt;
@@ -352,7 +352,7 @@ int main(int argc, char **argv)
 				sscanf(optarg, "%d", &display_mode);
 				break;
 			case 'i':
-				input_file = optarg;
+				INPUT_FILE = optarg;
 				break;
 			case '?':
 				if (optopt == 'c' || optopt == 'n' || optopt == 'i' || optopt == 's' || optopt == 'g')
@@ -383,16 +383,15 @@ int main(int argc, char **argv)
 
 	PGMData mydata = {};
 
-	if (input_file != NULL)
+	if (INPUT_FILE != NULL)
 	{
 		char command[300] = {0};
 
-		sprintf(command, "x=%s; convert $x ${x%%.*}.pgm", input_file);
-		// printf("%s\n", command);
+		sprintf(command, "x=%s; convert $x ${x%%.*}.pgm", INPUT_FILE);
 		system(command);
 
-		char *pFile = strrchr(input_file, '/');
-		pFile = pFile == NULL ? input_file : pFile+1;
+		char *pFile = strrchr(INPUT_FILE, '/');
+		pFile = pFile == NULL ? INPUT_FILE : pFile+1;
 		// change extension
 		char *pExt = strrchr(pFile, '.');
 		if (pExt != NULL)
@@ -400,16 +399,23 @@ int main(int argc, char **argv)
 		else
 			strcat(pFile, ".pgm");
 
-
-		printf("input = %s\n", input_file);
-		readPGM(input_file, &mydata);
+		printf("input = %s\n", INPUT_FILE);
+		readPGM(INPUT_FILE, &mydata);
 	}
 
 	if (!(display_mode >= 0 && display_mode <= 4)) display_mode = 3;
 
-	printf ("n = %d, c = %d, i=%s\n", NB_VERTEX, display_mode, input_file);
+	printf ("n = %d, c = %d, i=%s\n", NB_VERTEX, display_mode, INPUT_FILE);
 	printf("Executing %s with line option %d = %s.\n", argv[0], display_mode, lineOption[display_mode]);
 
+	switch (display_mode)
+	{
+		case 0: display_mode = GL_POINTS ; break;
+		case 1: display_mode = GL_LINES ; break;
+		case 2: display_mode = GL_LINE_STRIP ; break;
+		case 3: display_mode = GL_LINE_LOOP ; break;
+		case 4: display_mode = GL_POLYGON ; break;
+	}
 
 
 	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET, &mydata, GOF/1000.f );
@@ -422,10 +428,7 @@ int main(int argc, char **argv)
 			delauney( mygrid );
 	else		
 		while (mygrid->fdp->table[1]->candidates->length != 0)
-		{
-			// printf("%f\n", mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist);
 			delauney( mygrid );
-		}
 
 
 	// Display
