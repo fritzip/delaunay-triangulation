@@ -199,37 +199,38 @@ void compute_pos()
 	// printf("camx = %f, camy = %f, camz = %f\n", camx, camy, camz);
 }
 
-// void GlutShade(GLfloat r,GLfloat v,GLfloat b)
-// {
-// 	// Couleur sans lumieres
-// 	glColor3f(0.8,0.9,0.6);
+void GlutShade(GLfloat r,GLfloat v,GLfloat b)
+{
+	// Couleur sans lumieres
+	glColor3f(0.8,0.9,0.6);
 
-// 	// Couleur avec lumieres
-// 	GLfloat color[4];
+	// Couleur avec lumieres
+	GLfloat color[4];
 
-// 	// La couleur diffuse sera egale a 25% de la couleur
-// 	color[0]=0.75f*r;
-// 	color[1]=0.75f*v;
-// 	color[2]=0.75f*b;
-// 	color[3]=1.0;
+	// La couleur diffuse sera egale a 25% de la couleur
+	color[0]=0.75f*r;
+	color[1]=0.75f*v;
+	color[2]=0.75f*b;
+	color[3]=1.0;
 
-// 	glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
 
-// 	// La couleur ambiante sera egale a 25% de la couleur
-// 	color[0]=0.25f*r;
-// 	color[1]=0.25f*v;
-// 	color[2]=0.25f*b;
-// 	color[3]=1.0;
+	// La couleur ambiante sera egale a 25% de la couleur
+	color[0]=0.25f*r;
+	color[1]=0.25f*v;
+	color[2]=0.25f*b;
+	color[3]=1.0;
 
-// 	glMaterialfv(GL_FRONT, GL_AMBIENT, color); // GL_AMBIENT_AND_DIFFUSE
+	glMaterialfv(GL_FRONT, GL_AMBIENT, color); // GL_AMBIENT_AND_DIFFUSE
 
-// 	color[0]=1.0f;
-// 	color[1]=0.0f;
-// 	color[2]=0.0f;
-// 	color[3]=1.0;
+	color[0]=1.0f;
+	color[1]=0.0f;
+	color[2]=0.0f;
+	color[3]=1.0;
 
-// 	glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, color);
-// }
+	glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+}
+
 void compute_color_gradient(Color tab[], int nbval, double r1, double g1, double b1, double r2, double g2, double b2)
 {
 	// pour chaque canal, calcul du différenciel entre chaque teinte (nbVal est le nombre de teintes du dégradé)
@@ -260,8 +261,9 @@ void display (void)
 	// glClear(GL_COLOR_BUFFER_BIT);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// GlutShade(0.0, 1.0, 0.0);
-	
+	GlutShade(0.1, 0.3, 0.8);
+	// glColor3f(0.0, 1.0, 0.0);
+
 	// Reset transformations
 	glLoadIdentity();
 
@@ -290,13 +292,15 @@ void display (void)
 	for (int i = 1; i <= mygrid->fdp->nb; i++)
 	{
 		glBegin(display_mode);
+		Simplex *simp = mygrid->fdp->table[i];
+		glNormal3f(simp->na, simp->nb, simp->nc);
 		for(int j = 0; j < 3; j++)
 		{
-			double z = mygrid->fdp->table[i]->sommet[j]->coords[2];
-			Color col = getcol(z);
-			glColor4f(col.r/255, col.g/255, col.b/255, 1);
+			double z = simp->sommet[j]->coords[2];
+			// Color col = getcol(z);
+			// glColor4f(col.r/255, col.g/255, col.b/255, 1);
 			// printf("r = %f, g = %f, b = %f\n", col.r, col.g, col.b);
-			glVertex3f(mygrid->fdp->table[i]->sommet[j]->coords[0], mygrid->fdp->table[i]->sommet[j]->coords[1], z);
+			glVertex3f(simp->sommet[j]->coords[0], simp->sommet[j]->coords[1], z);
 		}
 		glEnd();
 	}	
@@ -451,8 +455,8 @@ int main(int argc, char **argv)
 	glutReshapeFunc(changeSize); 
 
 	glEnable (GL_DEPTH_TEST);
-    // glEnable (GL_LIGHTING);
-    // glEnable (GL_LIGHT0);
+    glEnable (GL_LIGHTING);
+    glEnable (GL_LIGHT0);
 
 	compute_color_gradient(gradient_color, nbval, 39.0, 131.0, 29.0, 215.0, 226.0, 214.0);
 

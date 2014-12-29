@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "math_fn.h"
 
@@ -51,20 +52,29 @@ int orientation(Vertex const *p1, Vertex const *p2, Vertex const *p3)
 
 void compute_plan( Simplex *simp )
 {
-	simp->na =  ( simp->sommet[1]->coords[1] - simp->sommet[0]->coords[1] ) 
+	double na =  ( simp->sommet[1]->coords[1] - simp->sommet[0]->coords[1] ) 
 		   *    ( simp->sommet[2]->coords[2] - simp->sommet[0]->coords[2] )
 		   -    ( simp->sommet[1]->coords[2] - simp->sommet[0]->coords[2] ) 
 		   *    ( simp->sommet[2]->coords[1] - simp->sommet[0]->coords[1] );
 
-	simp->nb =  ( simp->sommet[1]->coords[2] - simp->sommet[0]->coords[2] ) 
+	double nb =  ( simp->sommet[1]->coords[2] - simp->sommet[0]->coords[2] ) 
 		   *    ( simp->sommet[2]->coords[0] - simp->sommet[0]->coords[0] )
 		   -    ( simp->sommet[1]->coords[0] - simp->sommet[0]->coords[0] ) 
 		   *    ( simp->sommet[2]->coords[2] - simp->sommet[0]->coords[2] );
 
-	simp->nc =  ( simp->sommet[1]->coords[0] - simp->sommet[0]->coords[0] ) 
+	double nc =  ( simp->sommet[1]->coords[0] - simp->sommet[0]->coords[0] ) 
 		   *    ( simp->sommet[2]->coords[1] - simp->sommet[0]->coords[1] )
 		   -    ( simp->sommet[1]->coords[1] - simp->sommet[0]->coords[1] ) 
 		   *    ( simp->sommet[2]->coords[0] - simp->sommet[0]->coords[0] );
+
+	double norm = sqrt(na*na + nb*nb + nc*nc);
+	na /= norm;
+	nb /= norm;
+	nc /= norm;
+
+	simp->na = na;
+	simp->nb = nb;
+	simp->nc = nc;
 }
 
 double compute_zdist( Simplex const *simp, Vertex const *vert ) //double x, double y )
