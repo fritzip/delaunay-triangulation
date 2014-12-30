@@ -48,13 +48,14 @@ ln       = ln -sf
 
 
 $(BINDIR)/$(TARGET): $(OBJECTS)
+	@mkdir -p $(BINDIR)
 	@$(CC) $(LFLAGS) $(OBJECTS) $(GL_LIBDIR) $(GL_LIBRARIES) -o $@ 
 	@echo "Linking complete !"
 	@$(ln) $(BINDIR)/$(TARGET)
 	@echo "You can now run ./"$(TARGET)
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
-	@mkdir -p $(OBJDIR)
+	@mkdir -p $(OBJDIR) 
 	@$(CC) $(CFLAGS) $(GL_INCLUDE) -c $< -o $@
 	@echo "Successfully compiled "$<
 
