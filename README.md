@@ -89,8 +89,6 @@ _Se reporter à la documentation pour plus d'information_
 
 
 
-
-
 ### Crédits ###
 
 Maxime Sainlot

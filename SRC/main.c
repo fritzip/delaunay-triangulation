@@ -29,8 +29,9 @@ char *lineOption[] = { "GL_POINTS", "GL_LINES", "GL_LINE_STRIP", "GL_LINE_LOOP",
 
 int SCREEN_WIDTH = 1000, SCREEN_HEIGHT = 1000;
 
-int twoD = 0; 
+int TWO_D = 0; 
 int GRAD = 0;
+int NORMAL = 1;
 
 float rho = 2.0f;
 float xrot = -40.0f;
@@ -107,9 +108,23 @@ void processNormalKeys(unsigned char key, int xx, int yy)
 	if (key == 27)
 		exit(0);
 	if (key == ' ')
-		twoD = 1 - twoD;
+	{
+		TWO_D = 1 - TWO_D;
+		if (TWO_D)
+		{
+			NORMAL = 0;
+			display_mode = GL_LINE_LOOP;			
+		}
+		else 
+		{
+			NORMAL = 1;
+			display_mode = GL_POLYGON;
+		}
+	}
 	if (key == 'c')
 		GRAD = 1 - GRAD;
+	if (key == 'n')
+		NORMAL = 1 - NORMAL;
 	switch (key)
 	{
 		case '0': display_mode = GL_POINTS ; break;
@@ -199,37 +214,37 @@ void compute_pos()
 	// printf("camx = %f, camy = %f, camz = %f\n", camx, camy, camz);
 }
 
-void GlutShade(GLfloat r,GLfloat v,GLfloat b)
-{
-	// Couleur sans lumieres
-	glColor3f(0.8,0.9,0.6);
+// void GlutShade(GLfloat r,GLfloat v,GLfloat b)
+// {
+// 	// Couleur sans lumieres
+// 	glColor3f(0.8,0.9,0.6);
 
-	// Couleur avec lumieres
-	GLfloat color[4];
+// 	// Couleur avec lumieres
+// 	GLfloat color[4];
 
-	// La couleur diffuse sera egale a 25% de la couleur
-	color[0]=0.75f*r;
-	color[1]=0.75f*v;
-	color[2]=0.75f*b;
-	color[3]=1.0;
+// 	// La couleur diffuse sera egale a 25% de la couleur
+// 	color[0]=0.75f*r;
+// 	color[1]=0.75f*v;
+// 	color[2]=0.75f*b;
+// 	color[3]=1.0;
 
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
+// 	glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
 
-	// La couleur ambiante sera egale a 25% de la couleur
-	color[0]=0.25f*r;
-	color[1]=0.25f*v;
-	color[2]=0.25f*b;
-	color[3]=1.0;
+// 	// La couleur ambiante sera egale a 25% de la couleur
+// 	color[0]=0.25f*r;
+// 	color[1]=0.25f*v;
+// 	color[2]=0.25f*b;
+// 	color[3]=1.0;
 
-	glMaterialfv(GL_FRONT, GL_AMBIENT, color); // GL_AMBIENT_AND_DIFFUSE
+// 	glMaterialfv(GL_FRONT, GL_AMBIENT, color); // GL_AMBIENT_AND_DIFFUSE
 
-	color[0]=1.0f;
-	color[1]=0.0f;
-	color[2]=0.0f;
-	color[3]=1.0;
+// 	color[0]=1.0f;
+// 	color[1]=0.0f;
+// 	color[2]=0.0f;
+// 	color[3]=1.0;
 
-	glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, color);
-}
+// 	glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+// }
 
 void compute_color_gradient(Color tab[], int nbval, double r1, double g1, double b1, double r2, double g2, double b2)
 {
@@ -261,7 +276,37 @@ void display (void)
 	// glClear(GL_COLOR_BUFFER_BIT);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	GlutShade(0.1, 0.3, 0.8);
+	// if (LIGHTON)
+	// {
+	//     // glEnable(GL_LIGHTING);
+	//     glEnable(GL_LIGHT0);
+	//     LIGHTON = 0;
+	// }
+	// if (LIGHTOFF)
+	// {
+	//     // glDisable(GL_LIGHTING);
+	//     glDisable(GL_LIGHT0);
+	//     LIGHTOFF = 0;
+	// }
+
+
+	// // Couleur sans lumieres
+	// glColor3f(0.8,0.9,0.6);
+
+	// // Couleur avec lumieres
+	// GLfloat color[4];
+
+	// // La couleur diffuse sera egale a 25% de la couleur
+	// color[0]=0.75f*r;
+	// color[1]=0.75f*v;
+	// color[2]=0.75f*b;
+	// color[3]=1.0;
+
+	// glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
+
+
+	// 	GlutShade(0.1, 0.3, 0.8);
+	// else
 	// glColor3f(0.0, 1.0, 0.0);
 
 	// Reset transformations
@@ -275,7 +320,7 @@ void display (void)
 
 	glTranslatef(-0.5, -0.5, -0.5);
 
-	if (twoD)
+	if (TWO_D)
 	{
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
@@ -293,19 +338,21 @@ void display (void)
 	{
 		glBegin(display_mode);
 		Simplex *simp = mygrid->fdp->table[i];
-		glNormal3f(simp->na, simp->nb, simp->nc);
+		if (NORMAL)
+			glNormal3f(simp->na, simp->nb, simp->nc);
+		else
+			glNormal3f(1,1,1);
 		for(int j = 0; j < 3; j++)
 		{
 			double z = simp->sommet[j]->coords[2];
-			// Color col = getcol(z);
-			// glColor4f(col.r/255, col.g/255, col.b/255, 1);
-			// printf("r = %f, g = %f, b = %f\n", col.r, col.g, col.b);
+			Color col = getcol(z);
+			glColor4f(col.r/255, col.g/255, col.b/255, 1);
 			glVertex3f(simp->sommet[j]->coords[0], simp->sommet[j]->coords[1], z);
 		}
 		glEnd();
 	}	
 
-	if (twoD)
+	if (TWO_D)
 	{
 		// Making sure we can render 3d again
 		glMatrixMode(GL_PROJECTION);
@@ -365,7 +412,7 @@ int main(int argc, char **argv)
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
 				else
 					fprintf (stderr, "Unknown option character `\\%x'.\n", optopt);
-				printf("Usage: %s -c DISPLAY_MODE{0,1,2,3} -n NB_VERTEX -i INPUT_FILE [-g GOF (%%) || -s NB_SIMPLEX]\n", argv[0]);
+				printf("Usage: %s ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-s NB_SIMPX | -g GOF(%%)] [-c DISPLAY_MODE]\n cf. README.md for further information", argv[0]);
 				return 1;
 			default:
 				abort();
@@ -374,7 +421,7 @@ int main(int argc, char **argv)
 	if (NB_SIMPLEX > 0 && GOF > 0)
 	{
 		printf("Maximum 1 output condition (2 given -s %d -g %d)\n", NB_SIMPLEX, GOF);
-		printf("Usage: %s -c DISPLAY_MODE{0,1,2,3} -n NB_VERTEX -i INPUT_FILE [-g GOF (%%) || -s NB_SIMPLEX]\n", argv[0]);
+		printf("Usage: %s ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-s NB_SIMPX | -g GOF(%%)] [-c DISPLAY_MODE]\n cf. README.md for further information", argv[0]);
 		return 1;
 	}
 
@@ -457,13 +504,9 @@ int main(int argc, char **argv)
 	glEnable (GL_DEPTH_TEST);
     glEnable (GL_LIGHTING);
     glEnable (GL_LIGHT0);
-
+    glEnable(GL_COLOR_MATERIAL);
 	compute_color_gradient(gradient_color, nbval, 39.0, 131.0, 29.0, 215.0, 226.0, 214.0);
 
-	// for (int i = 0; i < nbval; ++i)
-	// {
-	// 	printf("%f \n", gradient_color[i].r);
-	// }
 	glutSetKeyRepeat( GLUT_KEY_REPEAT_ON );
 	glutKeyboardFunc(processNormalKeys);
 	glutSpecialFunc(pressKey);
