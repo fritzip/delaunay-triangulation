@@ -1,6 +1,11 @@
 Triangulation de Delaunay
 =========================
 
+### Dépendances ###
+
+ * Librairies de base du C + gcc
+ * Librairie Graphique : OpenGL
+
 ### Dossiers ###
 
 Le projet est divisé en plusieurs dossiers :
@@ -12,18 +17,26 @@ Le projet est divisé en plusieurs dossiers :
 * DOC : contient l'ensemble des fichiers de documentation. *Dossier et fichiers générés automatiquement à l'aide de doxygen*.
 * RAPPORT : rapport LaTeX du projet.
 
-### Fichiers SRC ###
+### Fichiers SRC/ ###
 
 Les sources du projet sont divisées en plusieurs fichiers (chaque *.c ayant sont *.h associé):
 
-* vertex
-* simplex
-* dll
-* fdp
-* triangulation
-* math_fn
-* main
-* ressources.h
+* vertex : Structure et fonctions relatives aux sommets
+* simplex : Structure et fonctions relatives aux triangles
+* dll : Structure et fonctions relatives aux listes doublement chainées
+* fdp : Structure et fonctions relatives aux files de prioritées
+* triangulation : Structure et fonctions relatives à la triangulation et la génération du maillage
+* math_fn : Fonctions mathématiques (géométriques) utiles au programme (prédicat orientation, signe, déterminant…)
+* main : Point de départ de l'algorithme et gestion de l'affichage.
+* ressources.h : 
+
+*Se reporter à la documentation pour plus d'information*
+
+### Fichiers / ###
+
+* Makefile
+* Doxyfile
+* README.md
 
 
 ### Utilisation du programme ###
@@ -56,6 +69,8 @@ Les sources du projet sont divisées en plusieurs fichiers (chaque *.c ayant son
 	* 2 : GL_LINE_STRIP
 	* 3 : GL_LINE_LOOP
 	* 4 : GL_POLYGON
+
+* Interaction avec le programme
 
 
 ### Crédits ###
