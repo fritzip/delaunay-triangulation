@@ -13,7 +13,9 @@
 #include <assert.h>
 #include <GL/glut.h> 
 
-#include "main.h"
+#include "triangulation.h"
+#include "print_fn.h"
+#include "ressources.h"
 #include "math_fn.h"
 #include "pgm.h"
 
@@ -39,24 +41,23 @@ float zrot = 0.0f;
 
 int xOrigin = -1, yOrigin = -1;
 
-
+/* Delaunay Grid */
 Grid* mygrid;
 
+/*----------------------------------------------------------------------------------*/
+//                                  Color functions
+/*----------------------------------------------------------------------------------*/
 typedef struct color
 {
 	double r,g,b;
 } Color ;
 
-int nbval = 100;
-Color gradient_color[100] = {};
-/*----------------------------------------------------------------------------------*/
-//                                  Graphic functions
-/*----------------------------------------------------------------------------------*/
+/* Color variables */
+#define nb_gradient_val 100
+Color gradient_color[nb_gradient_val] = {};
 
 Color getcol(double z)
 {
-	// printf("grad = %d\n",(int)floor(z*nbval));
-
 	if (GRAD)
 	{
 		if (z < 0.01)
@@ -65,7 +66,7 @@ Color getcol(double z)
 			return col;
 		}
 		else
-			return gradient_color[(int)floor(z*nbval)];
+			return gradient_color[(int)floor(z*nb_gradient_val)];
 	}
 	else
 	{
@@ -73,6 +74,30 @@ Color getcol(double z)
 		return col;
 	}
 }
+
+void compute_color_gradient(Color tab[], int nbval, double r1, double g1, double b1, double r2, double g2, double b2)
+{
+	// pour chaque canal, calcul du différenciel entre chaque teinte (nbVal est le nombre de teintes du dégradé)
+	double dr = ((r1 - r2) / nbval);
+	double dg = ((g1 - g2) / nbval);
+	double db = ((b1 - b2) / nbval);
+ 
+	// on boucle pour remplir un tableau contenant toutes les valeurs des teintes
+	for (int i = 0; i < nbval; ++i)
+	{
+		tab[i].r = r1;
+		tab[i].g = g1;
+		tab[i].b = b1; 
+		r1 -= dr;
+		g1 -= dg;
+		b1 -= db;
+	}
+}
+
+/*----------------------------------------------------------------------------------*/
+//                                  Graphic functions
+/*----------------------------------------------------------------------------------*/
+
 
 void changeSize(int w, int h)
 {
@@ -139,25 +164,11 @@ void pressKey(int key, int xx, int yy)
 {
 	switch (key) 
 	{
-		case GLUT_KEY_UP : xrot -= 2; break; //y+=0.01f; break;  // xOrigin = xx; break;
-		case GLUT_KEY_DOWN : xrot += 2; break; //y-=0.01f; break;
+		case GLUT_KEY_UP : xrot -= 2; break; 
+		case GLUT_KEY_DOWN : xrot += 2; break; 
 		case GLUT_KEY_LEFT : zrot += 2; break;
 		case GLUT_KEY_RIGHT : zrot -= 2; break;
 	}
-
-		// case GLUT_KEY_UP : glRotated(0.05, 0.0f, 1.0f, 0.0f); break;
-		// case GLUT_KEY_DOWN : glRotated(-0.05, 0.0f, 1.0f, 0.0f); break; //y-=0.01f; break;
-		// case GLUT_KEY_LEFT : glRotated(0.05, 0.0f, 0.0f, 1.0f); break;
-		// case GLUT_KEY_RIGHT : glRotated(-0.05, 0.0f, 0.0f, 1.0f); break;	
-} 
-
-void releaseKey(int key, int x, int y) 
-{  
-	// switch (key) {
-	// 	 case GLUT_KEY_UP :
-	// 	 case GLUT_KEY_DOWN : deltaMoveZ = 0; break;
-	// 	 // case GLUT_KEY_LEFT : deltaAngle = 0; break;
-	// }
 } 
 
 
@@ -214,57 +225,7 @@ void compute_pos()
 	// printf("camx = %f, camy = %f, camz = %f\n", camx, camy, camz);
 }
 
-// void GlutShade(GLfloat r,GLfloat v,GLfloat b)
-// {
-// 	// Couleur sans lumieres
-// 	glColor3f(0.8,0.9,0.6);
 
-// 	// Couleur avec lumieres
-// 	GLfloat color[4];
-
-// 	// La couleur diffuse sera egale a 25% de la couleur
-// 	color[0]=0.75f*r;
-// 	color[1]=0.75f*v;
-// 	color[2]=0.75f*b;
-// 	color[3]=1.0;
-
-// 	glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
-
-// 	// La couleur ambiante sera egale a 25% de la couleur
-// 	color[0]=0.25f*r;
-// 	color[1]=0.25f*v;
-// 	color[2]=0.25f*b;
-// 	color[3]=1.0;
-
-// 	glMaterialfv(GL_FRONT, GL_AMBIENT, color); // GL_AMBIENT_AND_DIFFUSE
-
-// 	color[0]=1.0f;
-// 	color[1]=0.0f;
-// 	color[2]=0.0f;
-// 	color[3]=1.0;
-
-// 	glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, color);
-// }
-
-void compute_color_gradient(Color tab[], int nbval, double r1, double g1, double b1, double r2, double g2, double b2)
-{
-	// pour chaque canal, calcul du différenciel entre chaque teinte (nbVal est le nombre de teintes du dégradé)
-	double dr = ((r1 - r2) / nbval);
-	double dg = ((g1 - g2) / nbval);
-	double db = ((b1 - b2) / nbval);
- 
-	// on boucle pour remplir un tableau contenant toutes les valeurs des teintes
-	for (int i = 0; i < nbval; ++i)
-	{
-		tab[i].r = r1;
-		tab[i].g = g1;
-		tab[i].b = b1; 
-		r1 -= dr;
-		g1 -= dg;
-		b1 -= db;
-		// printf("%f \n", r2);
-	}
-}
 
 void display (void)
 {
@@ -273,41 +234,7 @@ void display (void)
 	glColor3f(0.0, 0.0, 0.0);
 
 	// Clear Color and Depth Buffers
-	// glClear(GL_COLOR_BUFFER_BIT);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// if (LIGHTON)
-	// {
-	//     // glEnable(GL_LIGHTING);
-	//     glEnable(GL_LIGHT0);
-	//     LIGHTON = 0;
-	// }
-	// if (LIGHTOFF)
-	// {
-	//     // glDisable(GL_LIGHTING);
-	//     glDisable(GL_LIGHT0);
-	//     LIGHTOFF = 0;
-	// }
-
-
-	// // Couleur sans lumieres
-	// glColor3f(0.8,0.9,0.6);
-
-	// // Couleur avec lumieres
-	// GLfloat color[4];
-
-	// // La couleur diffuse sera egale a 25% de la couleur
-	// color[0]=0.75f*r;
-	// color[1]=0.75f*v;
-	// color[2]=0.75f*b;
-	// color[3]=1.0;
-
-	// glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
-
-
-	// 	GlutShade(0.1, 0.3, 0.8);
-	// else
-	// glColor3f(0.0, 1.0, 0.0);
 
 	// Reset transformations
 	glLoadIdentity();
@@ -321,15 +248,13 @@ void display (void)
 	glTranslatef(-0.5, -0.5, -0.5);
 
 	if (TWO_D)
-	{
+	{ // 2D Display
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		// glOrtho(0.0, SCREEN_WIDTH, SCREEN_HEgit IGHT, 0.0, -1.0, 10.0);
 		gluOrtho2D(minX-margin, maxX+margin, minY-margin, maxY+margin);
 
 		glMatrixMode(GL_MODELVIEW);
-		//glPushMatrix();        ----Not sure if I need this
 		glLoadIdentity();
 		glDisable(GL_CULL_FACE);
 	}
@@ -338,10 +263,10 @@ void display (void)
 	{
 		glBegin(display_mode);
 		Simplex *simp = mygrid->fdp->table[i];
-		if (NORMAL)
-			glNormal3f(simp->na, simp->nb, simp->nc);
-		else
-			glNormal3f(1,1,1);
+		// Normal or not 
+		if (NORMAL) glNormal3f(simp->na, simp->nb, simp->nc);
+		else glNormal3f(1,1,1);
+
 		for(int j = 0; j < 3; j++)
 		{
 			double z = simp->sommet[j]->coords[2];
@@ -353,21 +278,14 @@ void display (void)
 	}	
 
 	if (TWO_D)
-	{
-		// Making sure we can render 3d again
+	{ // 2D Display
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
-		//glPopMatrix();        ----and this?
 	}
 	glPopMatrix();
 
-
-	// // affiche_grid(mygrid, 0.0, 1.0, 0.0);
-
-	// glFlush();
-	glutSwapBuffers();   // swapping image buffer for double buffering
-	// glutPostRedisplay();
+	glutSwapBuffers();
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -384,6 +302,9 @@ int main(int argc, char **argv)
 	char *INPUT_FILE = NULL;
 	char OUTPUT_CONDITION;
 
+	//***********************//
+	//      Arg parser
+	//***********************//
 	int opt;
 	while ((opt = getopt (argc, argv, "c:n:i:g:s:")) != -1)
 		switch (opt)
@@ -418,6 +339,10 @@ int main(int argc, char **argv)
 				abort();
 		}
 
+	//*****************************//
+	// Check consistency of :
+	//*****************************//
+		// Output conditions
 	if (NB_SIMPLEX > 0 && GOF > 0)
 	{
 		printf("Maximum 1 output condition (2 given -s %d -g %d)\n", NB_SIMPLEX, GOF);
@@ -425,13 +350,15 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+		// Number of points
 	if (NB_VERTEX <= 0)
 		NB_VERTEX = 10000;
 
+		// Number of triangles
 	if (NB_SIMPLEX <= 0 || NB_SIMPLEX > 2*(NB_VERTEX+4 - 1) - 4 )
 		NB_SIMPLEX = 2*(NB_VERTEX+4 - 1) - 4;
 
-
+		// Input heightmap (convert if necessary)
 	PGMData mydata = {};
 
 	if (INPUT_FILE != NULL)
@@ -454,6 +381,7 @@ int main(int argc, char **argv)
 		readPGM(INPUT_FILE, &mydata);
 	}
 
+		// Display mode
 	if (!(display_mode >= 0 && display_mode <= 4)) display_mode = 3;
 
 	printf ("n = %d, c = %d, i=%s\n", NB_VERTEX, display_mode, INPUT_FILE);
@@ -468,6 +396,12 @@ int main(int argc, char **argv)
 		case 4: display_mode = GL_POLYGON ; break;
 	}
 
+	compute_color_gradient(gradient_color, nb_gradient_val, 39.0, 131.0, 29.0, 215.0, 226.0, 214.0);
+
+
+	//***********************//
+	//	Delaunay Algorithm
+	//***********************//
 
 	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET, &mydata, GOF/1000.f );
 
@@ -480,15 +414,14 @@ int main(int argc, char **argv)
 	else		
 		while (mygrid->fdp->table[1]->candidates->length != 0)
 			delauney( mygrid );
+	
 
+	//***********************//
+	// 		Display
+	//***********************//
 
-	// Display
 	glutInit(&argc, argv);  
-	// glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);  
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH);
-	// glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-
-
 
 	glutInitWindowPosition(5,5);  
 	glutInitWindowSize(SCREEN_WIDTH,SCREEN_HEIGHT);  
@@ -505,7 +438,6 @@ int main(int argc, char **argv)
     glEnable (GL_LIGHTING);
     glEnable (GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
-	compute_color_gradient(gradient_color, nbval, 39.0, 131.0, 29.0, 215.0, 226.0, 214.0);
 
 	glutSetKeyRepeat( GLUT_KEY_REPEAT_ON );
 	glutKeyboardFunc(processNormalKeys);
@@ -514,92 +446,7 @@ int main(int argc, char **argv)
 	glutMouseFunc(mouseButton);
 	glutMotionFunc(mouseMove);
 
-	// glutFullScreen();  
-
 	glutMainLoop();  
 		
 	return EXIT_SUCCESS; 
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void affiche_dll(Dllist *dll, int LNK, int GL_DRAW_STYLE, double r, double g, double b)
-{
-	glBegin(GL_DRAW_STYLE);
-	glColor3f(r, g, b);
-
-	Vertex *current = dll->root->links[LNK][FWD];
-
-	for(int i = 0; i < dll->length; i++)
-	{
-		glVertex2f(current->coords[0], current->coords[1]);
-		current = current->links[LNK][FWD];
-	}
-
-	glEnd();
-}
-
-void affiche_simplex(Simplex *simp, double r, double g, double b)
-{
-	// glBegin(lineOption[displayChoice]);
-	glColor3f(r, g, b);
-
-	for(int i = 0; i < 3; i++)
-	{
-		glVertex3f(simp->sommet[i]->coords[0], simp->sommet[i]->coords[1], simp->sommet[i]->coords[2]);
-	}
-
-	// glEnd();
-
-	// scanf("%d", &go_on);
-	// glutSwapBuffers();   // swapping image buffer for double buffering
-	// glutPostRedisplay();
-	// glFlush();
-
-
-	// printf("len = %d\n", simp->candidats->length[STD]);
-	// glBegin(GL_POINTS);
-
-	// Vertex *current = simp->candidats->root->links[STD][FWD];
-	// for (int i = 0; i < simp->candidats->length[STD]; i++)
-	// {
-	// 	glVertex3f(current->coords[0], current->coords[1], current->coords[2]);
-	// 	current = current->links[STD][FWD];
-	// }
-
-	// glEnd();
-}
-
-void affiche_grid(Grid *grid, double r, double g, double b)
-{
-	// print_fdp(grid->fdp);
-	// printf("size = %d\n", grid->fdp->nb);
-	for (int i = 1; i <= grid->fdp->nb; i++)
-	{
-		affiche_simplex( grid->fdp->table[i], r, g, b );
-	}	
 }
