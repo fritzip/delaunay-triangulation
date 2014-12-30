@@ -86,7 +86,7 @@ void redistribute_candidates( Dllist *dll, Simplex **tab, const int nb_simp, con
 void add_end_array( Simplex **tab, int *c_size, int *m_size, Simplex *simp );
 
 /**
- * @brief Stack a simplex at the top of stack
+ * @brief Stack a simplex at the top of stack.
  * 
  * @param grid top_of_stack is a parameter of grid, therefore it is necessary to give it as argument.
  * @param simp the simplex to stack (at the top).
@@ -101,10 +101,32 @@ void stack( Grid *grid, Simplex *simp ) ;
  */
 Simplex* unstack( Grid *grid ) ;
 
+/**
+ * @brief Split a simplex in 3 given a vertex inside this simplex.
+ * 
+ * @param grid The grid is required for stacking the new simplex and inserting them in fdp.
+ * @param simp Simplex to split.
+ * @param vert Vertex inside the simplex to split.
+ */
 void split_in_3(Grid *grid, Simplex *simp, Vertex *vert) ;
 
+/**
+ * @brief Flips the diagonal of the convex quad formed by two neighbors simplices. 
+ * 
+ * @param grid The grid is required for inserting them in fdp
+ * @param current The first simplex
+ * @param ind_vert The index of the first simplex's vertex not included in the diagonal before flip. 
+ * @param opp The second simplex
+ * @param ind_opp The index of the second simplex's vertex not included in the diagonal before flip.
+ */
 void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp);
 
+/**
+ * @brief Delaunay algorithm
+ * @details Take the first candidate to insert, insert it (split in 3) and check whether it is required or not to flip the diagonal around that point.
+ * 
+ * @param grid The grid
+ */
 void delauney( Grid *grid ) ;
 
 
