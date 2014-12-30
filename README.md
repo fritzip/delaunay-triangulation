@@ -30,15 +30,15 @@ Les sources du projet sont divisées en plusieurs fichiers (chaque *.c ayant son
 
 * Compilation 
 
-	make
+    make
 
 * Génération de la documentation (optionel)
 
-	make dox
+    make dox
 
 * Lancement du programme
 
-	./delaunay [ -i INPUT_FILE ] [ -n NB_PTS ] [ -s NB_SIMPLEX ] [ -g GOF(%) ] [ -c DISPLAY_MODE ]
+    ./delaunay [ -i INPUT_FILE ] [ -n NB_PTS ] [ -s NB_SPLEX ] [ -g GOF(%) ] [ -c DISPLAY_MODE ]
 
 
 ### Crédits ###
