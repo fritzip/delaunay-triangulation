@@ -54,17 +54,18 @@ _Se reporter à la documentation pour plus d'information_
 
         ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-s NB_SIMPX | -g GOF(%)] [-c DISPLAY_MODE]
 
+
     * `-i INPUT_FILE` : de la forme `DATA/heightmap`. Où `heightmap` est une image d'extension quelconque (elle sera automatiquement convertie en `heightmap.pgm`). _Defaut : NULL_
+
 
     * `-n NB_PTS` : nombre de points générés aléatoirement en x, y, (et z si l'option -i n'est pas renseignée). _Defaut : 10000_ 
 
-    * `-s NB_SIMPX` et `-g GOF(%)` : conditions d'arrêt, mutuellement exclusives. 
+
+    * `-s NB_SIMPX` et `-g GOF(%)` : conditions d'arrêt, mutuellement exclusives. _Defaut : arrêt quand tout les points ont été insérés._
 
         * `-s` arrête la triangulation une fois le nombre de facettes générées égal à `NB_SIMPX` (ou si le nombre maximum de facettes est atteint). 
 
         * `-g` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `zmax*GOF/100` (z étant normalisé, zmax = 1)
-
-        * _Defaut : arrêt quand tout les points ont été insérés._
 
 
     * `-c DISPLAY_MODE` : 0 ≤ DISPLAY_MODE ≤ 4. _Defaut : 3_
