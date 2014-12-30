@@ -58,11 +58,11 @@ _Se reporter à la documentation pour plus d'information_
 
     * `-n NB_PTS` : nombre de points générés aléatoirement en x, y, (et z si l'option -i n'est pas renseignée). _Defaut : 10000_ 
 
-        * `-s NB_SIMPX` et `-g GOF(%)` : conditions d'arrêt, mutuellement exclusives. 
+    * `-s NB_SIMPX` et `-g GOF(%)` : conditions d'arrêt, mutuellement exclusives. 
 
-            * `-s` arrête la triangulation une fois le nombre de facettes générées égal à `NB_SIMPX` (ou si le nombre maximum de facettes est atteint). 
+        * `-s` arrête la triangulation une fois le nombre de facettes générées égal à `NB_SIMPX` (ou si le nombre maximum de facettes est atteint). 
 
-            * `-g` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `zmax*GOF/100` (z étant normalisé, zmax = 1)
+        * `-g` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `zmax*GOF/100` (z étant normalisé, zmax = 1)
 
         * _Defaut : arrêt quand tout les points ont été insérés._
 
