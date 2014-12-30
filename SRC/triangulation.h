@@ -63,12 +63,42 @@ typedef struct grid
  */
 Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic, const double GOF );
 
+/**
+ * @brief Redistributes candidates point to the corresponding simplex (in tab)
+ * @details At the end of a Delaunay iteration, all new or modified simplex are in tab and the candidates are stored in the dll.  
+ * 
+ * @param dll Doubly linked list of candidates points to redistribute through the array (tab) of simplex.
+ * @param tab Table of simplex, containing all new or recently modified simplex.
+ * @param nb_simp Size of the array (tab) (i.e. The number of simplex recently created or modified)
+ * @param LNK The doubly linked list link
+ */
 void redistribute_candidates( Dllist *dll, Simplex **tab, const int nb_simp, const int LNK );
 
+/**
+ * @brief Add a simplex (simp) at the end of an array (tab).
+ * @details This function checks if the max allocated size of the array is exceed, in which case it realloc an array of the max size + OFFSET.
+ * 
+ * @param tab Table of simplex.
+ * @param c_size Current size of the array (tab) (ie. the number of element in the array).
+ * @param m_size Max size of the array (tab) (ie. maximum number of element you can put in the array before realloc )
+ * @param simp Simplex to add in the array.
+ */
 void add_end_array( Simplex **tab, int *c_size, int *m_size, Simplex *simp );
 
+/**
+ * @brief Stack a simplex at the top of stack
+ * 
+ * @param grid top_of_stack is a parameter of grid, therefore it is necessary to give it as argument.
+ * @param simp the simplex to stack (at the top).
+ */
 void stack( Grid *grid, Simplex *simp ) ;
 
+/**
+ * @brief Unstack the simplex at the top of stack. 
+ * 
+ * @param grid top_of_stack is a parameter of grid, therefore it is necessary to give it as argument.
+ * @return The former simplex at the top of the stack. (Second become first)
+ */
 Simplex* unstack( Grid *grid ) ;
 
 void split_in_3(Grid *grid, Simplex *simp, Vertex *vert) ;
