@@ -78,6 +78,18 @@ _Se reporter à la documentation pour plus d'information_
 
 * Interaction avec le programme
 
+    * Souris : Le bouton 1 de la souris une fois enfoncé permet une rotation de la visualisation instinctive. La roulette permet le zoom et le dezoom. 
+
+    * Clavier : Différentes touches ont été configurées.
+
+        * [SPACE] : Passage de la visualisation 2D <=> 3D
+        * [c] : 
+        * [NUMPAD{0, 1, 2, 3, 4}] : Changement entre les différents DISPLAY_MODE
+        * [ESCAPE] : Quitte le programme.
+
+
+
+
 
 ### Crédits ###
 
