@@ -82,12 +82,13 @@ _Se reporter à la documentation pour plus d'information_
 
     * Clavier : Différentes touches ont été configurées.
 
-        * [SPACE] : Passage de la visualisation 2D <=> 3D
-        * [c] : 
+        * [SPACE] : 2D <=> 3D
+        * [c] : couleur uniforme (verte) <=> gradient
+        * [n] : Active/Desactive les normales (utile lors du passage en 2D)
         * [NUMPAD{0, 1, 2, 3, 4}] : Changement entre les différents DISPLAY_MODE
         * [ESCAPE] : Quitte le programme.
 
-
+    Les normales sont automatiquement desactivées (resp. activées) lors du passage en 2D (resp. 3D), mais peuvent être toutefois changé à l'aide de la touche [n] une fois le passage effectué.
 
 ### Crédits ###
 
