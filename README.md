@@ -42,21 +42,22 @@ Les sources du projet sont divisées en plusieurs fichiers (chaque *.c ayant son
 
 `-i INPUT_FILE` : de la forme `DATA/heightmap`. Où `heightmap` est une image d'extension quelconque (elle sera automatiquement convertie en `heightmap.pgm`). *Defaut : NULL*
 
-`-n NB_PTS` : nombre de points générés aléatoirement en x, y, (et z si l'option -i n'est pas renseignée). *Defaut : 1000* 
+`-n NB_PTS` : nombre de points générés aléatoirement en x, y, (et z si l'option -i n'est pas renseignée). *Defaut : 10000* 
 
-`-s NB_SIMPX` et -g GOF(%) : conditions d'arrêt, mutuellement exclusives. 
-`-s` arrête la triangulation une fois le nombre de facettes générées égal à NB_SIMPX (ou si le nombre maximum de facettes est atteint). 
-`-g` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à zmax*GOF/100 (z étant normalisé, zmax = 1)
-defaut : arrêt quand tout les points ont été insérés.
+`-s NB_SIMPX` et `-g GOF(%)` : conditions d'arrêt, mutuellement exclusives. 
+`-s` arrête la triangulation une fois le nombre de facettes générées égal à `NB_SIMPX` (ou si le nombre maximum de facettes est atteint). 
+`-g` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `zmax*GOF/100` (z étant normalisé, zmax = 1)
+*Defaut : arrêt quand tout les points ont été insérés.*
 
-`-c DISPLAY_MODE` : 0 <= DISPLAY_MODE <= 4
+`-c DISPLAY_MODE` : 0 ≤ DISPLAY_MODE ≤ 4. *Defaut : 3*
 
 	* 0 : GL_POINTS
 	* 1 : GL_LINES
 	* 2 : GL_LINE_STRIP
 	* 3 : GL_LINE_LOOP
 	* 4 : GL_POLYGON
-	* default : 3
+
+
 ### Crédits ###
 
 Maxime Sainlot
