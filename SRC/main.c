@@ -26,7 +26,7 @@ extern char *optarg;
 extern int opterr;
 
 /* Display option */
-GLenum display_mode = 3;
+GLenum gl_display_mode[] = {GL_POINTS, GL_LINES, GL_LINE_STRIP, GL_LINE_LOOP, GL_POLYGON};
 char *lineOption[] = { "GL_POINTS", "GL_LINES", "GL_LINE_STRIP", "GL_LINE_LOOP", "GL_POLYGON"};
 
 int SCREEN_WIDTH = 1000, SCREEN_HEIGHT = 1000;
@@ -34,6 +34,8 @@ int SCREEN_WIDTH = 1000, SCREEN_HEIGHT = 1000;
 int TWO_D = 0; 
 int GRAD = 0;
 int NORMAL = 1;
+int DISPLAY_MODE = 3;
+int TEXT = 1;
 
 float rho = 2.0f;
 float xrot = -40.0f;
@@ -138,25 +140,27 @@ void processNormalKeys(unsigned char key, int xx, int yy)
 		if (TWO_D)
 		{
 			NORMAL = 0;
-			display_mode = GL_LINE_LOOP;			
+			DISPLAY_MODE = 3;			
 		}
 		else 
 		{
 			NORMAL = 1;
-			display_mode = GL_POLYGON;
+			DISPLAY_MODE = 4;
 		}
 	}
 	if (key == 'c')
 		GRAD = 1 - GRAD;
 	if (key == 'n')
 		NORMAL = 1 - NORMAL;
+	if (key == 't')
+		TEXT = 1 - TEXT;
 	switch (key)
 	{
-		case '0': display_mode = GL_POINTS ; break;
-		case '1': display_mode = GL_LINES ; break;
-		case '2': display_mode = GL_LINE_STRIP ; break;
-		case '3': display_mode = GL_LINE_LOOP ; break;
-		case '4': display_mode = GL_POLYGON ; break;
+		case '0': DISPLAY_MODE = 0 ; break;
+		case '1': DISPLAY_MODE = 1 ; break;
+		case '2': DISPLAY_MODE = 2 ; break;
+		case '3': DISPLAY_MODE = 3 ; break;
+		case '4': DISPLAY_MODE = 4 ; break;
 	}
 } 
 
@@ -225,18 +229,97 @@ void compute_pos()
 	// printf("camx = %f, camy = %f, camz = %f\n", camx, camy, camz);
 }
 
-
-
-void display (void)
+void vBitmapOutput(double x, double y, char *string, void *font)
 {
-	compute_pos();
+	int len,i; // len donne la longueur de la chaîne de caractères
 
-	glColor3f(0.0, 0.0, 0.0);
+	glRasterPos2f(x,y); // Positionne le premier caractère de la chaîne
+	len = (int) strlen(string); // Calcule la longueur de la chaîne
+	for (i = 0; i < len; i++) glutBitmapCharacter(font,string[i]); // Affiche chaque caractère de la chaîne
+}
 
-	// Clear Color and Depth Buffers
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Reset transformations
+void display_text()
+{
+	if (TEXT)
+	{
+		glColor3d(0, 0, 0);
+		glBegin(GL_QUADS);
+	        glVertex3f(0.01,0.99,0.5);
+	        glVertex3f(0.01,0.86,0.5);
+	        glVertex3f(0.3,0.86,0.5);
+	        glVertex3f(0.3,0.99,0.5);
+	    glEnd();
+
+		glColor3d(1,1,1);
+
+
+		vBitmapOutput(0.02,0.97,"[ SPACE ]",GLUT_BITMAP_HELVETICA_12);
+		vBitmapOutput(0.08,0.97,"VISUALISATION",GLUT_BITMAP_HELVETICA_12);
+		if (TWO_D)
+			vBitmapOutput(0.2,0.97," : 2D",GLUT_BITMAP_HELVETICA_12);
+		else
+			vBitmapOutput(0.2,0.97," : 3D",GLUT_BITMAP_HELVETICA_12);
+
+
+		vBitmapOutput(0.02,0.95,"[ C ]",GLUT_BITMAP_HELVETICA_12);
+		vBitmapOutput(0.08,0.95,"GRADIENT COLOR",GLUT_BITMAP_HELVETICA_12);
+		if (GRAD)
+			vBitmapOutput(0.2,0.95," : ON",GLUT_BITMAP_HELVETICA_12);
+		else
+			vBitmapOutput(0.2,0.95," : OFF",GLUT_BITMAP_HELVETICA_12);
+
+
+		vBitmapOutput(0.02,0.93,"[ N ]",GLUT_BITMAP_HELVETICA_12);
+		vBitmapOutput(0.08,0.93,"NORMALS",GLUT_BITMAP_HELVETICA_12);
+		if (NORMAL)
+			vBitmapOutput(0.2,0.93," : ON",GLUT_BITMAP_HELVETICA_12);
+		else
+			vBitmapOutput(0.2,0.93," : OFF",GLUT_BITMAP_HELVETICA_12);
+
+
+		if (DISPLAY_MODE == 0)
+		{
+			vBitmapOutput(0.02,0.91,"[ 0 ]",GLUT_BITMAP_HELVETICA_12);
+			vBitmapOutput(0.08,0.91,"DISPLAY MODE",GLUT_BITMAP_HELVETICA_12);
+			vBitmapOutput(0.2,0.91," : POINTS ",GLUT_BITMAP_HELVETICA_12);
+		}
+		else if (DISPLAY_MODE == 1)
+		{
+			vBitmapOutput(0.02,0.91,"[ 1 ]",GLUT_BITMAP_HELVETICA_12);
+			vBitmapOutput(0.08,0.91,"DISPLAY MODE",GLUT_BITMAP_HELVETICA_12);
+			vBitmapOutput(0.2,0.91," : LINES",GLUT_BITMAP_HELVETICA_12);
+		}
+		else if (DISPLAY_MODE == 2)
+		{
+			vBitmapOutput(0.02,0.91,"[ 2 ]",GLUT_BITMAP_HELVETICA_12);
+			vBitmapOutput(0.08,0.91,"DISPLAY MODE",GLUT_BITMAP_HELVETICA_12);
+			vBitmapOutput(0.2,0.91," : LINE_STRIP",GLUT_BITMAP_HELVETICA_12);
+		}
+		else if (DISPLAY_MODE == 3)
+		{
+			vBitmapOutput(0.02,0.91,"[ 3 ]",GLUT_BITMAP_HELVETICA_12);
+			vBitmapOutput(0.08,0.91,"DISPLAY MODE",GLUT_BITMAP_HELVETICA_12);
+			vBitmapOutput(0.2,0.91," : LINE_LOOP",GLUT_BITMAP_HELVETICA_12);
+		}
+		else if (DISPLAY_MODE == 4)
+		{
+			vBitmapOutput(0.02,0.91,"[ 4 ]",GLUT_BITMAP_HELVETICA_12);
+			vBitmapOutput(0.08,0.91,"DISPLAY MODE",GLUT_BITMAP_HELVETICA_12);
+			vBitmapOutput(0.2,0.91," : POLYGON",GLUT_BITMAP_HELVETICA_12);
+		}
+
+		vBitmapOutput(0.02,0.89,"[ T ]",GLUT_BITMAP_HELVETICA_12);
+		vBitmapOutput(0.08,0.89,"TOOGLE INFO",GLUT_BITMAP_HELVETICA_12);
+
+		vBitmapOutput(0.02,0.87,"[ ESC ]",GLUT_BITMAP_HELVETICA_12);
+		vBitmapOutput(0.08,0.87,"CLOSE",GLUT_BITMAP_HELVETICA_12);
+		
+	}
+}
+
+void apply_transform()
+{
 	glLoadIdentity();
 
 	glTranslatef(0.0f, 0.0f, -rho);
@@ -246,44 +329,83 @@ void display (void)
 	glRotatef(zrot, 0.0, 0.0, 1.0); 
 
 	glTranslatef(-0.5, -0.5, -0.5);
+}
+
+void switch_to_ortho()
+{
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(minX-margin, maxX+margin, minY-margin,  maxY+margin, -1, 0);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+}
+
+void switch_to_perspective()
+{
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
+void display (void)
+{
+	compute_pos();
+	double x, y, z;
+
+	glColor3f(0.0, 0.0, 0.0);
+
+	// Clear Color and Depth Buffers
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	apply_transform();
 
 	if (TWO_D)
-	{ // 2D Display
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
-		gluOrtho2D(minX-margin, maxX+margin, minY-margin, maxY+margin);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glDisable(GL_CULL_FACE);
-	}
-
+		switch_to_ortho();
+	
 	for (int i = 1; i <= mygrid->fdp->nb; i++)
 	{
-		glBegin(display_mode);
+		glBegin(gl_display_mode[DISPLAY_MODE]);
 		Simplex *simp = mygrid->fdp->table[i];
+		
 		// Normal or not 
 		if (NORMAL) glNormal3f(simp->na, simp->nb, simp->nc);
 		else glNormal3f(1,1,1);
 
+		x = simp->sommet[0]->coords[0];
+		y = simp->sommet[0]->coords[1];
+
 		for(int j = 0; j < 3; j++)
 		{
-			double z = simp->sommet[j]->coords[2];
+			x = simp->sommet[j]->coords[0];
+			y = simp->sommet[j]->coords[1];
+			z = simp->sommet[j]->coords[2];
+			
 			Color col = getcol(z);
 			glColor4f(col.r/255, col.g/255, col.b/255, 1);
-			glVertex3f(simp->sommet[j]->coords[0], simp->sommet[j]->coords[1], z);
-		}
+
+			glVertex3f(x, y, z);
+		
+		}			
 		glEnd();
 	}	
 
+
 	if (TWO_D)
-	{ // 2D Display
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		glMatrixMode(GL_MODELVIEW);
+	{
+		display_text();
+		switch_to_perspective();
 	}
-	glPopMatrix();
+	else
+	{
+		switch_to_ortho();
+		display_text();
+		switch_to_perspective();
+	}
 
 	glutSwapBuffers();
 }
@@ -306,34 +428,34 @@ int main(int argc, char **argv)
 	//      Arg parser
 	//***********************//
 	int opt;
-	while ((opt = getopt (argc, argv, "c:n:i:g:s:")) != -1)
+	while ((opt = getopt (argc, argv, "c:n:i:f:s:")) != -1)
 		switch (opt)
 		{
 			case 'n':
 				sscanf(optarg, "%d", &NB_VERTEX);
 				break;			
-			case 'g':
-				sscanf(optarg, "%d", &GOF);
-				OUTPUT_CONDITION = 'g';
-				break;			
 			case 's':
-				sscanf(optarg, "%d", &NB_SIMPLEX);
+				sscanf(optarg, "%d", &GOF);
 				OUTPUT_CONDITION = 's';
+				break;			
+			case 'f':
+				sscanf(optarg, "%d", &NB_SIMPLEX);
+				OUTPUT_CONDITION = 'f';
 				break;
 			case 'c':
-				sscanf(optarg, "%d", &display_mode);
+				sscanf(optarg, "%d", &DISPLAY_MODE);
 				break;
 			case 'i':
 				INPUT_FILE = optarg;
 				break;
 			case '?':
-				if (optopt == 'c' || optopt == 'n' || optopt == 'i' || optopt == 's' || optopt == 'g')
+				if (optopt == 'c' || optopt == 'n' || optopt == 'i' || optopt == 's' || optopt == 'f')
 					fprintf (stderr, "Option -%c requires an argument.\n", optopt);
 				else if (isprint (optopt))
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
 				else
 					fprintf (stderr, "Unknown option character `\\%x'.\n", optopt);
-				printf("Usage: %s ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-s NB_SIMPX | -g GOF(%%)] [-c DISPLAY_MODE]\n cf. README.md for further information", argv[0]);
+				printf("Usage: %s ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-f NB_SIMPX | -s GOF(%%)/10] [-c DISPLAY_MODE]\n cf. README.md for further information", argv[0]);
 				return 1;
 			default:
 				abort();
@@ -345,8 +467,8 @@ int main(int argc, char **argv)
 		// Output conditions
 	if (NB_SIMPLEX > 0 && GOF > 0)
 	{
-		printf("Maximum 1 output condition (2 given -s %d -g %d)\n", NB_SIMPLEX, GOF);
-		printf("Usage: %s ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-s NB_SIMPX | -g GOF(%%)] [-c DISPLAY_MODE]\n cf. README.md for further information", argv[0]);
+		printf("Maximum 1 output condition (2 given -f %d -s %d)\n", NB_SIMPLEX, GOF);
+		printf("Usage: %s ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-f NB_SIMPX | -s GOF(%%)/10] [-c DISPLAY_MODE]\n cf. README.md for further information", argv[0]);
 		return 1;
 	}
 
@@ -382,19 +504,9 @@ int main(int argc, char **argv)
 	}
 
 		// Display mode
-	if (!(display_mode >= 0 && display_mode <= 4)) display_mode = 3;
+	if (!(DISPLAY_MODE >= 0 && DISPLAY_MODE <= 4)) DISPLAY_MODE = 3;
 
-	printf ("n = %d, c = %d, i=%s\n", NB_VERTEX, display_mode, INPUT_FILE);
-	printf("Executing %s with line option %d = %s.\n", argv[0], display_mode, lineOption[display_mode]);
-
-	switch (display_mode)
-	{
-		case 0: display_mode = GL_POINTS ; break;
-		case 1: display_mode = GL_LINES ; break;
-		case 2: display_mode = GL_LINE_STRIP ; break;
-		case 3: display_mode = GL_LINE_LOOP ; break;
-		case 4: display_mode = GL_POLYGON ; break;
-	}
+	printf("Executing %s with line option %d = %s.\n", argv[0], DISPLAY_MODE, lineOption[DISPLAY_MODE]);
 
 	compute_color_gradient(gradient_color, nb_gradient_val, 39.0, 131.0, 29.0, 215.0, 226.0, 214.0);
 
@@ -402,19 +514,26 @@ int main(int argc, char **argv)
 	//***********************//
 	//	Delaunay Algorithm
 	//***********************//
+	clock_t begin, end;
+	double time_spent;
+
+	begin = clock();
 
 	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET, &mydata, GOF/1000.f );
 
-	if (OUTPUT_CONDITION == 's')
+	if (OUTPUT_CONDITION == 'f')
 		while ( mygrid->fdp->nb < NB_SIMPLEX )
 			delauney( mygrid );
-	else if (OUTPUT_CONDITION == 'g')
+	else if (OUTPUT_CONDITION == 's')
 		while ( fabs(mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist) > mygrid->gof )
 			delauney( mygrid );
 	else		
 		while (mygrid->fdp->table[1]->candidates->length != 0)
 			delauney( mygrid );
 	
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Execution time : %f sec\n", time_spent);
 
 	//***********************//
 	// 		Display

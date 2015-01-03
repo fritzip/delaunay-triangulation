@@ -41,7 +41,15 @@ Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new
 		if (pic->matrix != NULL)
 			new_vert = create_vertex_img_based(pic);
 		else
-			new_vert = create_vertex(randf(), randf(), randf());
+		{
+			double x = randf();
+			double y = randf();
+			double xsc = (x*16)-8;
+			double ysc = (y*16)-8;
+			// double z = sin(xsc*xsc+ysc*ysc) / (xsc*xsc+ysc*ysc);
+			double z = cos(xsc)+sin(ysc);
+			new_vert = create_vertex(x,y,(z+2)/8);
+		}
 		for (j = 0; j < 2; j++)
 		{
 			if ( inside_simplex( simp[j], new_vert ) )

@@ -1,6 +1,6 @@
 #ifndef __GRID_H__
 #define __GRID_H__
-/*! \file primitives.h
+/*! \file triangulation.h
  * \author M. Sainlot
  * \date 2014
  */
@@ -13,7 +13,6 @@
 
 /**
  * @brief The grid structure
- * @details [long description]
  * 
  * @param fdp : priority queue of simplex to know which one to treat next
  * @param candidates_to_redistrubute : a doubly linked list which stores during one delaunay round
@@ -125,7 +124,6 @@ void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp)
  * @brief Delaunay algorithm
  * @details Take the first candidate to insert, insert it (split in 3) and check whether it is required or not to flip the diagonal around that point.
  * 
- * @param grid The grid
  */
 void delauney( Grid *grid ) ;
 
