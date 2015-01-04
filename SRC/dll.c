@@ -17,7 +17,7 @@ void init_dll(Dllist *dll, Vertex* root)
 {
 	dll->root = root;
 
-	for(int i=0; i<NBL; i++)
+	for(int i=0; i < NB_LNK; i++)
 	{
 		dll->root->links[i][BWD] = dll->root;	
 		dll->root->links[i][FWD] = dll->root;

@@ -11,6 +11,7 @@ typedef struct fdprior
 {
 	Simplex **table;
 	int nb;
+	int nb_comp;
 } FDP ;
 
 

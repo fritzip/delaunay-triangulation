@@ -18,14 +18,10 @@
  * @param candidates_to_redistrubute : a doubly linked list which stores during one delaunay round
  * (ie. insertion of one point and computation of any changes required) all the candidates which will be redistribute
  * between all the recently created and/or modified simplices.
- * @param top_of_stack : A pointer to the first simplex to unstack (ie. the last added). Each simplex have a pointer to the 
+ * @param top_of_stack[NB_STK] : A pointer to the first simplex to unstack (ie. the last added). Each simplex have a pointer to the 
  * next one (next_in_stack)
- * @param stack_size : Number of simplex currently in stack.
- * @param new : A table of fix but expandable size (thanks to realloc if needed) which stores at every delaunay iteration 
- * the recently created and/or modified simpices in order to iterate through and redistribute candidates in candidates_to_redistrubute
- * @param new_current_size : The current size of the table described above (new). In other terms the number of element currently in the table.
- * @param new_max_size : The maximum number of simplex pointers that you can currently store in new table. 
- * If new_current_size > new_max_size then new is reallocated.
+ * @param stack_size[NB_STK] : Number of simplex currently in stack.
+ * @param stack_max_size[NB_STK] : 
  */
 typedef struct grid
 {
@@ -33,14 +29,10 @@ typedef struct grid
 
 	Dllist *candidates_to_redistribute;
 	
-	Simplex *top_of_stack;
-	int stack_size;
-	int stack_max_size;
+	Simplex *top_of_stack[NB_STK];
+	int stack_size[NB_STK];
+	int stack_max_size[NB_STK];
 	
-	Simplex **new;
-	int new_current_size;
-	int new_max_size;
-
 	int nb_vertex_inserted;
 } Grid ;
 
@@ -56,22 +48,18 @@ typedef struct grid
  * 
  * @param nb_pts Number of vertex (set by user on command line default in ressources.h NB_VERTEX)
  * @param size_fdp Size of the priority queue, initialized to the maximum number of simplices you can possibly have.
- * @param init_size_new_tab OFFSET (set by user in ressources.h) realloc if superior size needed.
  * @param pic  The heightmap picture which define the z coordinate of every vertex. If NULL, z is random.
  * @return The new grid created and initialized.
  */
-Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic);
+Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic);
 
 /**
- * @brief Redistributes candidates point to the corresponding simplex (in tab)
- * @details At the end of a Delaunay iteration, all new or modified simplex are in tab and the candidates are stored in the dll.  
+ * @brief Redistributes candidates point to the corresponding simplex (in stack NEW)
+ * @details At the end of a Delaunay iteration, all new or modified simplex are in a stack (of link NEW) and the candidates are stored in the dll candidates_to_redistribute.  
  * 
- * @param dll Doubly linked list of candidates points to redistribute through the array (tab) of simplex.
- * @param tab Table of simplex, containing all new or recently modified simplex.
- * @param nb_simp Size of the array (tab) (i.e. The number of simplex recently created or modified)
- * @param LNK The doubly linked list link
+ * @param grid The grid which contain candidates_to_redistribute and the stack of link NEW.
  */
-void redistribute_candidates( Dllist *dll, Simplex **tab, const int nb_simp, const int LNK );
+void redistribute_candidates( Grid *grid );
 
 /**
  * @brief Add a simplex (simp) at the end of an array (tab).
@@ -82,23 +70,25 @@ void redistribute_candidates( Dllist *dll, Simplex **tab, const int nb_simp, con
  * @param m_size Max size of the array (tab) (ie. maximum number of element you can put in the array before realloc )
  * @param simp Simplex to add in the array.
  */
-void add_end_array( Simplex **tab, int *c_size, int *m_size, Simplex *simp );
+// void add_end_array( Simplex **tab, int *c_size, int *m_size, Simplex *simp );
 
 /**
- * @brief Stack a simplex at the top of stack.
+ * @brief Stack a simplex at the top of stack given a link.
  * 
  * @param grid top_of_stack is a parameter of grid, therefore it is necessary to give it as argument.
  * @param simp the simplex to stack (at the top).
+ * @param LNK the link of the stack.
  */
-void stack( Grid *grid, Simplex *simp ) ;
+void stack( Grid *grid, Simplex *simp, int LNK ) ;
 
 /**
  * @brief Unstack the simplex at the top of stack. 
  * 
  * @param grid top_of_stack is a parameter of grid, therefore it is necessary to give it as argument.
+ * @param LNK the link of the stack.
  * @return The former simplex at the top of the stack. (Second become first)
  */
-Simplex* unstack( Grid *grid ) ;
+Simplex* unstack( Grid *grid, int LNK ) ;
 
 /**
  * @brief Split a simplex in 3 given a vertex inside this simplex.

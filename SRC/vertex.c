@@ -20,7 +20,7 @@ void init_vertex( Vertex *vert, double x, double y, double z )
 	vert->coords[1] = y;
 	vert->coords[2] = z;
 
-	for(int i=0; i<NBL; i++)
+	for(int i=0; i<NB_LNK; i++)
 	{
 		vert->links[i][BWD] = NULL;	
 		vert->links[i][FWD] = NULL;
@@ -78,9 +78,9 @@ void init_vertex_img_based( Vertex *vert, const PGMData *pic )
 
 	vert->coords[0] = x;
 	vert->coords[1] = y;	
-	vert->coords[2] = z;
+	vert->coords[2] = z/4;
 
-	for(int i=0; i<NBL; i++)
+	for(int i=0; i<NB_LNK; i++)
 	{
 		vert->links[i][BWD] = NULL;	
 		vert->links[i][FWD] = NULL;

@@ -49,9 +49,9 @@ int get_number_of_sons( const int i, const int n )
 	else return 2;
 }
 
-
 int is_superior_fdp( FDP *fdp, const int a, const int b )
 {
+	fdp->nb_comp++;
 	if ( !is_empty(fdp->table[a]) && !is_empty(fdp->table[b]) )
 		return is_superior_simplex(fdp->table[a], fdp->table[b]);
 	else if ( !is_empty(fdp->table[a]) )

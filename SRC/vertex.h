@@ -11,7 +11,7 @@
 typedef struct vertex
 {
 	double coords[DIM];
-	struct vertex *links[NBL][2];
+	struct vertex *links[NB_LNK][2];
 	double zdist;
 } Vertex ;
 

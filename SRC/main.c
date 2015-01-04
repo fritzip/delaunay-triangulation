@@ -32,9 +32,9 @@ char *lineOption[] = { "GL_POINTS", "GL_LINES", "GL_LINE_STRIP", "GL_LINE_LOOP",
 int SCREEN_WIDTH = 1000, SCREEN_HEIGHT = 1000;
 
 int TWO_D = 0; 
-int GRAD = 0;
+int GRAD = 1;
 int NORMAL = 1;
-int DISPLAY_MODE = 3;
+int DISPLAY_MODE = 4;
 int TEXT = 1;
 
 float rho = 2.0f;
@@ -220,7 +220,7 @@ void mouseButton(int button, int state, int x, int y)
 void compute_pos() 
 {
 	if (xrot > 0) xrot = 0;
-	if (xrot < -180) xrot = -180; 
+	if (xrot < -90) xrot = -90; 
 	if (zrot > 360) zrot -= 360;
 	if (zrot < 0) zrot += 360;
 
@@ -328,7 +328,7 @@ void apply_transform()
 	glRotatef(xrot, 1.0, 0.0, 0.0);
 	glRotatef(zrot, 0.0, 0.0, 1.0); 
 
-	glTranslatef(-0.5, -0.5, -0.5);
+	glTranslatef(-0.5, -0.5, -0.2);
 }
 
 void switch_to_ortho()
@@ -517,18 +517,20 @@ int main(int argc, char **argv)
 	clock_t begin, end;
 	double time_spent;
 
-	begin = clock();
 
-	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET, &mydata );
+	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, &mydata );
+
+	begin = clock();
 
 	if (OUTPUT_CONDITION == 'f')
 		while ( mygrid->fdp->nb < NB_SIMPLEX )
 			delauney( mygrid );
 	else if (OUTPUT_CONDITION == 's')
-		while ( fabs(mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist) > GOF/1000 )
+		while ( fabs(mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist) > GOF/1000.0 )
 			delauney( mygrid );
 	else		
 		while (mygrid->fdp->table[1]->candidates->length != 0)
+		// while (mygrid->nb_vertex_inserted < NB_VERTEX )
 			delauney( mygrid );
 	
 	end = clock();
@@ -536,7 +538,8 @@ int main(int argc, char **argv)
 	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 	printf("Execution time : %f sec\n", time_spent);
 	printf("Points inserted : %d\nTriangles generated : %d\n", mygrid->nb_vertex_inserted, mygrid->fdp->nb);
-	printf("Stack maximum size : %d\n", mygrid->stack_max_size);
+	printf("Stack maximum size : %d\n", mygrid->stack_max_size[DEL]);
+	printf("Nb comparaison / log(m) : %f\n", mygrid->fdp->nb_comp/(mygrid->nb_vertex_inserted*log(mygrid->nb_vertex_inserted)));
 
 
 	//***********************//

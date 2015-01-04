@@ -26,7 +26,12 @@ void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *ca
 		simp->voisin[i] = NULL;
 
 	simp->candidates = candidates;
-	simp->next_stk = NULL;
+	
+	for (int i = 0; i < NB_STK; ++i)
+	{
+		simp->next_stk[i] = NULL;
+	}
+
 	simp->index_in_fdp = 0;
 }
 

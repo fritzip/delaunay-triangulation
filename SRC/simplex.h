@@ -12,7 +12,7 @@ typedef struct simplex
 {
 	Vertex *sommet[3];
 	struct simplex *voisin[3];
-	struct simplex *next_stk;
+	struct simplex *next_stk[2];
 	Dllist *candidates;
 	
 	double na;
