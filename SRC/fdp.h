@@ -7,7 +7,7 @@
 
 #include "simplex.h"
 
-typedef struct fdprior
+typedef struct FDP
 {
 	Simplex **table;
 	int nb;
@@ -35,7 +35,7 @@ void down_heap( FDP *fdp, int son, int father) ;
 
 void insert_in_fdp( FDP *fdp, Simplex *simp ) ;
 
-Simplex* extract_max( FDP *fdp ) ;
+void rm_of_fdp( FDP *fdp, Simplex *simp ) ;
 
 void heap_sort( FDP *fdp ) ;
 

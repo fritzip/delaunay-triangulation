@@ -8,11 +8,11 @@
 #include "dll.h"
 #include "vertex.h"
 
-typedef struct simplex
+typedef struct Simplex
 {
 	Vertex *sommet[3];
-	struct simplex *voisin[3];
-	struct simplex *next_stk[2];
+	struct Simplex *voisin[3];
+	struct Simplex *next_stk[2];
 	Dllist *candidates;
 	
 	double na;
@@ -20,6 +20,7 @@ typedef struct simplex
 	double nc;
 
 	int index_in_fdp;
+	
 } Simplex ;
 
 
@@ -49,6 +50,8 @@ void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *ca
  * @return The new simplex created
  */
 Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 ) ;
+
+Simplex* create_empty_simplex();
 
 /**
  * @brief Test whether a point (vert) is inside or outside of the simplex (simp)

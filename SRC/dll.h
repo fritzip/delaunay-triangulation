@@ -7,7 +7,7 @@
 
 #include "vertex.h"
 
-typedef struct dllist
+typedef struct Dllist
 {
 	int length;
 	Vertex *root;

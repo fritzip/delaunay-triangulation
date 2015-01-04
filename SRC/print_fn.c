@@ -86,7 +86,7 @@ void print_fdp(FDP const *fdp )
 	for (int i = 1; i <= fdp->nb; i++)
 	{
 		n = fdp->table[i]->candidates->length;
-		printf("( %4d | %3d) ", i, n );
+		printf("( %4d | %3d) ", fdp->table[i]->index_in_fdp, n );
 		vert = fdp->table[i]->candidates->root->links[STD][FWD];
 		for (int j = 0; j < n; j++)
 		{

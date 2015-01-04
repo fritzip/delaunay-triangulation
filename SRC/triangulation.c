@@ -17,10 +17,30 @@
 //                                  Triangulation functions
 /*----------------------------------------------------------------------------------*/
 
-Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic )
+Simplex* add_new_simp( Grid *grid, Vertex *v0, Vertex *v1, Vertex *v2 )
+{
+	Simplex *simp = grid->table_of_simp[grid->nb_simp];
+	grid->nb_simp++;
+
+	simp->sommet[0] = v0;
+	simp->sommet[1] = v1;
+	simp->sommet[2] = v2;
+
+	compute_plan(simp);
+
+	return simp;
+}
+
+Grid* create_grid( const int nb_pts, const int nb_simp, const PGMData *pic )
 {
 	Grid *grid = (Grid *) malloc(sizeof(Grid));
+	grid->table_of_simp = (Simplex **)malloc(nb_simp*sizeof(Simplex *));
 
+	for (int i = 0; i < nb_simp; ++i)
+	{
+		grid->table_of_simp[i] = create_empty_simplex();
+	}
+	grid->nb_simp = 0;
 	// 4 corners vertex
 	Vertex *ul = create_vertex(0.0, 1.0, 0.0);
 	Vertex *ur = create_vertex(1.0, 1.0, 0.0);
@@ -29,8 +49,8 @@ Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic )
 
 	// 2 init triangles
 	Simplex *simp[2];
-	simp[0] = create_simplex(ur, ul, dl);
-	simp[1] = create_simplex(dl, dr, ur);
+	simp[0] = add_new_simp(grid, ur, ul, dl);
+	simp[1] = add_new_simp(grid, dl, dr, ur);
 	simp[0]->voisin[1] = simp[1];
 	simp[1]->voisin[1] = simp[0];
 
@@ -40,7 +60,9 @@ Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic )
 	for (i = 0; i < nb_pts; i++)
 	{
 		if (pic->matrix != NULL)
+		{
 			new_vert = create_vertex_img_based(pic);
+		}
 		else
 		{
 			double x = randf();
@@ -56,16 +78,15 @@ Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic )
 			if ( inside_simplex( simp[j], new_vert ) )
 				break;
 		}
-
 		new_vert->zdist = compute_zdist( simp[j], new_vert );
-
 		if ( simp[j]->candidates->length > 0 && is_superior_vertex( new_vert, simp[j]->candidates->root->links[STD][FWD]) )
 			add_begin_dll( simp[j]->candidates, new_vert, STD );
 		else
 			add_end_dll( simp[j]->candidates, new_vert, STD );
 	}
 
-	grid->fdp = create_fdp( size_fdp );
+	
+	grid->fdp = create_fdp( nb_simp );
 
 	grid->candidates_to_redistribute = create_dll();
 
@@ -76,38 +97,11 @@ Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic )
 		grid->stack_max_size[i] = 0;
 	}
 
-	// grid->new = (Simplex **)malloc(init_size_new_tab*sizeof(Simplex *));
-	// grid->new_current_size = 0;
-	// grid->new_max_size = init_size_new_tab;
-
 	insert_in_fdp(grid->fdp, simp[0]);
 	insert_in_fdp(grid->fdp, simp[1]);
 
 	return grid;
 }
-
-// void redistribute_candidates( Dllist *dll, Simplex *tab[], const int nb_simp, const int LNK )
-// {
-// 	int i, j;
-// 	int nb_candidates = dll->length;
-// 	Vertex *current = dll->root->links[LNK][FWD];
-// 	Vertex *next = NULL;
-
-// 	// redistributes candidates through 3 new triangles and update zdist
-// 	for (i = 0; i < nb_candidates; i++)
-// 	{
-// 		for (j = 0; j < nb_simp; j++)
-// 			if ( inside_simplex( tab[j], current ) ) break;
-
-// 		current->zdist = compute_zdist( tab[j], current );
-// 		next = current->links[STD][FWD];
-// 		if ( tab[j]->candidates->length > 0 && is_superior_vertex( current, tab[j]->candidates->root->links[STD][FWD]) )
-// 			add_begin_dll( tab[j]->candidates, current, STD );
-// 		else
-// 			add_end_dll( tab[j]->candidates, current, STD );
-// 		current = next;
-// 	}
-// }
 
 void redistribute_candidates( Grid *grid )
 {
@@ -136,19 +130,6 @@ void redistribute_candidates( Grid *grid )
 	}
 }
 
-// void add_end_array( Simplex **tab, int *c_size, int *m_size, Simplex *simp )
-// {
-// 	if ( *c_size >= *m_size )
-// 	{
-// 		printf("OFFSET\n");
-// 		tab = (Simplex **) realloc(tab, (*m_size + OFFSET) * sizeof(Simplex *));
-// 		*m_size += OFFSET;
-// 	}
-
-// 	tab[*c_size] = simp;
-// 	*c_size = *c_size + 1;
-// }
-
 void stack( Grid *grid, Simplex *simp, int LNK )
 {
 	simp->next_stk[LNK] = grid->top_of_stack[LNK];
@@ -170,8 +151,8 @@ Simplex* unstack( Grid *grid, int LNK )
 void split_in_3(Grid *grid, Simplex *simp, Vertex *vert)
 {
 	// define new vertices of new simplex
-	Simplex *new_simp1 = create_simplex(vert, simp->sommet[1], simp->sommet[2]); // modifier gestion simplex
-	Simplex *new_simp2 = create_simplex(vert, simp->sommet[2], simp->sommet[0]);
+	Simplex *new_simp1 = add_new_simp(grid, vert, simp->sommet[1], simp->sommet[2]); 
+	Simplex *new_simp2 = add_new_simp(grid, vert, simp->sommet[2], simp->sommet[0]);
 	simp->sommet[2] = vert;
 
 	// define new neighbors
@@ -236,6 +217,12 @@ void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp)
 	compute_plan(current);
 	compute_plan(opp);
 
+	if (current->index_in_fdp <= 0)
+		insert_in_fdp(grid->fdp, current);
+
+	if (opp->index_in_fdp <= 0)
+		insert_in_fdp(grid->fdp, opp);
+
 	stack( grid, current, DEL );
 	stack( grid, opp, DEL );
 }
@@ -243,10 +230,11 @@ void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp)
 void delauney( Grid *grid )
 {
 	Simplex *simp =	grid->fdp->table[1] ;
-
+	
 	// Vertex to insert (first candidat)
 	Vertex *vert = simp->candidates->root->links[STD][FWD];
-	
+	grid->nb_vertex_inserted++;
+
 	vert->zdist = 0;
 
 	rm_begin_dll(simp->candidates, STD);
@@ -279,38 +267,30 @@ void delauney( Grid *grid )
 		}
 		else
 		{
-			// add_end_array(grid->new, &grid->new_current_size, &grid->new_max_size, current ); // use stack here !
 			stack( grid, current, NEW);
 		}
 	}
 
-	// redistribute_candidates(grid->candidates_to_redistribute, grid->new, grid->new_current_size, STD );
 	redistribute_candidates(grid);
 
 	int n = grid->stack_size[NEW];
 	for (int i = 0; i < n; i++)
 	{
 		current = unstack(grid, NEW);
-		up_heap( grid->fdp, current->index_in_fdp, current->index_in_fdp/2 );
-		down_heap( grid->fdp, current->index_in_fdp*2, current->index_in_fdp );
+		if (current->index_in_fdp > 0)
+		{
+			if (is_empty(current) )
+			{
+				rm_of_fdp(grid->fdp, current);
+			}
+			else
+			{
+				up_heap( grid->fdp, current->index_in_fdp, current->index_in_fdp/2 );
+				down_heap( grid->fdp, current->index_in_fdp*2, current->index_in_fdp );
+			}
+		}
 	}
-
-	grid->nb_vertex_inserted++;
 
 	// reinit
 	init_dll(grid->candidates_to_redistribute, grid->candidates_to_redistribute->root);
-
-	// int n = grid->new_current_size;
-	// for (int i = 0; i < n; i++)
-	// {
-	// 	grid->new[i] = NULL;
-	// 	grid->new_current_size--;
-	// }
-
-	// for (int i = 0; i < n; i++)
-	// {
-	// 	unstack(grid,  NEW);
-	// }
-
-	// print_fdp(grid->fdp);
 }

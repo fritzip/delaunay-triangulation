@@ -23,9 +23,11 @@
  * @param stack_size[NB_STK] : Number of simplex currently in stack.
  * @param stack_max_size[NB_STK] : 
  */
-typedef struct grid
+typedef struct Grid
 {
 	FDP *fdp;
+	Simplex **table_of_simp;
+	int nb_simp;
 
 	Dllist *candidates_to_redistribute;
 	
@@ -53,6 +55,9 @@ typedef struct grid
  */
 Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic);
 
+
+Simplex* add_new_simp( Grid *grid, Vertex *v0, Vertex *v1, Vertex *v2 );
+
 /**
  * @brief Redistributes candidates point to the corresponding simplex (in stack NEW)
  * @details At the end of a Delaunay iteration, all new or modified simplex are in a stack (of link NEW) and the candidates are stored in the dll candidates_to_redistribute.  
@@ -60,17 +65,6 @@ Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic);
  * @param grid The grid which contain candidates_to_redistribute and the stack of link NEW.
  */
 void redistribute_candidates( Grid *grid );
-
-/**
- * @brief Add a simplex (simp) at the end of an array (tab).
- * @details This function checks if the max allocated size of the array is exceed, in which case it realloc an array of the max size + OFFSET.
- * 
- * @param tab Table of simplex.
- * @param c_size Current size of the array (tab) (ie. the number of element in the array).
- * @param m_size Max size of the array (tab) (ie. maximum number of element you can put in the array before realloc )
- * @param simp Simplex to add in the array.
- */
-// void add_end_array( Simplex **tab, int *c_size, int *m_size, Simplex *simp );
 
 /**
  * @brief Stack a simplex at the top of stack given a link.

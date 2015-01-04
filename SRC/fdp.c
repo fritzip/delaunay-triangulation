@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "fdp.h"
+#include "print_fn.h"
 /*----------------------------------------------------------------------------------*/
 //                                  Priority Queue
 /*----------------------------------------------------------------------------------*/
@@ -32,9 +33,9 @@ FDP* create_fdp( int size )
 
 void switch_cells_fdp( FDP *fdp, const int a, const int b )
 {
-	int ind = fdp->table[a]->index_in_fdp;
-	fdp->table[a]->index_in_fdp = fdp->table[b]->index_in_fdp;
-	fdp->table[b]->index_in_fdp = ind;
+	fdp->nb_comp++;
+	fdp->table[a]->index_in_fdp = b; 
+	fdp->table[b]->index_in_fdp = a; 
 
 	Simplex *c = fdp->table[a];
 	fdp->table[a] = fdp->table[b];
@@ -51,7 +52,6 @@ int get_number_of_sons( const int i, const int n )
 
 int is_superior_fdp( FDP *fdp, const int a, const int b )
 {
-	fdp->nb_comp++;
 	if ( !is_empty(fdp->table[a]) && !is_empty(fdp->table[b]) )
 		return is_superior_simplex(fdp->table[a], fdp->table[b]);
 	else if ( !is_empty(fdp->table[a]) )
@@ -107,6 +107,16 @@ void insert_in_fdp( FDP *fdp, Simplex *simp )
 	fdp->table[fdp->nb + 1] = simp;
 	fdp->nb++;
 	up_heap(fdp, fdp->nb, fdp->nb / 2);
+}
+
+void rm_of_fdp( FDP *fdp, Simplex *simp )
+{
+	int index = simp->index_in_fdp;
+	switch_cells_fdp(fdp, index, fdp->nb);
+	simp->index_in_fdp = -1;
+	fdp->table[fdp->nb] = NULL;
+	fdp->nb--;
+	down_heap(fdp, index*2, index);
 }
 
 void heap_sort( FDP *fdp )

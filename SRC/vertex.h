@@ -8,10 +8,10 @@
 #include "ressources.h"
 #include "pgm.h"
 
-typedef struct vertex
+typedef struct Vertex
 {
 	double coords[DIM];
-	struct vertex *links[NB_LNK][2];
+	struct Vertex *links[NB_LNK][2];
 	double zdist;
 } Vertex ;
 

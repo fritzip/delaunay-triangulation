@@ -8,7 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct _PGMData {
+typedef struct PGMData 
+{
     int row;
     int col;
     int max_gray;

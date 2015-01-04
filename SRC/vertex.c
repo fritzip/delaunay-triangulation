@@ -63,7 +63,6 @@ void init_vertex_img_based( Vertex *vert, const PGMData *pic )
 
 	if (xpic <= 0 || xpic >= pic->row - 1 || ypic <=0 || ypic >= pic->col - 1)
 	{
-		// printf("fup\n");
 		z = (double) pic->matrix[xpic][ypic]/255;
 	}
 	else
@@ -73,8 +72,6 @@ void init_vertex_img_based( Vertex *vert, const PGMData *pic )
 		int yul = pic->matrix[xpic][ypic+sensy];
 		z = ( (difx*sensx*xul + (1-difx*sensx)*xy) + (dify*sensy*yul + (1-dify*sensy)*xy) ) / (2*255);
 	}
-
-	// printf("z = %.4f\n", z);
 
 	vert->coords[0] = x;
 	vert->coords[1] = y;	

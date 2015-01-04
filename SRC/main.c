@@ -367,10 +367,10 @@ void display (void)
 	if (TWO_D)
 		switch_to_ortho();
 	
-	for (int i = 1; i <= mygrid->fdp->nb; i++)
+	for (int i = 0; i < mygrid->nb_simp; i++)
 	{
 		glBegin(gl_display_mode[DISPLAY_MODE]);
-		Simplex *simp = mygrid->fdp->table[i];
+		Simplex *simp = mygrid->table_of_simp[i];
 		
 		// Normal or not 
 		if (NORMAL) glNormal3f(simp->na, simp->nb, simp->nc);
@@ -455,7 +455,7 @@ int main(int argc, char **argv)
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
 				else
 					fprintf (stderr, "Unknown option character `\\%x'.\n", optopt);
-				printf("Usage: %s ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-f NB_SIMPX | -s GOF(%%)/10] [-c DISPLAY_MODE]\n cf. README.md for further information", argv[0]);
+				printf("Usage: %s [-i INPUT_FILE] [-n NB_PTS] [-f NB_SIMPX | -s GOF(‰)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
 				return 1;
 			default:
 				abort();
@@ -468,7 +468,7 @@ int main(int argc, char **argv)
 	if (NB_SIMPLEX > 0 && GOF > 0)
 	{
 		printf("Maximum 1 output condition (2 given -f %d -s %d)\n", NB_SIMPLEX, GOF);
-		printf("Usage: %s ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-f NB_SIMPX | -s GOF(%%)/10] [-c DISPLAY_MODE]\n cf. README.md for further information", argv[0]);
+		printf("Usage: %s [-i INPUT_FILE] [-n NB_PTS] [-f NB_SIMPX | -s GOF(‰)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
 		return 1;
 	}
 
@@ -499,7 +499,7 @@ int main(int argc, char **argv)
 		else
 			strcat(pFile, ".pgm");
 
-		printf("input = %s\n", INPUT_FILE);
+		// printf("input = %s\n", INPUT_FILE);
 		readPGM(INPUT_FILE, &mydata);
 	}
 
@@ -523,23 +523,22 @@ int main(int argc, char **argv)
 	begin = clock();
 
 	if (OUTPUT_CONDITION == 'f')
-		while ( mygrid->fdp->nb < NB_SIMPLEX )
+		while ( mygrid->nb_simp < NB_SIMPLEX )
 			delauney( mygrid );
 	else if (OUTPUT_CONDITION == 's')
 		while ( fabs(mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist) > GOF/1000.0 )
 			delauney( mygrid );
 	else		
-		while (mygrid->fdp->table[1]->candidates->length != 0)
-		// while (mygrid->nb_vertex_inserted < NB_VERTEX )
+		while (mygrid->fdp->nb != 0)
 			delauney( mygrid );
 	
 	end = clock();
 
 	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 	printf("Execution time : %f sec\n", time_spent);
-	printf("Points inserted : %d\nTriangles generated : %d\n", mygrid->nb_vertex_inserted, mygrid->fdp->nb);
+	printf("Points inserted : %d\nTriangles generated : %d\n", mygrid->nb_vertex_inserted, mygrid->nb_simp);
 	printf("Stack maximum size : %d\n", mygrid->stack_max_size[DEL]);
-	printf("Nb comparaison / log(m) : %f\n", mygrid->fdp->nb_comp/(mygrid->nb_vertex_inserted*log(mygrid->nb_vertex_inserted)));
+	printf("Mean number of comparaisons / log(m) : %f\n", mygrid->fdp->nb_comp/(mygrid->nb_vertex_inserted*log(mygrid->nb_vertex_inserted)));
 
 
 	//***********************//

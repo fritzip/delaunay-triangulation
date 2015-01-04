@@ -48,6 +48,28 @@ Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
 	return new_simp;
 }
 
+
+Simplex* create_empty_simplex()
+{
+	Simplex *simp = (Simplex *)malloc(sizeof(Simplex));
+	simp->candidates = create_dll();
+
+	for(int i=0; i<3; i++)
+	{
+		simp->sommet[i] = NULL;
+		simp->voisin[i] = NULL;
+	}
+	
+	for (int i = 0; i < NB_STK; ++i)
+	{
+		simp->next_stk[i] = NULL;
+	}
+
+	simp->index_in_fdp = 0;
+
+	return simp;
+}
+
 int inside_simplex( Simplex *simp, Vertex *vert )
 {
 	int ori = 0;
