@@ -52,7 +52,7 @@ _Se reporter à la documentation pour plus d'information_
 
 * Lancement du programme
 
-        ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-s NB_SIMPX | -g GOF(%)] [-c DISPLAY_MODE]
+        ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-f NB_SIMPX | -s GOF(‰)] [-c DISPLAY_MODE]
 
 
     * `-i INPUT_FILE` : de la forme `DATA/heightmap`. Où `heightmap` est une image d'extension quelconque (elle sera automatiquement convertie en `heightmap.pgm`). _Defaut : NULL_
@@ -61,11 +61,11 @@ _Se reporter à la documentation pour plus d'information_
     * `-n NB_PTS` : nombre de points générés aléatoirement en x, y, (et z si l'option -i n'est pas renseignée). _Defaut : 10000_ 
 
 
-    * `-s NB_SIMPX` et `-g GOF(%)` : conditions d'arrêt, mutuellement exclusives. _Defaut : arrêt quand tout les points ont été insérés._
+    * `-f NB_SIMPX` et `-s GOF(‰)` : conditions d'arrêt, mutuellement exclusives. _Defaut : arrêt quand tout les points ont été insérés._
 
-        * `-s` arrête la triangulation une fois le nombre de facettes générées égal à `NB_SIMPX` (ou si le nombre maximum de facettes est atteint). 
+        * `-f` arrête la triangulation une fois le nombre de facettes générées égal à `NB_SIMPX` (ou si le nombre maximum de facettes est atteint). 
 
-        * `-g` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `zmax*GOF/100` (z étant normalisé, zmax = 1)
+        * `-s` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `zmax*GOF/100` (z étant normalisé, zmax = 1)
 
 
     * `-c DISPLAY_MODE` : 0 ≤ DISPLAY_MODE ≤ 4. _Defaut : 3_
@@ -83,12 +83,13 @@ _Se reporter à la documentation pour plus d'information_
     * Clavier : Différentes touches ont été configurées.
 
         * [SPACE] : 2D <=> 3D
-        * [c] : Couleur uniforme (verte) <=> Gradient
-        * [n] : Active/Desactive les normales (utile lors du passage en 2D)
+        * [C] : Couleur uniforme (verte) <=> Gradient
+        * [N] : Active/Desactive les normales (utile lors du passage en 2D)
         * [NUMPAD{0, 1, 2, 3, 4}] : Changement entre les différents DISPLAY_MODE
+        * [T] : Active/Desactive l'affichage de ces informations dans la fenêtre.
         * [ESCAPE] : Quitte le programme.
 
-    Les normales sont automatiquement desactivées (resp. activées) lors du passage en 2D (resp. 3D), mais peuvent être toutefois changé à l'aide de la touche [n] une fois le passage effectué.
+    Les normales sont automatiquement desactivées (resp. activées) lors du passage en 2D (resp. 3D), mais peuvent être toutefois changées à l'aide de la touche [N] une fois le passage effectué.
 
 ### Crédits ###
 
