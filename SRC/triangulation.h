@@ -26,7 +26,6 @@
  * @param new_current_size : The current size of the table described above (new). In other terms the number of element currently in the table.
  * @param new_max_size : The maximum number of simplex pointers that you can currently store in new table. 
  * If new_current_size > new_max_size then new is reallocated.
- * @param gof : Goodness of fit. An output condition between others.
  */
 typedef struct grid
 {
@@ -36,12 +35,13 @@ typedef struct grid
 	
 	Simplex *top_of_stack;
 	int stack_size;
+	int stack_max_size;
 	
 	Simplex **new;
 	int new_current_size;
 	int new_max_size;
 
-	double gof;
+	int nb_vertex_inserted;
 } Grid ;
 
 
@@ -60,7 +60,7 @@ typedef struct grid
  * @param pic  The heightmap picture which define the z coordinate of every vertex. If NULL, z is random.
  * @return The new grid created and initialized.
  */
-Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic, const double GOF );
+Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic);
 
 /**
  * @brief Redistributes candidates point to the corresponding simplex (in tab)

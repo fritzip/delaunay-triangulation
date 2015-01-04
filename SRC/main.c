@@ -519,21 +519,25 @@ int main(int argc, char **argv)
 
 	begin = clock();
 
-	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET, &mydata, GOF/1000.f );
+	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, OFFSET, &mydata );
 
 	if (OUTPUT_CONDITION == 'f')
 		while ( mygrid->fdp->nb < NB_SIMPLEX )
 			delauney( mygrid );
 	else if (OUTPUT_CONDITION == 's')
-		while ( fabs(mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist) > mygrid->gof )
+		while ( fabs(mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist) > GOF/1000 )
 			delauney( mygrid );
 	else		
 		while (mygrid->fdp->table[1]->candidates->length != 0)
 			delauney( mygrid );
 	
 	end = clock();
+
 	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 	printf("Execution time : %f sec\n", time_spent);
+	printf("Points inserted : %d\nTriangles generated : %d\n", mygrid->nb_vertex_inserted, mygrid->fdp->nb);
+	printf("Stack maximum size : %d\n", mygrid->stack_max_size);
+
 
 	//***********************//
 	// 		Display

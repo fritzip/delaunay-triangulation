@@ -16,7 +16,7 @@
 //                                  Triangulation functions
 /*----------------------------------------------------------------------------------*/
 
-Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic, const double GOF )
+Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new_tab, const PGMData *pic )
 {
 	Grid *grid = (Grid *) malloc(sizeof(Grid));
 
@@ -75,8 +75,6 @@ Grid* create_grid( const int nb_pts, const int size_fdp, const int init_size_new
 	grid->new_current_size = 0;
 	grid->new_max_size = init_size_new_tab;
 
-	grid->gof = GOF;
-
 	insert_in_fdp(grid->fdp, simp[0]);
 	insert_in_fdp(grid->fdp, simp[1]);
 
@@ -124,6 +122,8 @@ void stack( Grid *grid, Simplex *simp )
 	simp->next_stk = grid->top_of_stack;
 	grid->top_of_stack = simp;
 	grid->stack_size++;
+	if (grid->stack_size > grid->stack_max_size)
+		grid->stack_max_size = grid->stack_size;
 }
 
 Simplex* unstack( Grid *grid )
@@ -258,6 +258,8 @@ void delauney( Grid *grid )
 		up_heap( grid->fdp, grid->new[i]->index_in_fdp, grid->new[i]->index_in_fdp/2 );
 		down_heap( grid->fdp, grid->new[i]->index_in_fdp*2, grid->new[i]->index_in_fdp );
 	}
+
+	grid->nb_vertex_inserted++;
 
 	// reinit
 	init_dll(grid->candidates_to_redistribute, grid->candidates_to_redistribute->root);
