@@ -75,7 +75,7 @@ void init_vertex_img_based( Vertex *vert, const PGMData *pic )
 
 	vert->coords[0] = x;
 	vert->coords[1] = y;	
-	vert->coords[2] = z/4;
+	vert->coords[2] = z/2;
 
 	for(int i=0; i<NB_LNK; i++)
 	{

@@ -421,6 +421,7 @@ int main(int argc, char **argv)
 	int NB_VERTEX = 0;
 	int NB_SIMPLEX = 0;
 	int GOF = 0;
+	int ZUNIF = 0;
 	char *INPUT_FILE = NULL;
 	char OUTPUT_CONDITION;
 
@@ -428,7 +429,7 @@ int main(int argc, char **argv)
 	//      Arg parser
 	//***********************//
 	int opt;
-	while ((opt = getopt (argc, argv, "c:n:i:f:s:")) != -1)
+	while ((opt = getopt (argc, argv, "c:n:i:f:s:z")) != -1)
 		switch (opt)
 		{
 			case 'n':
@@ -448,6 +449,9 @@ int main(int argc, char **argv)
 			case 'i':
 				INPUT_FILE = optarg;
 				break;
+			case 'z':
+				ZUNIF = 1;
+				break;	
 			case '?':
 				if (optopt == 'c' || optopt == 'n' || optopt == 'i' || optopt == 's' || optopt == 'f')
 					fprintf (stderr, "Option -%c requires an argument.\n", optopt);
@@ -455,7 +459,7 @@ int main(int argc, char **argv)
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
 				else
 					fprintf (stderr, "Unknown option character `\\%x'.\n", optopt);
-				printf("Usage: %s [-i INPUT_FILE] [-n NB_PTS] [-f NB_SIMPX | -s GOF(‰)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
+				printf("Usage: %s [-i INPUT_FILE | -z] [-n NB_PTS] [-f NB_SIMPX | -s GOF(‰)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
 				return 1;
 			default:
 				abort();
@@ -468,7 +472,7 @@ int main(int argc, char **argv)
 	if (NB_SIMPLEX > 0 && GOF > 0)
 	{
 		printf("Maximum 1 output condition (2 given -f %d -s %d)\n", NB_SIMPLEX, GOF);
-		printf("Usage: %s [-i INPUT_FILE] [-n NB_PTS] [-f NB_SIMPX | -s GOF(‰)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
+		printf("Usage: %s [-i INPUT_FILE | -z] [-n NB_PTS] [-f NB_SIMPX | -s GOF(‰)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
 		return 1;
 	}
 
@@ -485,28 +489,43 @@ int main(int argc, char **argv)
 
 	if (INPUT_FILE != NULL)
 	{
-		char command[300] = {0};
-
-		sprintf(command, "x=%s; convert $x ${x%%.*}.pgm", INPUT_FILE);
-		system(command);
-
 		char *pFile = strrchr(INPUT_FILE, '/');
 		pFile = pFile == NULL ? INPUT_FILE : pFile+1;
 		// change extension
 		char *pExt = strrchr(pFile, '.');
+
+		if (strcmp(pExt,".pgm") != 0)
+		{
+			printf("Convertion \n");
+			char command[300] = {0};
+
+			sprintf(command, "x=%s; convert $x ${x%%.*}.pgm", INPUT_FILE);
+			system(command);
+		}
+
 		if (pExt != NULL)
 			strcpy(pExt, ".pgm");
 		else
 			strcat(pFile, ".pgm");
 
-		// printf("input = %s\n", INPUT_FILE);
 		readPGM(INPUT_FILE, &mydata);
 	}
 
 		// Display mode
-	if (!(DISPLAY_MODE >= 0 && DISPLAY_MODE <= 4)) DISPLAY_MODE = 3;
+	if (DISPLAY_MODE == 5)
+	{
+		printf("No display\n");
+	}
+	else if (!(DISPLAY_MODE >= 0 && DISPLAY_MODE <= 5)) 
+	{
+		DISPLAY_MODE = 3;
+		printf("Executing %s with line option %d = %s.\n", argv[0], DISPLAY_MODE, lineOption[DISPLAY_MODE]);
+	}
+	else
+	{
+		printf("Executing %s with line option %d = %s.\n", argv[0], DISPLAY_MODE, lineOption[DISPLAY_MODE]);
+	}
 
-	printf("Executing %s with line option %d = %s.\n", argv[0], DISPLAY_MODE, lineOption[DISPLAY_MODE]);
 
 	compute_color_gradient(gradient_color, nb_gradient_val, 39.0, 131.0, 29.0, 215.0, 226.0, 214.0);
 
@@ -518,7 +537,7 @@ int main(int argc, char **argv)
 	double time_spent;
 
 
-	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, &mydata );
+	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, &mydata, ZUNIF );
 
 	begin = clock();
 
@@ -570,8 +589,10 @@ int main(int argc, char **argv)
 
 	glutMouseFunc(mouseButton);
 	glutMotionFunc(mouseMove);
-
-	glutMainLoop();  
+	if (DISPLAY_MODE != 5)
+	{
+		glutMainLoop();  
+	}
 		
 	return EXIT_SUCCESS; 
 }

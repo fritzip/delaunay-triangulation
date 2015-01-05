@@ -48,7 +48,6 @@ Simplex* create_simplex( Vertex *v0, Vertex *v1, Vertex *v2 )
 	return new_simp;
 }
 
-
 Simplex* create_empty_simplex()
 {
 	Simplex *simp = (Simplex *)malloc(sizeof(Simplex));

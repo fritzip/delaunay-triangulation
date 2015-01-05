@@ -53,7 +53,7 @@ typedef struct Grid
  * @param pic  The heightmap picture which define the z coordinate of every vertex. If NULL, z is random.
  * @return The new grid created and initialized.
  */
-Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic);
+Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic, const int ZUNIF);
 
 
 Simplex* add_new_simp( Grid *grid, Vertex *v0, Vertex *v1, Vertex *v2 );

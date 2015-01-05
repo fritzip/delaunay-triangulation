@@ -31,7 +31,7 @@ Simplex* add_new_simp( Grid *grid, Vertex *v0, Vertex *v1, Vertex *v2 )
 	return simp;
 }
 
-Grid* create_grid( const int nb_pts, const int nb_simp, const PGMData *pic )
+Grid* create_grid( const int nb_pts, const int nb_simp, const PGMData *pic, const int ZUNIF )
 {
 	Grid *grid = (Grid *) malloc(sizeof(Grid));
 	grid->table_of_simp = (Simplex **)malloc(nb_simp*sizeof(Simplex *));
@@ -63,15 +63,21 @@ Grid* create_grid( const int nb_pts, const int nb_simp, const PGMData *pic )
 		{
 			new_vert = create_vertex_img_based(pic);
 		}
+		else if (ZUNIF)
+		{
+			double x = randf();
+			double y = randf();
+			double z = randf();
+			new_vert = create_vertex(x,y,z);
+		}
 		else
 		{
 			double x = randf();
 			double y = randf();
 			double xsc = (x*16)-8;
 			double ysc = (y*16)-8;
-			// double z = sin(xsc*xsc+ysc*ysc) / (xsc*xsc+ysc*ysc);
-			double z = cos(xsc)+sin(ysc);
-			new_vert = create_vertex(x,y,(z+2)/8);
+			double z = sin(xsc*xsc+ysc*ysc) / (xsc*xsc+ysc*ysc);
+			new_vert = create_vertex(x,y,(z+2)/8);			
 		}
 		for (j = 0; j < 2; j++)
 		{

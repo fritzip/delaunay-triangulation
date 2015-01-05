@@ -9,11 +9,11 @@ TARGET   = delaunay
 CC       = gcc
 
 # compiling flags here
-CFLAGS   = -std=gnu99 -Wall -pg 
+CFLAGS   = -std=gnu99
 #-I.
 
 # linking flags here
-LFLAGS   = -Wall -I. -pg
+LFLAGS   = -Wall -I.
 
 # using OpenGL lib
 #GL_INCLUDE    = -I/usr/include/GL
@@ -65,7 +65,10 @@ clean:
 	@echo "Cleanup complete !"
 
 remove: clean
-	@$(rm) $(BINDIR)/$(TARGET)
+	@$(rm) $(BINDIR)
+	@$(rm) $(TARGET)
+	@$(rm) $(OBJDIR)
+	@$(rm) $(DOCDIR)
 	@echo "Executable removed !"
 
 dox:
