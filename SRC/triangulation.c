@@ -35,7 +35,6 @@ Grid* create_grid( const int nb_pts, const int nb_simp, const PGMData *pic, cons
 {
 	Grid *grid = (Grid *) malloc(sizeof(Grid));
 	grid->table_of_simp = (Simplex **)malloc(nb_simp*sizeof(Simplex *));
-
 	for (int i = 0; i < nb_simp; ++i)
 	{
 		grid->table_of_simp[i] = create_empty_simplex();
@@ -56,29 +55,53 @@ Grid* create_grid( const int nb_pts, const int nb_simp, const PGMData *pic, cons
 
 	// init vertex
 	Vertex *new_vert;
+	grid->zmax = 0;
 	int i, j;
 	for (i = 0; i < nb_pts; i++)
 	{
+		double x = randf();
+		double y = randf();
+		double z;
 		if (pic->matrix != NULL)
 		{
-			new_vert = create_vertex_img_based(pic);
+			int sizex = pic->row;
+			int sizey = pic->col;
+			int xpic = floor(x*sizex);
+			int ypic = floor(y*sizey);
+			double difx = (x*sizex)-xpic-0.5;
+			double dify = (y*sizey)-ypic-0.5;
+			int sensx = sgn(difx);
+			int sensy = sgn(dify);
+
+			if (xpic <= 0 || xpic >= pic->row - 1 || ypic <=0 || ypic >= pic->col - 1)
+			{
+				z = (double) pic->matrix[xpic][ypic]/255;
+			}
+			else
+			{
+				int xy = pic->matrix[xpic][ypic];
+				int xul = pic->matrix[xpic+sensx][ypic];
+				int yul = pic->matrix[xpic][ypic+sensy];
+				z = ( (difx*sensx*xul + (1-difx*sensx)*xy) + (dify*sensy*yul + (1-dify*sensy)*xy) ) / (2*255);
+				z = z/2;
+			}
 		}
 		else if (ZUNIF)
 		{
-			double x = randf();
-			double y = randf();
-			double z = randf();
-			new_vert = create_vertex(x,y,z);
+			z = randf();
 		}
 		else
 		{
-			double x = randf();
-			double y = randf();
 			double xsc = (x*16)-8;
 			double ysc = (y*16)-8;
-			double z = sin(xsc*xsc+ysc*ysc) / (xsc*xsc+ysc*ysc);
-			new_vert = create_vertex(x,y,(z+2)/8);			
+			z = sin(xsc*xsc+ysc*ysc) / (xsc*xsc+ysc*ysc);
+			z = z/8;
 		}
+
+		if (z > grid->zmax) grid->zmax = z;
+		new_vert = create_vertex(x,y,z);	
+
+
 		for (j = 0; j < 2; j++)
 		{
 			if ( inside_simplex( simp[j], new_vert ) )

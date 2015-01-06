@@ -36,6 +36,7 @@ typedef struct Grid
 	int stack_max_size[NB_STK];
 	
 	int nb_vertex_inserted;
+	double zmax;
 } Grid ;
 
 
