@@ -29,7 +29,7 @@ void init_simplex( Simplex *simp, Vertex *v0, Vertex *v1, Vertex *v2, Dllist *ca
 	
 	for (int i = 0; i < NB_STK; ++i)
 	{
-		simp->next_stk[i] = NULL;
+		simp->next_in_stack[i] = NULL;
 	}
 
 	simp->index_in_fdp = 0;
@@ -61,7 +61,7 @@ Simplex* create_empty_simplex()
 	
 	for (int i = 0; i < NB_STK; ++i)
 	{
-		simp->next_stk[i] = NULL;
+		simp->next_in_stack[i] = NULL;
 	}
 
 	simp->index_in_fdp = 0;

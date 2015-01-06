@@ -357,7 +357,7 @@ void display (void)
 	compute_pos();
 	double x, y, z;
 
-	glColor3f(0.0, 0.0, 0.0);
+	// glColor3f(1.0, 1.0, 1.0);
 
 	// Clear Color and Depth Buffers
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -536,7 +536,6 @@ int main(int argc, char **argv)
 	clock_t begin, end;
 	double time_spent;
 
-
 	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, &mydata, ZUNIF );
 
 	begin = clock();
@@ -556,7 +555,8 @@ int main(int argc, char **argv)
 	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 	printf("Execution time : %f sec\n", time_spent);
 	printf("Points inserted : %d\nTriangles generated : %d\n", mygrid->nb_vertex_inserted, mygrid->nb_simp);
-	printf("Stack maximum size : %d\n", mygrid->stack_max_size[DEL]);
+	printf("Delaunay stack maximum size : %d\n", mygrid->stack_max_size[DEL]);
+	printf("New stack maximum size : %d\n", mygrid->stack_max_size[NEW]);
 	printf("Mean number of comparaisons / log(m) : %f\n", mygrid->fdp->nb_comp/(mygrid->nb_vertex_inserted*log(mygrid->nb_vertex_inserted)));
 
 
@@ -574,6 +574,9 @@ int main(int argc, char **argv)
 	
 	gluOrtho2D(minX-margin, maxX+margin, minY-margin, maxY+margin);
 
+	// glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+ //    glLineWidth(4);
+
 	glutIdleFunc(display);
 	glutDisplayFunc(display); 
 	glutReshapeFunc(changeSize); 
@@ -582,6 +585,7 @@ int main(int argc, char **argv)
     glEnable (GL_LIGHTING);
     glEnable (GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LINE_SMOOTH);
 
 	glutSetKeyRepeat( GLUT_KEY_REPEAT_ON );
 	glutKeyboardFunc(processNormalKeys);

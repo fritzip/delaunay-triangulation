@@ -123,7 +123,7 @@ void redistribute_candidates( Grid *grid )
 		while (1)
 		{
 			if ( inside_simplex( current_simp, current_vert ) ) break;
-			current_simp = current_simp->next_stk[NEW];
+			current_simp = current_simp->next_in_stack[NEW];
 		}
 
 		current_vert->zdist = compute_zdist( current_simp, current_vert );
@@ -138,7 +138,7 @@ void redistribute_candidates( Grid *grid )
 
 void stack( Grid *grid, Simplex *simp, int LNK )
 {
-	simp->next_stk[LNK] = grid->top_of_stack[LNK];
+	simp->next_in_stack[LNK] = grid->top_of_stack[LNK];
 	grid->top_of_stack[LNK] = simp;
 	grid->stack_size[LNK]++;
 	if (grid->stack_size[LNK] > grid->stack_max_size[LNK])
@@ -148,8 +148,8 @@ void stack( Grid *grid, Simplex *simp, int LNK )
 Simplex* unstack( Grid *grid, int LNK )
 {
 	Simplex *top = grid->top_of_stack[LNK];
-	grid->top_of_stack[LNK] = top->next_stk[LNK];
-	top->next_stk[LNK] = NULL;
+	grid->top_of_stack[LNK] = top->next_in_stack[LNK];
+	top->next_in_stack[LNK] = NULL;
 	grid->stack_size[LNK]--;
 	return top;
 }
@@ -188,9 +188,6 @@ void split_in_3(Grid *grid, Simplex *simp, Vertex *vert)
 
 	compute_plan(simp);
 
-	insert_in_fdp(grid->fdp, new_simp1);
-	insert_in_fdp(grid->fdp, new_simp2);
-
 	stack( grid, new_simp1, DEL );
 	stack( grid, new_simp2, DEL );
 	stack( grid, simp, DEL );
@@ -223,33 +220,30 @@ void flip(Grid *grid, Simplex *current, int ind_vert, Simplex *opp, int ind_opp)
 	compute_plan(current);
 	compute_plan(opp);
 
-	if (current->index_in_fdp <= 0)
-		insert_in_fdp(grid->fdp, current);
-
-	if (opp->index_in_fdp <= 0)
-		insert_in_fdp(grid->fdp, opp);
-
 	stack( grid, current, DEL );
 	stack( grid, opp, DEL );
 }
 
 void delauney( Grid *grid )
 {
+	// Simplex to insert into
 	Simplex *simp =	grid->fdp->table[1] ;
 	
 	// Vertex to insert (first candidat)
 	Vertex *vert = simp->candidates->root->links[STD][FWD];
 	grid->nb_vertex_inserted++;
-
 	vert->zdist = 0;
 
+	// Remove point to insert from candidates list
 	rm_begin_dll(simp->candidates, STD);
 
+	// Save candidates of the simplex
 	add_dll_end_dll(grid->candidates_to_redistribute, simp->candidates->root->links[STD][FWD], simp->candidates->root->links[STD][BWD], simp->candidates->length, STD );
 
 	// reinit dll
 	init_dll(simp->candidates, simp->candidates->root);
 
+	// Insert new point into simplex (generate 2 new simplices)
 	split_in_3(grid, simp, vert);
 
 	Simplex *current = NULL;
@@ -257,6 +251,7 @@ void delauney( Grid *grid )
 	int ind_vert;
 	int ind_opp;
 
+	// While stack is not empty, check Delaunay condition, flip and readd to stack if False. Add to new simplex stack if okay.
 	while (grid->stack_size[DEL] > 0)
 	{
 		current = unstack(grid, DEL);
@@ -277,8 +272,10 @@ void delauney( Grid *grid )
 		}
 	}
 
+	// Redistrubutes candidates through all new simplices
 	redistribute_candidates(grid);
 
+	// Insert new in fdp if not already and remove emply simplex to speed up upheap and downheap
 	int n = grid->stack_size[NEW];
 	for (int i = 0; i < n; i++)
 	{
@@ -295,8 +292,12 @@ void delauney( Grid *grid )
 				down_heap( grid->fdp, current->index_in_fdp*2, current->index_in_fdp );
 			}
 		}
+		else if (current->index_in_fdp <= 0 && !is_empty(current))
+		{
+			insert_in_fdp(grid->fdp, current);
+		}
 	}
 
-	// reinit
+	// Reinit candidates to redistribute for next iteration.
 	init_dll(grid->candidates_to_redistribute, grid->candidates_to_redistribute->root);
 }
