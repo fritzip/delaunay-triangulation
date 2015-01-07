@@ -8,11 +8,21 @@
 #include "dll.h"
 #include "vertex.h"
 
+/**
+ * @brief The simplex structure
+ *
+ * @param sommet[3] : The vertex
+ * @param voisin[3] : The neighbors of the vertex
+ * @param next_in_stack[NB_STK] : Pointer to the next simplex in stack (NULL if none)
+ * @param candidates : The doubly link list of candidates (vertex to insert)
+ * @param na, nb, nc : The normal vector of the plan.
+ * @param index_in_fdp : The index of the simplex in the priority queue (0 if not into) 
+ */
 typedef struct Simplex
 {
 	Vertex *sommet[3];
 	struct Simplex *voisin[3];
-	struct Simplex *next_in_stack[2];
+	struct Simplex *next_in_stack[NB_STK];
 	Dllist *candidates;
 	
 	double na;

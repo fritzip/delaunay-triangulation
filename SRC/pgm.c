@@ -49,7 +49,7 @@ void deallocate_dynamic_matrix(int **matrix, int row)
 }
 
 
-void SkipComments(FILE *fp)
+void skip_comments(FILE *fp)
 {
     int ch;
     char line[100];
@@ -59,7 +59,7 @@ void SkipComments(FILE *fp)
     if (ch == '#')
     {
         fgets(line, sizeof(line), fp);
-        SkipComments(fp);
+        skip_comments(fp);
     } 
     else
         fseek(fp, -1, SEEK_CUR);
@@ -67,7 +67,7 @@ void SkipComments(FILE *fp)
 
 
 /*for reading:*/
-PGMData* readPGM(const char *file_name, PGMData *data)
+PGMData* read_PGM(const char *file_name, PGMData *data)
 {
     FILE *pgmFile;
     char version[3];
@@ -88,11 +88,11 @@ PGMData* readPGM(const char *file_name, PGMData *data)
         exit(EXIT_FAILURE);
     }
  
-    SkipComments(pgmFile);
+    skip_comments(pgmFile);
     fscanf(pgmFile, "%d", &data->col);
-    SkipComments(pgmFile);
+    skip_comments(pgmFile);
     fscanf(pgmFile, "%d", &data->row);
-    SkipComments(pgmFile);
+    skip_comments(pgmFile);
     fscanf(pgmFile, "%d", &data->max_gray);
     fgetc(pgmFile);
  

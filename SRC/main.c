@@ -506,7 +506,7 @@ int main(int argc, char **argv)
 		else
 			strcat(pFile, ".pgm");
 
-		readPGM(INPUT_FILE, &mydata);
+		read_PGM(INPUT_FILE, &mydata);
 	}
 
 		// Display mode

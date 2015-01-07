@@ -21,7 +21,9 @@
  * @param top_of_stack[NB_STK] : A pointer to the first simplex to unstack (ie. the last added). Each simplex have a pointer to the 
  * next one (next_in_stack)
  * @param stack_size[NB_STK] : Number of simplex currently in stack.
- * @param stack_max_size[NB_STK] : 
+ * @param stack_max_size[NB_STK] : Indicator of the maximal size that the stack has taken given a link. 
+ * @param nb_vertex_inserted : Indicator for displaying information. Number of vertex that has been inserted so far.
+ * @param zmax : maximum height of all the candidates. Usefull for better display and computation of goodness of fit
  */
 typedef struct Grid
 {
@@ -56,7 +58,13 @@ typedef struct Grid
  */
 Grid* create_grid( const int nb_pts, const int size_fdp, const PGMData *pic, const int ZUNIF);
 
-
+/**
+ * @brief Add a simplex to table_of_simp given 3 vertices
+ * @details No allocation is made (table_of_simp) is already allocated at good size
+ * 
+ * @param grid table_of_simp is an attribute of grid
+ * @return The new simplex created
+ */
 Simplex* add_new_simp( Grid *grid, Vertex *v0, Vertex *v1, Vertex *v2 );
 
 /**

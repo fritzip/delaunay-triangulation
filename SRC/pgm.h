@@ -20,8 +20,8 @@ int **allocate_dynamic_matrix(int row, int col);
  
 void deallocate_dynamic_matrix(int **matrix, int row);
 
-void SkipComments(FILE *fp);
+void skip_comments(FILE *fp);
 
-PGMData* readPGM(const char *file_name, PGMData *data);
+PGMData* read_PGM(const char *file_name, PGMData *data);
 
 #endif

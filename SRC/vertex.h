@@ -8,6 +8,11 @@
 #include "ressources.h"
 #include "pgm.h"
 
+/**
+ * @brief The vertex structure
+ * @details Define as well candidates points inside a simplex as vertex of a simplex
+ * 
+ */
 typedef struct Vertex
 {
 	double coords[DIM];

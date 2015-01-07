@@ -20,8 +20,6 @@
 
 #define STD 0
 #define NB_LNK 1 // Number of link : to increment manually, LAST + 1
-
-// #define OFFSET 100
  
 #define minX	0
 #define maxX	1
