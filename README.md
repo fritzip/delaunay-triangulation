@@ -52,29 +52,39 @@ _Se reporter à la documentation pour plus d'information_
 
 * Lancement du programme
 
-        ./delaunay [-i INPUT_FILE] [-n NB_PTS] [-f NB_SIMPX | -s GOF(‰)] [-c DISPLAY_MODE]
+        ./delaunay [-i INPUT_FILE | -z] [-n NB_PTS] [-f NB_SIMPX | -s GOF(%)] [-c DISPLAY_MODE]
 
 
-    * `-i INPUT_FILE` : de la forme `DATA/heightmap`. Où `heightmap` est une image d'extension quelconque (elle sera automatiquement convertie en `heightmap.pgm`). _Defaut : NULL_
+    __Génération sur z__
 
+    * `-i INPUT_FILE` et `-z` : génération des points sur z, optionelles et mutuellement exclusives. _Defaut : Génération des z selon une équation de chapeau mexicain._
+
+        * `-i` : de la forme `DATA/heightmap`. Où `heightmap` est une image d'extension quelconque (elle sera automatiquement convertie en `heightmap.pgm`). _Defaut : NULL_
+
+        * `-z` : génération aléatoire sur z
+
+
+    __Conditions d'arrêt__
+    
+    * `-f NB_SIMPX` et `-s GOF(%)` : conditions d'arrêt, optionnelles et mutuellement exclusives. _Defaut : arrêt quand tout les points ont été insérés._
+
+        * `-f` arrête la triangulation une fois le nombre de facettes générées égal à `NB_SIMPX` (ou si le nombre maximum de facettes est atteint). 
+
+        * `-s` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `GOF/(100*zmax)`. Equivalent à un pourcentage d'amplitude maximale atteint. (-s 98  <=> 98% de fitting ).
 
     * `-n NB_PTS` : nombre de points générés aléatoirement en x, y, (et z si l'option -i n'est pas renseignée). _Defaut : 10000_ 
 
 
-    * `-f NB_SIMPX` et `-s GOF(‰)` : conditions d'arrêt, mutuellement exclusives. _Defaut : arrêt quand tout les points ont été insérés._
+    __Affichage__
 
-        * `-f` arrête la triangulation une fois le nombre de facettes générées égal à `NB_SIMPX` (ou si le nombre maximum de facettes est atteint). 
-
-        * `-s` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `zmax*GOF/100` (z étant normalisé, zmax = 1)
-
-
-    * `-c DISPLAY_MODE` : 0 ≤ DISPLAY_MODE ≤ 4. _Defaut : 3_
+    * `-c DISPLAY_MODE` : 0 ≤ DISPLAY_MODE ≤ 5. _Defaut : 3_
 
         * 0 : GL_POINTS
         * 1 : GL_LINES
         * 2 : GL_LINE_STRIP
         * 3 : GL_LINE_LOOP
         * 4 : GL_POLYGON
+        * 5 : NO_DISPLAY
 
 * Interaction avec le programme
 
