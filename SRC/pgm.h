@@ -8,6 +8,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/**
+ * @brief The PGMData structure
+ * @details Allows us to read a *.pgm picture
+ * 
+ * @param row number of rows
+ * @param col number of columns
+ * @param max_gray the maximum gray scale value
+ * @param matrix the value (in grayscale) of the picture (once it is read)
+ */
 typedef struct PGMData 
 {
     int row;

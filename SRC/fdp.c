@@ -118,24 +118,3 @@ void rm_of_fdp( FDP *fdp, Simplex *simp )
 	fdp->nb--;
 	down_heap(fdp, index*2, index);
 }
-
-void heap_sort( FDP *fdp )
-{
-	int son, father;
-
-	for(int i = 2; i <= fdp->nb; i++)
-	{
-		son = i;
-		father = son/2;
-		up_heap(fdp, son, father);
-	}
-
-	while(fdp->nb > 1)
-	{
-		switch_cells_fdp(fdp, 1, fdp->nb);
-
-		fdp->nb--;
-
-		down_heap(fdp, 2, 1);
-	}
-}
