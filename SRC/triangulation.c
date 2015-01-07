@@ -83,8 +83,8 @@ Grid* create_grid( const int nb_pts, const int nb_simp, const PGMData *pic, cons
 				int xul = pic->matrix[xpic+sensx][ypic];
 				int yul = pic->matrix[xpic][ypic+sensy];
 				z = ( (difx*sensx*xul + (1-difx*sensx)*xy) + (dify*sensy*yul + (1-dify*sensy)*xy) ) / (2*255);
-				z = z/2;
 			}
+			z = z/4;
 		}
 		else if (ZUNIF)
 		{

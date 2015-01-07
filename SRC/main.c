@@ -58,7 +58,7 @@ typedef struct color
 #define nb_gradient_val 100
 Color gradient_color[nb_gradient_val] = {};
 
-Color getcol(double z)
+Color getcol(double z, double zmax)
 {
 	if (GRAD)
 	{
@@ -68,7 +68,7 @@ Color getcol(double z)
 			return col;
 		}
 		else
-			return gradient_color[(int)floor(z*nb_gradient_val)];
+			return gradient_color[(int)floor(z*nb_gradient_val/(zmax))];
 	}
 	else
 	{
@@ -383,7 +383,7 @@ void display (void)
 			y = simp->sommet[j]->coords[1];
 			z = simp->sommet[j]->coords[2];
 			
-			Color col = getcol(z);
+			Color col = getcol( z, mygrid->zmax );
 			glColor4f(col.r/255, col.g/255, col.b/255, 1);
 
 			glVertex3f(x, y, z);
@@ -525,7 +525,6 @@ int main(int argc, char **argv)
 	}
 
 
-	compute_color_gradient(gradient_color, nb_gradient_val, 39.0, 131.0, 29.0, 215.0, 226.0, 214.0);
 
 
 	//***********************//
@@ -535,6 +534,7 @@ int main(int argc, char **argv)
 	double time_spent;
 
 	mygrid = create_grid( NB_VERTEX, NB_SIMPLEX + 1, &mydata, ZUNIF );
+	compute_color_gradient(gradient_color, nb_gradient_val, 39.0, 131.0, 29.0, 215.0, 226.0, 214.0);
 
 	begin = clock();
 
