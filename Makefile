@@ -39,6 +39,9 @@ SRCDIR   = SRC
 OBJDIR   = OBJ
 BINDIR   = BIN
 DOCDIR   = DOC
+RAPDIR   = RAPPORT
+
+RAPPORT  = rapport_delaunay_SAINLOT 
 
 SOURCES  := $(wildcard $(SRCDIR)/*.c)
 INCLUDES := $(wildcard $(SRCDIR)/*.h)
@@ -46,20 +49,22 @@ OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 rm       = rm -rf
 ln       = ln -sf
 
-
 $(BINDIR)/$(TARGET): $(OBJECTS)
+	@echo -n "Linking ... "
 	@mkdir -p $(BINDIR)
 	@$(CC) $(LFLAGS) $(OBJECTS) $(GL_LIBDIR) $(GL_LIBRARIES) -o $@ 
-	@echo "Linking complete !"
 	@$(ln) $(BINDIR)/$(TARGET)
+	@echo "OK"
 	@echo "You can now run ./"$(TARGET)
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+	@echo -n "Compilation de "$<" ... "
 	@mkdir -p $(OBJDIR) 
 	@$(CC) $(CFLAGS) $(GL_INCLUDE) -c $< -o $@
-	@echo "Successfully compiled "$<
+	@echo "OK"
 
-.PHONEY: clean
+all: $(BINDIR)/$(TARGET) dox rapport
+
 clean:
 	@$(rm) $(OBJECTS)
 	@echo "Cleanup complete !"
@@ -72,6 +77,13 @@ remove: clean
 	@echo "Executable removed !"
 
 dox:
+	@echo -n "Génération de la documentation ... "
 	@$(rm) $(DOCDIR)
-	doxygen Doxyfile
-	@echo "Doc generated !"
+	@doxygen Doxyfile >/dev/null
+	@echo "OK"
+
+rapport:
+	@echo -n "Génération du rapport ... "
+	@cd $(RAPDIR) && pdflatex $(RAPPORT).tex >/dev/null
+	@$(rm) $(RAPPORT).aux $(RAPPORT).log
+	@echo "OK"
