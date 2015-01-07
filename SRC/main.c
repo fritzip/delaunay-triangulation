@@ -357,8 +357,6 @@ void display (void)
 	compute_pos();
 	double x, y, z;
 
-	// glColor3f(1.0, 1.0, 1.0);
-
 	// Clear Color and Depth Buffers
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -459,7 +457,7 @@ int main(int argc, char **argv)
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
 				else
 					fprintf (stderr, "Unknown option character `\\%x'.\n", optopt);
-				printf("Usage: %s [-i INPUT_FILE | -z] [-n NB_PTS] [-f NB_SIMPX | -s GOF(‰)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
+				printf("Usage: %s [-i INPUT_FILE | -z] [-n NB_PTS] [-f NB_SIMPX | -s GOF(%%)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
 				return 1;
 			default:
 				abort();
@@ -472,7 +470,7 @@ int main(int argc, char **argv)
 	if (NB_SIMPLEX > 0 && GOF > 0)
 	{
 		printf("Maximum 1 output condition (2 given -f %d -s %d)\n", NB_SIMPLEX, GOF);
-		printf("Usage: %s [-i INPUT_FILE | -z] [-n NB_PTS] [-f NB_SIMPX | -s GOF(‰)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
+		printf("Usage: %s [-i INPUT_FILE | -z] [-n NB_PTS] [-f NB_SIMPX | -s GOF(%%)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
 		return 1;
 	}
 
@@ -544,7 +542,7 @@ int main(int argc, char **argv)
 		while ( mygrid->nb_simp < NB_SIMPLEX )
 			delauney( mygrid );
 	else if (OUTPUT_CONDITION == 's')
-		while ( fabs(mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist) > GOF/1000.0 )
+		while ( (mygrid->fdp->nb != 0) && (fabs(mygrid->fdp->table[1]->candidates->root->links[STD][FWD]->zdist) >= mygrid->zmax*(100-GOF)/100.0 ) )
 			delauney( mygrid );
 	else		
 		while (mygrid->fdp->nb != 0)
@@ -573,9 +571,6 @@ int main(int argc, char **argv)
 	glutCreateWindow("Delaunay grid");  
 	
 	gluOrtho2D(minX-margin, maxX+margin, minY-margin, maxY+margin);
-
-	// glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
- //    glLineWidth(4);
 
 	glutIdleFunc(display);
 	glutDisplayFunc(display); 

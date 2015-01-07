@@ -95,7 +95,7 @@ Grid* create_grid( const int nb_pts, const int nb_simp, const PGMData *pic, cons
 			double xsc = (x*16)-8;
 			double ysc = (y*16)-8;
 			z = sin(xsc*xsc+ysc*ysc) / (xsc*xsc+ysc*ysc);
-			z = z/8;
+			z = (z+1)/8;
 		}
 
 		if (z > grid->zmax) grid->zmax = z;
