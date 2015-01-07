@@ -68,7 +68,7 @@ Color getcol(double z, double zmax)
 			return col;
 		}
 		else
-			return gradient_color[(int)floor(z*nb_gradient_val/(zmax))];
+			return gradient_color[(int)floor(z*nb_gradient_val/(zmax+0.00001))];
 	}
 	else
 	{
