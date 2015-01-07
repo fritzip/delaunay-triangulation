@@ -73,7 +73,7 @@ _Se reporter à la documentation pour plus d'information_
 
         * `-f` arrête la triangulation une fois le nombre de facettes générées égal à `NB_SIMPX` (ou si le nombre maximum de facettes est atteint). 
 
-        * `-s` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `GOF/(100*zmax)`. Equivalent à un pourcentage d'amplitude maximale atteint. (`-s 98`  <=> 98% de fitting ).
+        * `-s` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `GOF/(100*zmax)`. Équivalent à un pourcentage d'amplitude maximale atteint. (`-s 98`  <=> 98% de fitting ).
 
 
     __Affichage__
@@ -100,7 +100,7 @@ _Se reporter à la documentation pour plus d'information_
         * [T] : Active/Desactive l'affichage de ces informations dans la fenêtre.
         * [ESCAPE] : Quitte le programme.
 
-    Les normales sont automatiquement desactivées (resp. activées) lors du passage en 2D (resp. 3D), mais peuvent être toutefois changées à l'aide de la touche [N] une fois le passage effectué.
+    Les normales sont automatiquement désactivées (resp. activées) lors du passage en 2D (resp. 3D), mais peuvent être toutefois changées à l'aide de la touche [N] une fois le passage effectué.
 
 ### Crédits ###
 
