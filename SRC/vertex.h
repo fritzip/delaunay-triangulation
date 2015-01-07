@@ -12,6 +12,10 @@
  * @brief The vertex structure
  * @details Define as well candidates points inside a simplex as vertex of a simplex
  * 
+ * @param coords[DIM] : The coordinates of the vertex
+ * @param links[NB_LNK][2] : The implicit definition of a doubly link list
+ * @param zdist : Vertical distance of the point to the simplex it belongs to. (0 if inserted)
+ * 
  */
 typedef struct Vertex
 {

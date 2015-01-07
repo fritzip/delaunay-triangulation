@@ -7,6 +7,12 @@
 
 #include "vertex.h"
 
+/**
+ * @brief The doubly link list structure
+ *
+ * @param length : The number of elements in the dll
+ * @param root : The entry point of the doubly link list. It makes it pseudo circular because from root you can go either forward (and reack the first element) or backword (and reach the last one). 
+ */
 typedef struct Dllist
 {
 	int length;
