@@ -457,7 +457,7 @@ int main(int argc, char **argv)
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
 				else
 					fprintf (stderr, "Unknown option character `\\%x'.\n", optopt);
-				printf("Usage: %s [-i INPUT_FILE | -z] [-n NB_PTS] [-f NB_SIMPX | -s GOF(%%)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
+				printf("Usage: %s [-n NB_PTS] [-i INPUT_FILE | -z] [-f NB_SIMPX | -s GOF(%%)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
 				return 1;
 			default:
 				abort();
@@ -470,7 +470,7 @@ int main(int argc, char **argv)
 	if (NB_SIMPLEX > 0 && GOF > 0)
 	{
 		printf("Maximum 1 output condition (2 given -f %d -s %d)\n", NB_SIMPLEX, GOF);
-		printf("Usage: %s [-i INPUT_FILE | -z] [-n NB_PTS] [-f NB_SIMPX | -s GOF(%%)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
+		printf("Usage: %s [-n NB_PTS] [-i INPUT_FILE | -z] [-f NB_SIMPX | -s GOF(%%)] [-c DISPLAY_MODE]\ncf. README.md for further information\n", argv[0]);
 		return 1;
 	}
 
