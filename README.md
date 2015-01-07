@@ -73,7 +73,7 @@ _Se reporter à la documentation pour plus d'information_
 
         * `-f` arrête la triangulation une fois le nombre de facettes générées égal à `NB_SIMPX` (ou si le nombre maximum de facettes est atteint). 
 
-        * `-s` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `GOF/(100*zmax)`. Equivalent à un pourcentage d'amplitude maximale atteint. (-s 98  <=> 98% de fitting ).
+        * `-s` arrête la triangulation une fois le point le plus éloigné (en projection verticale) du triangle auquel il appartient inferieur à `GOF/(100*zmax)`. Equivalent à un pourcentage d'amplitude maximale atteint. (`-s 98`  <=> 98% de fitting ).
 
 
     __Affichage__
